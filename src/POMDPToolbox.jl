@@ -4,7 +4,8 @@ using POMDPs
 
 export 
     Interpolants,
-    interpolants!
+    interpolants!,
+    interpolants_gaussian_1d!
 
 type Interpolants
     indeces::Vector{Int}
@@ -48,7 +49,7 @@ interpolants!(interps::Interpolants, d::AbstractDistribution) = error("$(typeof(
 zval(x::Real, μ::Real, σ::Real) = (x - μ) / σ
 cdf(x::Real, μ::Real, σ::Real) = Φ(zval(x, μ, σ))
 
-function interpolant_gaussian_1d!{F<:Real}(
+function interpolants_gaussian_1d!{F<:Real}(
     interps::Interpolants,
     orderedstates::AbstractVector{F}, # list of discrete states, ordered from smallest to largest
     stateindeces::AbstractVector{Int}, # list of state indeces corresponding to the ordered states
