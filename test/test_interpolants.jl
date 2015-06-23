@@ -1,18 +1,18 @@
 
-@test isapprox(Φ(-Inf), 0.0)
-@test isapprox(Φ(Inf), 1.0)
-@test isapprox(Φ(0.0), 0.5)
-@test isapprox(Φ(-1.0), 0.1587, atol=0.0001)
-@test isapprox(Φ( 1.0), 0.8413, atol=0.0001)
+@test isapprox(POMDPToolbox.Φ(-Inf), 0.0)
+@test isapprox(POMDPToolbox.Φ(Inf), 1.0)
+@test isapprox(POMDPToolbox.Φ(0.0), 0.5)
+@test isapprox(POMDPToolbox.Φ(-1.0), 0.1587, atol=0.0001)
+@test isapprox(POMDPToolbox.Φ( 1.0), 0.8413, atol=0.0001)
 
-@test isapprox(zval(0.0, 0.0, 1.0), 0.0)
-@test isapprox(zval(0.0, 0.0, 2.0), 0.0)
-@test isapprox(zval(1.0, 0.0, 1.0), 1.0)
-@test isapprox(zval(1.0, 1.0, 1.0), 0.0)
+@test isapprox(POMDPToolbox.zval(0.0, 0.0, 1.0), 0.0)
+@test isapprox(POMDPToolbox.zval(0.0, 0.0, 2.0), 0.0)
+@test isapprox(POMDPToolbox.zval(1.0, 0.0, 1.0), 1.0)
+@test isapprox(POMDPToolbox.zval(1.0, 1.0, 1.0), 0.0)
 
-@test isapprox(cdf(-Inf, 10.0, 10.0), 0.0)
-@test isapprox(cdf(10.0, 10.0, 10.0), 0.5)
-@test isapprox(cdf(12.0, 10.0,  5.0), 0.65542, atol=1e-5)
+@test isapprox(POMDPToolbox.cdf(-Inf, 10.0, 10.0), 0.0)
+@test isapprox(POMDPToolbox.cdf(10.0, 10.0, 10.0), 0.5)
+@test isapprox(POMDPToolbox.cdf(12.0, 10.0,  5.0), 0.65542, atol=1e-5)
 
 interps = Interpolants()
 @test interps.length == 0
