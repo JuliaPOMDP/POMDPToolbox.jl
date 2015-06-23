@@ -32,6 +32,10 @@ function Base.empty!(interpolants::Interpolants)
 
     interpolants.length = 0
 end
+function Base.getindex(interpolants::Interpolants, index::Int)
+    @assert(0 < index ≤ interpolants.length)
+    (interpolants.indeces[index], interpolants.weights[index])
+end
 function Base.show(io::IO, interpolants::Interpolants)
     println(io, "Interpolant:")
     println(io, "indeces: ", interpolants.indeces[1:interpolants.length])
@@ -39,5 +43,42 @@ function Base.show(io::IO, interpolants::Interpolants)
 end
 
 interpolants!(interps::Interpolants, d::AbstractDistribution) = error("$(typeof(d)) does not implement interpolants!")
+
+Φ(z::Real) = 0.5*erfc(-z/√2)
+zval(x::Real, μ::Real, σ::Real) = (x - μ) / σ
+cdf(x::Real, μ::Real, σ::Real) = Φ(zval(x, μ, σ))
+
+function interpolant_gaussian_1d!{F<:Real}(
+    interps::Interpolants,
+    orderedstates::AbstractVector{F}, # list of discrete states, ordered from smallest to largest
+    stateindeces::AbstractVector{Int}, # list of state indeces corresponding to the ordered states
+    μ::Real, # Gaussian mean
+    σ::Real; # Gaussian standard deviation
+    threshold_probability_too_small::Float64=1e-10 # will not add interpolant if the weighting is too low
+    )
+
+    # assigns all weight in the gaussian to the bins defined by the midpoints between states
+    # ie, if orderedstates is [-1,0,1], then the bin edges are [-∞,-0.5,0.5,∞]
+
+    n = length(orderedstates)
+
+    cdf_prev = 0.0
+    for i = 1 : n-1
+        bin_now = 0.5*(orderedstates[i+1] + orderedstates[i])
+        cdf_now = cdf(bin_now, μ, σ)
+        weight = cdf_now - cdf_prev
+        if weight > threshold_probability_too_small
+            push!(interps, stateindeces[i], weight)
+        end
+        cdf_prev = cdf_now
+    end
+
+    weight = 1.0 - cdf_prev
+    if weight > threshold_probability_too_small
+        push!(interps, stateindeces[n], weight)
+    end
+
+    interps
+end
 
 end # module
