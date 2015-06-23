@@ -26,7 +26,7 @@ empty!(interps)
 @test length(interps) == 0
 @test_throws ErrorException interps[1]
 
-interpolant_gaussian_1d!(interps, [-1.0,0.0,1.0], [1,2,3], 0.0, 1.0)
+interpolants_gaussian_1d!(interps, [-1.0,0.0,1.0], [1,2,3], 0.0, 1.0)
 @test interps.indeces[1:3] == [1,2,3]
 @test isapprox(interps.weights[1], 0.308537, atol=1e-6)
 @test isapprox(interps.weights[2], 0.382924, atol=1e-6)
@@ -35,4 +35,12 @@ interpolant_gaussian_1d!(interps, [-1.0,0.0,1.0], [1,2,3], 0.0, 1.0)
 i,v = interps[2]
 @test i == 2
 @test isapprox(v, 0.382924, atol=1e-6)
-println(interps)
+
+interpolants_uniform_1d!(interps, [-1.0,0.0,2.0], [1,2])
+@test interps.indeces[4:5] == [1,2]
+@test isapprox(interps.weights[4], 0.333333, atol=1e-6)
+@test isapprox(interps.weights[5], 0.666666, atol=1e-6)
+@test length(interps) == 5
+i,v = interps[5]
+@test i == 2
+@test isapprox(v, 0.666666, atol=1e-6)

@@ -5,7 +5,8 @@ using POMDPs
 export 
     Interpolants,
     interpolants!,
-    interpolants_gaussian_1d!
+    interpolants_gaussian_1d!,
+    interpolants_uniform_1d!
 
 type Interpolants
     indeces::Vector{Int}
@@ -58,7 +59,7 @@ function interpolants_gaussian_1d!{F<:Real}(
     threshold_probability_too_small::Float64=1e-10 # will not add interpolant if the weighting is too low
     )
 
-    # assigns all weight in the gaussian to the bins defined by the midpoints between states
+    # assigns all weight to the bins defined by the midpoints between states
     # ie, if orderedstates is [-1,0,1], then the bin edges are [-∞,-0.5,0.5,∞]
 
     n = length(orderedstates)
@@ -77,6 +78,28 @@ function interpolants_gaussian_1d!{F<:Real}(
     weight = 1.0 - cdf_prev
     if weight > threshold_probability_too_small
         push!(interps, stateindeces[n], weight)
+    end
+
+    interps
+end
+function interpolants_uniform_1d!{F<:Real}(
+    interps::Interpolants,
+    binedges::AbstractVector{F}, # list of discrete states bin edges, ordered from smallest to largest
+    stateindeces::AbstractVector{Int}, # list of state indeces corresponding to the ordered states
+    threshold_probability_too_small::Float64=1e-10 # will not add interpolant if the weighting is too low
+    )
+
+    n = length(stateindeces)
+    @assert(length(binedges) == n + 1)
+
+    total_width = binedges[end] - binedges[1]
+
+    for i = 1 : n
+        width = binedges[i+1] - binedges[i]
+        weight = width / total_width
+        if weight > threshold_probability_too_small
+            push!(interps, stateindeces[i], weight)
+        end
     end
 
     interps
