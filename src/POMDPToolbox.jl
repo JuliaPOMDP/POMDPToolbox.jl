@@ -2,13 +2,15 @@ module POMDPToolbox
 
 using POMDPs
 
+import POMDPs: interpolants!
+
 export 
     Interpolants,
     interpolants!,
     interpolants_gaussian_1d!,
     interpolants_uniform_1d!
 
-type Interpolants
+type Interpolants <: AbstractInterpolants
     indices::Vector{Int}
     weights::Vector{Float64}
     length::Int
@@ -41,7 +43,7 @@ end
 function Base.show(io::IO, interpolants::Interpolants)
     println(io, "Interpolant:")
     println(io, "indices: ", interpolants.indices[1:interpolants.length])
-    println(io, "weightes: ", interpolants.weights[1:interpolants.length])
+    println(io, "weights: ", interpolants.weights[1:interpolants.length])
 end
 
 interpolants!(interps::Interpolants, d::AbstractDistribution) = error("$(typeof(d)) does not implement interpolants!")
