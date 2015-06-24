@@ -9,7 +9,7 @@ export
     interpolants_uniform_1d!
 
 type Interpolants
-    indeces::Vector{Int}
+    indices::Vector{Int}
     weights::Vector{Float64}
     length::Int
 
@@ -21,11 +21,11 @@ end
 Base.length(interpolants::Interpolants) = interpolants.length
 function Base.push!(interpolants::Interpolants, stateindex::Int, val::Float64)
     interpolants.length += 1
-    if interpolants.length ≤ length(interpolants.indeces)
-        interpolants.indeces[interpolants.length] = stateindex
+    if interpolants.length ≤ length(interpolants.indices)
+        interpolants.indices[interpolants.length] = stateindex
         interpolants.weights[interpolants.length] = val
     else
-        push!(interpolants.indeces, stateindex)
+        push!(interpolants.indices, stateindex)
         push!(interpolants.weights, val)
     end
     interpolants
@@ -36,11 +36,11 @@ function Base.empty!(interpolants::Interpolants)
 end
 function Base.getindex(interpolants::Interpolants, index::Int)
     @assert(0 < index ≤ interpolants.length)
-    (interpolants.indeces[index], interpolants.weights[index])
+    (interpolants.indices[index], interpolants.weights[index])
 end
 function Base.show(io::IO, interpolants::Interpolants)
     println(io, "Interpolant:")
-    println(io, "indeces: ", interpolants.indeces[1:interpolants.length])
+    println(io, "indices: ", interpolants.indices[1:interpolants.length])
     println(io, "weightes: ", interpolants.weights[1:interpolants.length])
 end
 
@@ -53,7 +53,7 @@ cdf(x::Real, μ::Real, σ::Real) = Φ(zval(x, μ, σ))
 function interpolants_gaussian_1d!{F<:Real}(
     interps::Interpolants,
     orderedstates::AbstractVector{F}, # list of discrete states, ordered from smallest to largest
-    stateindeces::AbstractVector{Int}, # list of state indeces corresponding to the ordered states
+    stateindices::AbstractVector{Int}, # list of state indices corresponding to the ordered states
     μ::Real, # Gaussian mean
     σ::Real; # Gaussian standard deviation
     threshold_probability_too_small::Float64=1e-10 # will not add interpolant if the weighting is too low
@@ -70,14 +70,14 @@ function interpolants_gaussian_1d!{F<:Real}(
         cdf_now = cdf(bin_now, μ, σ)
         weight = cdf_now - cdf_prev
         if weight > threshold_probability_too_small
-            push!(interps, stateindeces[i], weight)
+            push!(interps, stateindices[i], weight)
         end
         cdf_prev = cdf_now
     end
 
     weight = 1.0 - cdf_prev
     if weight > threshold_probability_too_small
-        push!(interps, stateindeces[n], weight)
+        push!(interps, stateindices[n], weight)
     end
 
     interps
@@ -85,11 +85,11 @@ end
 function interpolants_uniform_1d!{F<:Real}(
     interps::Interpolants,
     binedges::AbstractVector{F}, # list of discrete states bin edges, ordered from smallest to largest
-    stateindeces::AbstractVector{Int}, # list of state indeces corresponding to the ordered states
+    stateindices::AbstractVector{Int}, # list of state indices corresponding to the ordered states
     threshold_probability_too_small::Float64=1e-10 # will not add interpolant if the weighting is too low
     )
 
-    n = length(stateindeces)
+    n = length(stateindices)
     @assert(length(binedges) == n + 1)
 
     total_width = binedges[end] - binedges[1]
@@ -98,7 +98,7 @@ function interpolants_uniform_1d!{F<:Real}(
         width = binedges[i+1] - binedges[i]
         weight = width / total_width
         if weight > threshold_probability_too_small
-            push!(interps, stateindeces[i], weight)
+            push!(interps, stateindices[i], weight)
         end
     end
 
