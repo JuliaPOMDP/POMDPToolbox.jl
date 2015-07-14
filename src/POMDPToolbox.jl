@@ -8,7 +8,7 @@ export
     interpolants_gaussian_1d!,
     interpolants_uniform_1d!
 
-type Interpolants <: AbstractInterpolants
+type Interpolants
     indices::Vector{Int}
     weights::Vector{Float64}
     length::Int
