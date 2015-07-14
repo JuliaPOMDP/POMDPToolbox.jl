@@ -2,8 +2,6 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: interpolants!
-
 export 
     Interpolants,
     interpolants!,
