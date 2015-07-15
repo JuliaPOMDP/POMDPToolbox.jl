@@ -32,21 +32,31 @@ function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
     @assert length(collect(pomdp_states)) == b.n
 
     od = create_observation(pomdp)
-    td = create_transition(pomdp)
+    td1 = create_transition(pomdp)
+    td2 = create_transition(pomdp)
 
     belief = b.b
     new_belief = b.bp
     fill!(new_belief, 0.0)
     
-    for (i, s) in enumerate(pomdp_states)
+    for (i, sp) in enumerate(pomdp_states)
         b_sum = 0.0
-        transition!(td, pomdp, s, a) 
-        observation!(od, pomdp, s, a)
+        transition!(td1, pomdp, sp, a) 
+        observation!(od, pomdp, sp, a)
         for is = 1:length(td)
-            t_prob = weight(td, is)
-            if t_prob > 0.0
-                idx = index(td, is)
-                b_sum += t_prob*belief[idx] 
+            p = weight(td1, is)
+            if p > 0.0
+                s = index(td1, is)
+                transition!(td2, pomdp, s, a) 
+                for js = 1:length(td2) 
+                    pp = weight(td2, js) 
+                    if pp > 0.0
+                        spidx = index(td2, js)
+                        if spidx == sp
+                            b_sum += pp*belief[s] 
+                        end
+                    end
+                end
             end
         end
         for io = 1:length(od)
