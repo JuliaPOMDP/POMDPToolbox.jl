@@ -69,6 +69,7 @@ function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
     end
     norm = sum(new_belief)
     for i = 1:length(new_belief) new_belief[i] /= norm end
+    belief[1:end] = new_belief[1:end]
     b
 end
 
