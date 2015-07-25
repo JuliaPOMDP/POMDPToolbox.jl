@@ -16,6 +16,9 @@ function DiscreteBelief(b::Vector{Float64})
     return DiscreteBelief(b, bp, n)
 end
 
+vec(b::DiscreteBelief) = b.b
+
+
 
 function update_belief(pomdp::POMDP, a::Int64, o::Int64)
     ns = n_states(pomdp)

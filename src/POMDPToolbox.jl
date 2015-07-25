@@ -12,6 +12,7 @@ export
     interpolants_uniform_1d!,
     # Support for updating beliefs
     DiscreteBelief,
+    vec,
     update_belief,
     update_belief!
 
