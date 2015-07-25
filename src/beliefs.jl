@@ -18,6 +18,10 @@ end
 
 vec(b::DiscreteBelief) = b.b
 
+Base.length(b::DiscreteBelief) = b.n
+POMDPs.index(b::DiscreteBelief, i::Int64) = i
+POMDPs.weight(b::DiscreteBelief, i::Int64) = b[i]
+
 
 
 function update_belief(pomdp::POMDP, a::Int64, o::Int64)
