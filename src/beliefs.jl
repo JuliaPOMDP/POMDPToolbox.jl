@@ -20,7 +20,7 @@ vec(b::DiscreteBelief) = b.b
 
 Base.length(b::DiscreteBelief) = b.n
 POMDPs.index(b::DiscreteBelief, i::Int64) = i
-POMDPs.weight(b::DiscreteBelief, i::Int64) = b[i]
+POMDPs.weight(b::DiscreteBelief, i::Int64) = b.b[i]
 
 
 

@@ -1,8 +1,8 @@
 module POMDPToolbox
 
-using MOMDPs
+using POMDPs
 
-import MOMDPs: Belief, update_belief, update_belief!, length, weight, index
+import POMDPs: Belief, update_belief, update_belief!
 
 export 
     # Support for interpolants
