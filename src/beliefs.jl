@@ -22,6 +22,12 @@ Base.length(b::DiscreteBelief) = b.n
 POMDPs.index(b::DiscreteBelief, i::Int64) = i
 POMDPs.weight(b::DiscreteBelief, i::Int64) = b.b[i]
 
+function Base.fill!(b::DiscreteBelief, x::Float64)
+    fill!(b.b, x)
+    fill!(b.bp, x)
+    b
+end
+
 
 
 function update_belief(pomdp::POMDP, a::Int64, o::Int64)
@@ -75,8 +81,14 @@ function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
         end
     end
     norm = sum(new_belief)
-    for i = 1:length(new_belief) new_belief[i] /= norm end
-    belief[1:end] = new_belief[1:end]
+    # if norm is zero, the update was invalid - reset to uniform
+    if norm == 0.0
+        u = 1.0/length(b)
+        fill!(b, u)
+    else
+        for i = 1:length(new_belief) new_belief[i] /= norm end
+        belief[1:end] = new_belief[1:end]
+    end
     b
 end
 

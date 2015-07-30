@@ -15,6 +15,7 @@ export
     length,
     index,
     weight,
+    fill!,
     vec,
     update_belief,
     update_belief!
