@@ -28,6 +28,11 @@ function Base.fill!(b::DiscreteBelief, x::Float64)
     b
 end
 
+function Base.setindex!(b::DiscreteBelief, x::Float64, i::Int64) 
+    b.b[i] = x
+    b.bp[i] = x
+    b
+end
 
 
 function update_belief(pomdp::POMDP, a::Int64, o::Int64)
