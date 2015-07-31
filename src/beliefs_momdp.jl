@@ -56,13 +56,9 @@ function update_belief!(b::DiscreteBelief, pomdp::MOMDP, x::Int64, a::Int64, o::
         end
     end
     norm = sum(new_belief)
-    # if norm is zero, the update was invalid - reset to uniform
+    # if norm is zero, the update was invalid - reset to old
     if norm == 0.0
-        u = 1.0/length(b)
-        fill!(b, u)
-    else
-        for i = 1:length(new_belief) new_belief[i] /= norm end
-        belief[1:end] = new_belief[1:end]
+        new_belief[1:end] = belief[1:end]
     end
     b
 end
