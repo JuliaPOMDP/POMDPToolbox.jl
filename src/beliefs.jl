@@ -13,7 +13,8 @@ end
 function DiscreteBelief(b::Vector{Float64})
     n = length(b)
     bp = deepcopy(b)
-    return DiscreteBelief(b, bp, n)
+    bpp = deepcopy(b)
+    return DiscreteBelief(bpp, bp, n)
 end
 
 vec(b::DiscreteBelief) = b.b
