@@ -98,3 +98,21 @@ function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
     b
 end
 
+# a belief that just stores the previous observation
+# policies based on the previous observation only are often pretty good
+# e.g. for the crying baby problem
+type PreviousObservation <: Belief
+    observation
+end
+function update_belief!(b::PreviousObservation, p::POMDP, action::Any, obs::Any)
+    b.observation = deepcopy(obs)
+end
+
+# an empty belief
+# for use with e.g. a random policy
+type EmptyBelief <: Belief
+end
+function update_belief!(b::EmptyBelief, p::POMDP, a, o)
+end
+
+
