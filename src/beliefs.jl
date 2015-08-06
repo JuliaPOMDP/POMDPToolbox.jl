@@ -47,14 +47,6 @@ function Base.setindex!(b::DiscreteBelief, x::Float64, i::Int64)
     b
 end
 
-
-function update_belief(pomdp::POMDP, a::Int64, o::Int64)
-    ns = n_states(pomdp)
-    b = DiscreteBelief(ns)
-    update_belief!(b, pomdp, a, o)
-    return b
-end
-
 # TODO(max): Support for non-integer actions/observations? Will need mapping functions
 # Updates the belief given the current action and observation
 function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
