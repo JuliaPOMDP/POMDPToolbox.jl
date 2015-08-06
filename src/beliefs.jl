@@ -2,6 +2,7 @@ type DiscreteBelief <: Belief
     b::Vector{Float64}
     bp::Vector{Float64}
     n::Int64
+    valid::Bool
 end
 # Constructor with uniform belief
 function DiscreteBelief(n::Int64)
@@ -22,10 +23,21 @@ vec(b::DiscreteBelief) = b.b
 Base.length(b::DiscreteBelief) = b.n
 POMDPs.index(b::DiscreteBelief, i::Int64) = i
 POMDPs.weight(b::DiscreteBelief, i::Int64) = b.b[i]
+valid(b::DiscreteBelief) = b.valid
 
 function Base.fill!(b::DiscreteBelief, x::Float64)
     fill!(b.b, x)
     fill!(b.bp, x)
+    b
+end
+
+function Base.fill!(b::DiscreteBelief, idxs::Vector{Int64}, vals::Vector{Float64})
+    fill!(b.b, 0.0)
+    fill!(b.bp, 0.0)
+    for i = 1:length(idxs)
+        index = idxs[i]
+        index > 0 ? (b[index] = vals[i]) : nothing 
+    end
     b
 end
 

@@ -17,6 +17,7 @@ export
     weight,
     fill!,
     vec,
+    valid,
     update_belief,
     update_belief!
 

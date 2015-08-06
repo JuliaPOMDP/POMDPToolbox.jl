@@ -18,6 +18,7 @@ function update_belief!(b::DiscreteBelief, pomdp::MOMDP, x::Int64, a::Int64, o::
     yspace = part_obs_space(pomdp)
     ystates = domain(yspace)
     @assert length(collect(ystates)) == b.n
+    b.valid = true
 
     od = create_observation(pomdp)
     td1 = create_partially_obs_transition(pomdp)
@@ -58,6 +59,7 @@ function update_belief!(b::DiscreteBelief, pomdp::MOMDP, x::Int64, a::Int64, o::
     norm = sum(new_belief)
     # if norm is zero, the update was invalid - reset to old
     if norm == 0.0
+        b.valid = false
         u = 1.0/length(b)
         fill!(b, u)
     else
