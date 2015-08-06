@@ -19,7 +19,10 @@ export
     vec,
     valid,
     update_belief,
-    update_belief!
+    update_belief!,
+    # beliefs
+    PreviousObservation,
+    EmptyBelief
 
 
 include("interpolants.jl")
