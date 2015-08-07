@@ -8,14 +8,14 @@ end
 function DiscreteBelief(n::Int64)
     b = zeros(n) + 1.0/n
     bp = zeros(n) + 1.0/n
-    return DiscreteBelief(b, bp, n)
+    return DiscreteBelief(b, bp, n, true)
 end
 # Constructor for user defined initial belief
 function DiscreteBelief(b::Vector{Float64})
     n = length(b)
     bp = deepcopy(b)
     bpp = deepcopy(b)
-    return DiscreteBelief(bpp, bp, n)
+    return DiscreteBelief(bpp, bp, n, true)
 end
 
 vec(b::DiscreteBelief) = b.b
