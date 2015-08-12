@@ -2,7 +2,7 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: Belief, update_belief, update_belief!
+import POMDPs: Belief, update_belief!
 
 export 
     # Support for interpolants
@@ -18,7 +18,6 @@ export
     fill!,
     vec,
     valid,
-    update_belief,
     update_belief!,
     # beliefs
     PreviousObservation,
