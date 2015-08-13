@@ -111,9 +111,14 @@ end
 function update_belief!(b::PreviousObservation, p::POMDP, action::Any, obs::Any)
     # b.observation = deepcopy(obs) # <- this is expensive
 
-    # XXX hack! this could be wrong and cause really subtle bugs in some cases!!! what should we do about this?
+    # XXX hack! seems like there should be a better way to do this
     for n in names(b.observation)
-        setfield!(b.observation, n, copy(getfield(obs,n)))
+        val = getfield(obs,n)
+        if typeof(val).mutable
+            setfield!(b.observation, n, deepcopy(val)) # <- should this be copy or deepcopy?
+        else
+            setfield!(b.observation, n, val)
+        end
     end
 end
 
