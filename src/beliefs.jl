@@ -109,7 +109,12 @@ type PreviousObservation <: Belief
     observation
 end
 function update_belief!(b::PreviousObservation, p::POMDP, action::Any, obs::Any)
-    b.observation = deepcopy(obs)
+    # b.observation = deepcopy(obs) # <- this is expensive
+
+    # XXX hack! this could be wrong and cause really subtle bugs in some cases!!! what should we do about this?
+    for n in names(b.observation)
+        setfield!(b.observation, n, copy(getfield(obs,n)))
+    end
 end
 
 # an empty belief
