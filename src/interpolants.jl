@@ -9,6 +9,8 @@ type Interpolants
     end
 end
 
+rand(interpolants::Interpolants) = quantile(interpolants, rand())
+
 Base.length(interpolants::Interpolants) = interpolants.length
 function Base.push!(interpolants::Interpolants, stateindex::Int, val::Float64)
     interpolants.length += 1
@@ -95,3 +97,17 @@ function interpolants_uniform_1d!{F<:Real}(
 
     interps
 end
+
+function quantile(interps::Interpolants, p::Float64)
+    0.0 <= p <= 1.0 || throw(DomainError())
+    k = interps.length
+    pv = interps.weights
+    i = 1
+    v = pv[1]
+    while v < p && i < k
+        i += 1
+        @inbounds v += pv[i]
+    end
+    i
+end
+
