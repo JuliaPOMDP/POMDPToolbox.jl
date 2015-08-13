@@ -109,7 +109,17 @@ type PreviousObservation <: Belief
     observation
 end
 function update_belief!(b::PreviousObservation, p::POMDP, action::Any, obs::Any)
-    b.observation = deepcopy(obs)
+    # b.observation = deepcopy(obs) # <- this is expensive
+
+    # XXX hack! seems like there should be a better way to do this
+    for n in names(b.observation)
+        val = getfield(obs,n)
+        if typeof(val).mutable
+            setfield!(b.observation, n, deepcopy(val)) # <- should this be copy or deepcopy?
+        else
+            setfield!(b.observation, n, val)
+        end
+    end
 end
 
 # an empty belief
