@@ -54,9 +54,9 @@ function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
     pomdp_states = domain(sspace)
     @assert length(collect(pomdp_states)) == b.n
 
-    od = create_observation(pomdp)
-    td1 = create_transition(pomdp)
-    td2 = create_transition(pomdp)
+    od = create_observation_distribution(pomdp)
+    td1 = create_transition_distribution(pomdp)
+    td2 = create_transition_distribution(pomdp)
 
     belief = b.b
     new_belief = b.bp

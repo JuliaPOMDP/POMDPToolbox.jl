@@ -20,7 +20,7 @@ function update_belief!(b::DiscreteBelief, pomdp::MOMDP, x::Int64, a::Int64, o::
     @assert length(collect(ystates)) == b.n
     b.valid = true
 
-    od = create_observation(pomdp)
+    od = create_observation_distribution(pomdp)
     td1 = create_partially_obs_transition(pomdp)
     td2 = create_partially_obs_transition(pomdp)
 
