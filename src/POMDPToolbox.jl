@@ -2,7 +2,7 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: Belief, update_belief!
+import POMDPs: Belief, belief
 import Base: rand, rand!
 
 export 

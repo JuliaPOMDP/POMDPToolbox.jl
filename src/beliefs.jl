@@ -107,8 +107,9 @@ end
 # e.g. for the crying baby problem
 type PreviousObservation <: Belief
     observation
+    PreviousObservation(obs) = new(deepcopy(obs))
 end
-function update_belief!(b::PreviousObservation, p::POMDP, action::Any, obs::Any)
+function belief(p::POMDP, ::PreviousObservation, action::Any, obs::Any, b::PreviousObservation=PreviousObservation(obs))
     # b.observation = deepcopy(obs) # <- this is expensive
 
     # XXX hack! seems like there should be a better way to do this
@@ -120,13 +121,15 @@ function update_belief!(b::PreviousObservation, p::POMDP, action::Any, obs::Any)
             setfield!(b.observation, n, val)
         end
     end
+    return b
 end
 
 # an empty belief
 # for use with e.g. a random policy
 type EmptyBelief <: Belief
 end
-function update_belief!(b::EmptyBelief, p::POMDP, a, o)
+function belief(::POMDP, ::EmptyBelief, ::Any, ::Any, b::EmptyBelief=EmptyBelief())
+    return b
 end
 
 
