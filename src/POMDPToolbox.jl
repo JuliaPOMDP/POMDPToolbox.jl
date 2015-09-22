@@ -2,7 +2,7 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: Belief, update_belief!
+import POMDPs: Belief, belief
 import Base: rand, rand!
 
 export 
@@ -17,10 +17,15 @@ export
     length,
     index,
     weight,
+    sum,
     fill!,
+    setindex!,
+    getindex,
+    copy!,
     vec,
     valid,
     update_belief!,
+    belief,
     # beliefs
     PreviousObservation,
     EmptyBelief

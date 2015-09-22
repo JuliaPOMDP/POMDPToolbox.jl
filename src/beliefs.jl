@@ -47,59 +47,55 @@ function Base.setindex!(b::DiscreteBelief, x::Float64, i::Int64)
     b
 end
 
+function Base.getindex(b::DiscreteBelief, i::Int64)
+    return b.b[i]
+end
+
+function Base.copy!(b1::DiscreteBelief, b2::DiscreteBelief)
+    copy!(b1.b, b2.b)
+    copy!(b1.bp, b2.bp)
+end
+
+Base.sum(b::DiscreteBelief) = sum(b.b)
+
 # TODO(max): Support for non-integer actions/observations? Will need mapping functions
 # Updates the belief given the current action and observation
-function update_belief!(b::DiscreteBelief, pomdp::POMDP, a::Int64, o::Int64)
-    sspace = space(pomdp)
+function belief(pomdp::POMDP, bold::DiscreteBelief, a::Action, o::Observation, bnew::DiscreteBelief=create_belief(pomdp))
+    # initialize spaces
+    sspace = states(pomdp)
     pomdp_states = domain(sspace)
-    @assert length(collect(pomdp_states)) == b.n
-
+    # ensure belief state sizes match 
+    @assert length(bold) == length(bnew)
+    # initialize distributions
     od = create_observation_distribution(pomdp)
-    td1 = create_transition_distribution(pomdp)
-    td2 = create_transition_distribution(pomdp)
-
-    belief = b.b
-    new_belief = b.bp
-    fill!(new_belief, 0.0)
-    
+    td = create_transition_distribution(pomdp)
+    # initialize belief 
+    fill!(bnew, 0.0)
+    # iterate through each state in belief vector
     for (i, sp) in enumerate(pomdp_states)
-        b_sum = 0.0
-        transition!(td1, pomdp, sp, a) 
-        observation!(od, pomdp, sp, a)
-        for is = 1:length(td)
-            p = weight(td1, is)
-            if p > 0.0
-                s = index(td1, is)
-                transition!(td2, pomdp, s, a) 
-                for js = 1:length(td2) 
-                    pp = weight(td2, js) 
-                    if pp > 0.0
-                        spidx = index(td2, js)
-                        if spidx == sp
-                            b_sum += pp*belief[s] 
-                        end
-                    end
-                end
-            end
+        # get the distributions
+        observation(pomdp, sp, a, od)
+        # get prob of observation o from current distribution
+        probo = pdf(od, o)
+        # if observation prob is 0.0, then skip rest of update b/c bnew[i] is zero
+        probo == 0.0 ? (continue) : (nothing)
+        b_sum = 0.0 # belief for state sp
+        for (j, s) in enumerate(pomdp_states)
+            transition(pomdp, s, a, td)
+            pp = pdf(td, sp)
+            b_sum += pp * bold[j]
         end
-        for io = 1:length(od)
-            idx = index(od, io)
-            if idx == o
-                new_belief[i] = weight(od, io)*b_sum
-                break
-            end
-        end
+        bnew[i] = probo * b_sum
     end
-    norm = sum(new_belief)
+    norm = sum(bnew)
     # if norm is zero, the update was invalid - reset to uniform
     if norm == 0.0
-        u = 1.0/length(b)
-        fill!(b, u)
+        u = 1.0/length(bnew)
+        fill!(bnew, u)
     else
-        for i = 1:length(new_belief) new_belief[i] /= norm end
-        belief[1:end] = new_belief[1:end]
+        for i = 1:length(bnew); bnew[i] /= norm; end
     end
-    b
+    bnew
 end
 
 # a belief that just stores the previous observation
