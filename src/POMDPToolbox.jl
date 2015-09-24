@@ -3,6 +3,7 @@ module POMDPToolbox
 using POMDPs
 
 import POMDPs: Belief, belief
+import POMDPs: Simulator, simulate
 import Base: rand, rand!
 
 export 
@@ -28,11 +29,15 @@ export
     belief,
     # beliefs
     PreviousObservation,
-    EmptyBelief
-
+    EmptyBelief,
+    #simulators
+    RolloutSimulator,
+    HistoryRecorder,
+    simulate
 
 include("interpolants.jl")
 include("beliefs.jl")
 include("beliefs_momdp.jl")
+include("simulators.jl")
 
 end # module
