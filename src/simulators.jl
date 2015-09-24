@@ -13,6 +13,13 @@ type RolloutSimulator <: Simulator
 end
 RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, nothing, nothing, nothing, nothing)
 RolloutSimulator() = RolloutSimulator(MersenneTwister(rand(Uint32)))
+function RolloutSimulator(;rng=MersenneTwister(rand(Uint32)),
+                           initial_belief=nothing,
+                           initial_state=nothing,
+                           eps=nothing,
+                           max_steps=nothing)
+    return RolloutSimulator(rng, initial_belief, initial_state, eps, max_steps)
+end
 
 #=
 Return the reward for a single simulation of the pomdp.
@@ -98,12 +105,18 @@ type HistoryRecorder <: Simulator
     eps
     max_steps
 end
+function HistoryRecorder(;rng=MersenneTwister(rand(Uint32)),
+                          initial_belief=nothing,
+                          initial_state=nothing,
+                          eps=nothing,
+                          max_steps=nothing)
+    return HistoryRecorder(rng, {}, {}, {}, {}, initial_belief, initial_state, eps, max_steps)
+end
 
 function simulate(sim::HistoryRecorder,
                   pomdp::POMDP,
                   policy::Policy)
 
-    
     if sim.initial_belief == nothing
         sim.initial_belief = initial_belief(pomdp)
     end
@@ -135,7 +148,7 @@ function simulate(sim::HistoryRecorder,
 
     step = 1
 
-    while disc > eps && !isterminal(pomdp, sh[step]) && step <= sim.max_steps
+    while disc > sim.eps && !isterminal(pomdp, sh[step]) && step <= sim.max_steps
         push!(ah, create_action(pomdp))
         ah[step] = action(pomdp, policy, bh[step], ah[step])
         r += disc*reward(pomdp, sh[step], ah[step])
