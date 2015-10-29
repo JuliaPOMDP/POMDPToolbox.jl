@@ -101,15 +101,26 @@ end
 # a belief that just stores the previous observation
 # policies based on the previous observation only are often pretty good
 # e.g. for the crying baby problem
+# when a belief is converted, the observation is initially set to nothing, so the policy must be able to handle a belief with nothing
 type PreviousObservation <: Belief
     observation
     PreviousObservation(obs) = new(deepcopy(obs))
 end
-function belief(p::POMDP, ::PreviousObservation, action::Any, obs::Any, b::PreviousObservation=PreviousObservation(obs))
+
+type PreviousObservationUpdater <: BeliefUpdater
+end
+
+convert_belief(u::PreviousObservationUpdater, b::Belief) = PreviousObservation(nothing)
+create_belief(u::PreviousObservationUpdater) = PreviousObservation(nothing)
+
+function update(bu::PreviousObservationUpdater, ::PreviousObservation, action::Action, obs::Observation, b::PreviousObservation=PreviousObservation(obs))
     # b.observation = deepcopy(obs) # <- this is expensive
 
     # XXX hack! seems like there should be a better way to do this
-    for n in names(b.observation)
+    if typeof(obs) != typeof(b.observation)
+        b.observation = deepcopy(obs)
+    end
+    for n in fieldnames(b.observation)
         val = getfield(obs,n)
         if typeof(val).mutable
             setfield!(b.observation, n, deepcopy(val)) # <- should this be copy or deepcopy?
@@ -124,8 +135,13 @@ end
 # for use with e.g. a random policy
 type EmptyBelief <: Belief
 end
-function belief(::POMDP, ::EmptyBelief, ::Any, ::Any, b::EmptyBelief=EmptyBelief())
-    return b
+
+type EmptyUpdater <: BeliefUpdater
 end
 
+convert_belief(::EmptyUpdater, ::BeliefUpdater) = EmptyBelief()
+create_belief(::EmptyUpdater) = EmptyBelief()
 
+function update(::EmptyUpdater, ::EmptyBelief, ::Action, ::Observation, b::EmptyBelief=EmptyBelief())
+    return b
+end

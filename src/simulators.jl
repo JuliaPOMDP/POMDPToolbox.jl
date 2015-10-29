@@ -1,24 +1,24 @@
 
 # TODO: There should be a common interface for things like setting the initial belief, state, max_steps, etc.
 
+using Debug
+
 # a fast simulator that just returns the reward
 type RolloutSimulator <: Simulator
     rng::AbstractRNG
 
     # optional: if these are nothing, they will be ignored
-    initial_belief
     initial_state
     eps
     max_steps
 end
-RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, nothing, nothing, nothing, nothing)
-RolloutSimulator() = RolloutSimulator(MersenneTwister(rand(Uint32)))
-function RolloutSimulator(;rng=MersenneTwister(rand(Uint32)),
-                           initial_belief=nothing,
+RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, nothing, nothing, nothing)
+RolloutSimulator() = RolloutSimulator(MersenneTwister(rand(UInt32)))
+function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
                            initial_state=nothing,
                            eps=nothing,
                            max_steps=nothing)
-    return RolloutSimulator(rng, initial_belief, initial_state, eps, max_steps)
+    return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
 #=
@@ -29,14 +29,8 @@ The simulation will be terminated when either
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
 =#
-function simulate(sim::RolloutSimulator,
-                  pomdp::POMDP,
-                  policy::Policy)
+function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::BeliefUpdater, initial_belief::Belief)
 
-    
-    if sim.initial_belief == nothing
-        sim.initial_belief = initial_belief(pomdp)
-    end
     if sim.initial_state == nothing
         sim.initial_state = create_state(pomdp)
         rand!(sim.rng, sim.initial_state, sim.initial_belief)
@@ -50,19 +44,21 @@ function simulate(sim::RolloutSimulator,
 
     disc = 1.0
     r = 0.0
+
+    # I think these deepcopies are necessary because the memory will be reused
     s = deepcopy(sim.initial_state)
-    b = deepcopy(sim.initial_belief)
+    b = deepcopy(initial_belief)
 
     obs_dist = create_observation_distribution(pomdp)
     trans_dist = create_transition_distribution(pomdp)
     sp = create_state(pomdp)
     o = create_observation(pomdp)
     a = create_action(pomdp)
-    bp = deepcopy(sim.initial_belief)
+    bp = create_belief(updater)
     step = 1
 
     while disc > sim.eps && !isterminal(pomdp, s) && step <= sim.max_steps
-        a = action(pomdp, policy, b, a)
+        a = action(policy, b, a)
         r += disc*reward(pomdp, s, a)
 
         trans_dist = transition(pomdp, s, a, trans_dist)
@@ -76,7 +72,7 @@ function simulate(sim::RolloutSimulator,
         s = sp
         sp = tmp
 
-        bp = belief(pomdp, b, a, o, bp)
+        bp = update(updater, b, a, o, bp)
         tmpb = b
         b = bp
         bp = tmpb
@@ -100,26 +96,19 @@ type HistoryRecorder <: Simulator
     belief_hist::Vector{Any}
 
     # optional: if these are nothing, they will be ignored
-    initial_belief
     initial_state
     eps
     max_steps
 end
-function HistoryRecorder(;rng=MersenneTwister(rand(Uint32)),
-                          initial_belief=nothing,
+function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           initial_state=nothing,
                           eps=nothing,
                           max_steps=nothing)
-    return HistoryRecorder(rng, {}, {}, {}, {}, initial_belief, initial_state, eps, max_steps)
+    return HistoryRecorder(rng, Any[], Any[], Any[], Any[], initial_state, eps, max_steps)
 end
 
-function simulate(sim::HistoryRecorder,
-                  pomdp::POMDP,
-                  policy::Policy)
+function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::BeliefUpdater, initial_belief::Belief)
 
-    if sim.initial_belief == nothing
-        sim.initial_belief = initial_belief(pomdp)
-    end
     if sim.initial_state == nothing
         sim.initial_state = create_state(pomdp)
         rand!(sim.rng, sim.initial_state, sim.initial_belief)
@@ -132,16 +121,16 @@ function simulate(sim::HistoryRecorder,
     end
 
     # aliases for the histories to make the code more concise
-    sh = sim.state_hist = {}
-    ah = sim.action_hist = {}
-    oh = sim.observation_hist = {}
-    bh = sim.belief_hist = {}
+    sh = sim.state_hist = Any[]
+    ah = sim.action_hist = Any[]
+    oh = sim.observation_hist = Any[]
+    bh = sim.belief_hist = Any[]
    
     disc = 1.0
     r = 0.0
 
-    push!(sim.state_hist, deepcopy(sim.initial_state))
-    push!(sim.belief_hist, deepcopy(sim.initial_belief))
+    push!(sh, sim.initial_state)
+    push!(bh, initial_belief)
 
     obs_dist = create_observation_distribution(pomdp)
     trans_dist = create_transition_distribution(pomdp)
@@ -149,8 +138,7 @@ function simulate(sim::HistoryRecorder,
     step = 1
 
     while disc > sim.eps && !isterminal(pomdp, sh[step]) && step <= sim.max_steps
-        push!(ah, create_action(pomdp))
-        ah[step] = action(pomdp, policy, bh[step], ah[step])
+        push!(ah, action(policy, bh[step]))
         r += disc*reward(pomdp, sh[step], ah[step])
 
         push!(sh, create_state(pomdp))
@@ -161,8 +149,7 @@ function simulate(sim::HistoryRecorder,
         obs_dist = observation(pomdp, sh[step+1], ah[step], obs_dist)
         rand!(sim.rng, oh[step], obs_dist)
 
-        push!(bh, create_belief(pomdp))
-        bh[step+1] = belief(pomdp, bh[step], ah[step], oh[step], bh[step+1])
+        push!(bh, update(bu, bh[step], ah[step], oh[step]))
 
         disc *= discount(pomdp)
         step += 1

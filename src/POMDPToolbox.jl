@@ -2,7 +2,7 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: Belief, belief
+import POMDPs: Belief, BeliefUpdater, update, convert_belief, create_belief
 import POMDPs: Simulator, simulate
 import Base: rand, rand!
 
@@ -25,11 +25,12 @@ export
     copy!,
     vec,
     valid,
-    update_belief!,
-    belief,
+    update,
     # beliefs
     PreviousObservation,
+    PreviousObservationUpdater,
     EmptyBelief,
+    EmptyUpdater,
     #simulators
     RolloutSimulator,
     HistoryRecorder,
