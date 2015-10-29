@@ -18,6 +18,16 @@ function DiscreteBelief(b::Vector{Float64})
     return DiscreteBelief(bpp, bp, n, true)
 end
 
+#Type declarations for particle-based belief representations
+type Particle{T}
+    state::T
+    weight::Float64
+end
+
+type ParticleBelief{T} <: Belief
+    particles::Vector{Particle{T}}
+end
+
 vec(b::DiscreteBelief) = b.b
 
 Base.length(b::DiscreteBelief) = b.n
