@@ -1,8 +1,6 @@
 
 # TODO: There should be a common interface for things like setting the initial belief, state, max_steps, etc.
 
-using Debug
-
 # a fast simulator that just returns the reward
 type RolloutSimulator <: Simulator
     rng::AbstractRNG
