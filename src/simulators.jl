@@ -62,7 +62,7 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
         trans_dist = transition(pomdp, s, a, trans_dist)
         rand!(sim.rng, sp, trans_dist)
 
-        obs_dist = observation(pomdp, sp, a, obs_dist)
+        obs_dist = observation(pomdp, s, a, sp, obs_dist)
         rand!(sim.rng, o, obs_dist)
 
         # alternates using the memory allocated for s and sp so nothing new has to be allocated
@@ -144,7 +144,7 @@ function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Belief
         rand!(sim.rng, sh[step+1], trans_dist)
 
         push!(oh, create_observation(pomdp))
-        obs_dist = observation(pomdp, sh[step+1], ah[step], obs_dist)
+        obs_dist = observation(pomdp, sh[step], ah[step], sh[step+1], obs_dist)
         rand!(sim.rng, oh[step], obs_dist)
 
         push!(bh, update(bu, bh[step], ah[step], oh[step]))
