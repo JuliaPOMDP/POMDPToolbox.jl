@@ -2,7 +2,7 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: Belief, BeliefUpdater, update, convert_belief, create_belief
+import POMDPs: Belief, BeliefUpdater, update, convert_belief, create_belief, domain, pdf
 import POMDPs: Simulator, simulate
 import Base: rand, rand!
 
