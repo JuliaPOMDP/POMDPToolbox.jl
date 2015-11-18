@@ -1,3 +1,8 @@
+type DiscreteUpdater <: BeliefUpdater
+    # convenience type
+    pomdp::POMDP
+end
+
 type DiscreteBelief <: Belief
     b::Vector{Float64}
     bp::Vector{Float64}
@@ -68,9 +73,11 @@ end
 
 Base.sum(b::DiscreteBelief) = sum(b.b)
 
-# TODO(max): Support for non-integer actions/observations? Will need mapping functions
+create_belief(updater::DiscreteUpdater) = DiscreteBelief(n_states(updater.pomdp))
+
 # Updates the belief given the current action and observation
-function belief(pomdp::POMDP, bold::DiscreteBelief, a::Action, o::Observation, bnew::DiscreteBelief=create_belief(pomdp))
+function update(updater::DiscreteUpdater, bold::DiscreteBelief, a::Action, o::Observation, bnew::DiscreteBelief=create_belief(updater))
+    pomdp = updater.pomdp
     # initialize spaces
     sspace = states(pomdp)
     pomdp_states = domain(sspace)

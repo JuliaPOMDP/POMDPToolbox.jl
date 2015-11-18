@@ -14,7 +14,9 @@ export
     interpolants_gaussian_1d!,
     interpolants_uniform_1d!,
     # Support for updating beliefs
+    DiscreteUpdater,
     DiscreteBelief,
+    create_belief,
     length,
     index,
     weight,
