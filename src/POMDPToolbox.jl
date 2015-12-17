@@ -33,14 +33,18 @@ export
     PreviousObservationUpdater,
     EmptyBelief,
     EmptyUpdater,
-    #simulators
+    # simulators
     RolloutSimulator,
     HistoryRecorder,
-    simulate
+    simulate,
+    # policies
+    RandomPolicy
+
 
 include("interpolants.jl")
 include("beliefs.jl")
 include("beliefs_momdp.jl")
 include("simulators.jl")
+include("polices.jl")
 
 end # module

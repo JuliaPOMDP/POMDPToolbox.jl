@@ -31,7 +31,7 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
 
     if sim.initial_state == nothing
         sim.initial_state = create_state(pomdp)
-        rand!(sim.rng, sim.initial_state, sim.initial_belief)
+        rand!(sim.rng, sim.initial_state, initial_belief)
     end
     if sim.eps == nothing
         sim.eps = 0.0
@@ -57,10 +57,11 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
 
     while disc > sim.eps && !isterminal(pomdp, s) && step <= sim.max_steps
         a = action(policy, b, a)
-        r += disc*reward(pomdp, s, a)
 
         trans_dist = transition(pomdp, s, a, trans_dist)
         rand!(sim.rng, sp, trans_dist)
+
+        r += disc*reward(pomdp, s, a, sp)
 
         obs_dist = observation(pomdp, s, a, sp, obs_dist)
         rand!(sim.rng, o, obs_dist)
@@ -109,7 +110,7 @@ function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Belief
 
     if sim.initial_state == nothing
         sim.initial_state = create_state(pomdp)
-        rand!(sim.rng, sim.initial_state, sim.initial_belief)
+        rand!(sim.rng, sim.initial_state, initial_belief)
     end
     if sim.eps == nothing
         sim.eps = 0.0
@@ -137,11 +138,12 @@ function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Belief
 
     while disc > sim.eps && !isterminal(pomdp, sh[step]) && step <= sim.max_steps
         push!(ah, action(policy, bh[step]))
-        r += disc*reward(pomdp, sh[step], ah[step])
 
         push!(sh, create_state(pomdp))
         trans_dist = transition(pomdp, sh[step], ah[step], trans_dist)
         rand!(sim.rng, sh[step+1], trans_dist)
+
+        r += disc*reward(pomdp, sh[step], ah[step], sh[step+1])
 
         push!(oh, create_observation(pomdp))
         obs_dist = observation(pomdp, sh[step], ah[step], sh[step+1], obs_dist)
