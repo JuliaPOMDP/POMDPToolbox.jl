@@ -38,13 +38,14 @@ export
     HistoryRecorder,
     simulate,
     # policies
-    RandomPolicy
+    RandomPolicy,
+    RandomSolver
 
 
 include("interpolants.jl")
 include("beliefs.jl")
 include("beliefs_momdp.jl")
 include("simulators.jl")
-include("polices.jl")
+include("policies.jl")
 
 end # module
