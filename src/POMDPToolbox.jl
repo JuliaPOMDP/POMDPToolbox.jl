@@ -4,6 +4,7 @@ using POMDPs
 
 import POMDPs: Belief, BeliefUpdater, update, convert_belief, create_belief, domain, pdf
 import POMDPs: Simulator, simulate
+import POMDPs: action, solve, create_policy
 import Base: rand, rand!
 
 export 

@@ -10,12 +10,17 @@ end
 RandomPolicy(problem::POMDP; rng=MersenneTwister()) = RandomPolicy(rng, problem, actions(problem))
 
 ## policy execution ##
-# b can be a belief or state, should work the same (assuming that POMDPs.jl #45 is accepted)
-function action(policy::RandomPolicy, b, action::Action)
+function action(policy::RandomPolicy, b::Belief, action::Action)
     actions(policy.problem, b, policy.action_space)
     return rand!(policy.rng, action, policy.action_space)
 end
-action(policy::RandomPolicy, b) = action(policy, b, create_action(policy.problem))
+action(policy::RandomPolicy, b::Belief) = action(policy, b, create_action(policy.problem))
+function action(policy::RandomPolicy, b::State, action::Action)
+    actions(policy.problem, b, policy.action_space)
+    return rand!(policy.rng, action, policy.action_space)
+end
+action(policy::RandomPolicy, b::State) = action(policy, b, create_action(policy.problem))
+
 
 ### Random Solver ###
 # solver that produces a random policy
