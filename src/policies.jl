@@ -27,6 +27,6 @@ action(policy::RandomPolicy, b::State) = action(policy, b, create_action(policy.
 type RandomSolver <: Solver
     rng::AbstractRNG
 end
-RandomSolver(;rng=MersenneTwister()) = RandomSolver(rng)
+RandomSolver(;rng=MersenneTwister(rand(UInt32))) = RandomSolver(rng)
 solve(solver::RandomSolver, problem::POMDP, policy::RandomPolicy=create_policy(solver, problem)) = policy
 create_policy(solver::RandomSolver, problem::POMDP) = RandomPolicy(problem, rng=solver.rng)
