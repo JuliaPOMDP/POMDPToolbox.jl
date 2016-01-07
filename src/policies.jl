@@ -14,12 +14,31 @@ function action(policy::RandomPolicy, b::Belief, action::Action)
     actions(policy.problem, b, policy.action_space)
     return rand!(policy.rng, action, policy.action_space)
 end
-action(policy::RandomPolicy, b::Belief) = action(policy, b, create_action(policy.problem))
+
 function action(policy::RandomPolicy, b::State, action::Action)
     actions(policy.problem, b, policy.action_space)
     return rand!(policy.rng, action, policy.action_space)
 end
+
+function action(policy::RandomPolicy, b::EmptyBelief, action::Action)
+    return rand!(policy.rng, action, policy.action_space)
+end
+
+action(policy::RandomPolicy, b::Belief) = action(policy, b, create_action(policy.problem))
 action(policy::RandomPolicy, b::State) = action(policy, b, create_action(policy.problem))
+
+## convenience functions ##
+function updater(policy::RandomPolicy)
+    try
+        return updater(policy.problem) # this is not standard but if there is an updater defined for the problem, I want to use it
+    catch ex
+        if isa(ex, MethodError)
+            return EmptyUpdater()
+        else
+            rethrow(ex)
+        end
+    end
+end
 
 
 ### Random Solver ###

@@ -159,6 +159,6 @@ end
 convert_belief(::EmptyUpdater, ::BeliefUpdater) = EmptyBelief()
 create_belief(::EmptyUpdater) = EmptyBelief()
 
-function update(::EmptyUpdater, ::EmptyBelief, ::Action, ::Observation, b::EmptyBelief=EmptyBelief())
+function update(::EmptyUpdater, ::Belief, ::Action, ::Observation, b::Belief=EmptyBelief())
     return b
 end
