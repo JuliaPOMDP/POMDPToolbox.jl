@@ -80,7 +80,7 @@ function update(updater::DiscreteUpdater, bold::DiscreteBelief, a::Action, o::Ob
     pomdp = updater.pomdp
     # initialize spaces
     sspace = states(pomdp)
-    pomdp_states = domain(sspace)
+    pomdp_states = iterator(sspace)
     # ensure belief state sizes match 
     @assert length(bold) == length(bnew)
     # initialize distributions

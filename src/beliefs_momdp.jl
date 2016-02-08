@@ -8,7 +8,7 @@ type DiscreteMOMDPUpdater <: BeliefUpdater
     momdp::POMDP
 end
 
-create_belief(updater::DiscreteMOMDPUpdater) = DiscreteBelief(length(collect(domain(part_obs_space(updater.momdp)))))
+create_belief(updater::DiscreteMOMDPUpdater) = DiscreteBelief(length(collect(iterator(part_obs_space(updater.momdp)))))
 
 
 # Updates the belief for a MOMDP with x fully observable variables index
@@ -16,7 +16,7 @@ function update(updater::DiscreteMOMDPUpdater, bold::DiscreteBelief, a::Action, 
     pomdp = updater.momdp
     # asset that number of part observable states is size of belief
     yspace = part_obs_space(pomdp)
-    ystates = domain(yspace)
+    ystates = iterator(yspace)
     @assert length(collect(ystates)) == b.n
     b.valid = true
     # initialize distributions
