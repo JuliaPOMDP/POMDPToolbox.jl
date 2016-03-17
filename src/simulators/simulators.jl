@@ -1,87 +1,8 @@
 
+
+
 # TODO: There should be a common interface for things like setting the initial belief, state, max_steps, etc.
 
-# a fast simulator that just returns the reward
-type RolloutSimulator <: Simulator
-    rng::AbstractRNG
-
-    # optional: if these are nothing, they will be ignored
-    initial_state
-    eps
-    max_steps
-end
-RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, nothing, nothing, nothing)
-RolloutSimulator() = RolloutSimulator(MersenneTwister(rand(UInt32)))
-function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
-                           initial_state=nothing,
-                           eps=nothing,
-                           max_steps=nothing)
-    return RolloutSimulator(rng, initial_state, eps, max_steps)
-end
-
-#=
-Return the reward for a single simulation of the pomdp.
-
-The simulation will be terminated when either
-1) a terminal state is reached (as determined by `isterminal()` or
-2) the discount factor is as small as `eps` or
-3) max_steps have been executed
-=#
-function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::BeliefUpdater, initial_belief::Belief)
-
-    if sim.initial_state == nothing
-        sim.initial_state = create_state(pomdp)
-        rand!(sim.rng, sim.initial_state, initial_belief)
-    end
-    if sim.eps == nothing
-        sim.eps = 0.0
-    end
-    if sim.max_steps == nothing
-        sim.max_steps = Inf
-    end
-
-    disc = 1.0
-    r = 0.0
-
-    # I think these deepcopies are necessary because the memory will be reused
-    s = deepcopy(sim.initial_state)
-    b = deepcopy(initial_belief)
-
-    obs_dist = create_observation_distribution(pomdp)
-    trans_dist = create_transition_distribution(pomdp)
-    sp = create_state(pomdp)
-    o = create_observation(pomdp)
-    a = create_action(pomdp)
-    bp = create_belief(updater)
-    step = 1
-
-    while disc > sim.eps && !isterminal(pomdp, s) && step <= sim.max_steps
-        a = action(policy, b, a)
-
-        trans_dist = transition(pomdp, s, a, trans_dist)
-        rand!(sim.rng, sp, trans_dist)
-
-        r += disc*reward(pomdp, s, a, sp)
-
-        obs_dist = observation(pomdp, s, a, sp, obs_dist)
-        rand!(sim.rng, o, obs_dist)
-
-        # alternates using the memory allocated for s and sp so nothing new has to be allocated
-        tmp = s
-        s = sp
-        sp = tmp
-
-        bp = update(updater, b, a, o, bp)
-        tmpb = b
-        b = bp
-        bp = tmpb
-
-        disc *= discount(pomdp)
-        step += 1
-    end
-
-    return r
-end
 
 # a slower (because of variable length arrays) simulator
 # that records the history for later examination

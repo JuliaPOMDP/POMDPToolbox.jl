@@ -7,13 +7,9 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, solve, create_policy
 import Base: rand, rand!
 
+# old exports... this will get removed
+#=
 export 
-    # Support for interpolants
-    Interpolants,
-    rand,
-    interpolants!,
-    interpolants_gaussian_1d!,
-    interpolants_uniform_1d!,
     # Support for updating beliefs
     DiscreteUpdater,
     DiscreteBelief,
@@ -41,12 +37,16 @@ export
     # policies
     RandomPolicy,
     RandomSolver
+    =#
 
+# only include the things that are working
+# export things immediately above the file they are contained in
+export RolloutSimulator
+include("simulators/rollout.jl")
 
-include("interpolants.jl")
-include("beliefs.jl")
-include("beliefs_momdp.jl")
-include("simulators.jl")
-include("policies.jl")
+export
+    EmptyBelief,
+    EmptyUpdater   
+include("beliefs/empty.jl")
 
 end # module
