@@ -1,6 +1,7 @@
 ### RandomPolicy ###
 # a generic policy that uses the actions function to create a list of actions
 # and then randomly samples an action from it.
+
 type RandomPolicy <: Policy
     rng::AbstractRNG
     problem::POMDP
