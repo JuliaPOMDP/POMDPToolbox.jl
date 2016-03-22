@@ -7,6 +7,7 @@ type EmptyUpdater <: BeliefUpdater end
 
 convert_belief(::EmptyUpdater, ::BeliefUpdater) = EmptyBelief()
 create_belief(::EmptyUpdater) = EmptyBelief()
+rand(rng::AbstractRNG, b::EmptyBelief, thing=nothing) = nothing
 
 function update(::EmptyUpdater, ::Belief, ::Any, ::Any, b::Belief=EmptyBelief())
     return b

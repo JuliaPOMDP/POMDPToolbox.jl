@@ -1,3 +1,5 @@
+# this file is old (pre-parametric)
+
 type DiscreteUpdater <: BeliefUpdater
     # convenience type
     pomdp::POMDP
@@ -114,38 +116,3 @@ function update(updater::DiscreteUpdater, bold::DiscreteBelief, a::Action, o::Ob
     end
     bnew
 end
-
-# a belief that just stores the previous observation
-# policies based on the previous observation only are often pretty good
-# e.g. for the crying baby problem
-# when a belief is converted, the observation is initially set to nothing, so the policy must be able to handle a belief with nothing
-type PreviousObservation <: Belief
-    observation
-    PreviousObservation(obs) = new(deepcopy(obs))
-end
-
-type PreviousObservationUpdater <: BeliefUpdater
-end
-
-convert_belief(u::PreviousObservationUpdater, b::Belief) = PreviousObservation(nothing)
-create_belief(u::PreviousObservationUpdater) = PreviousObservation(nothing)
-
-function update(bu::PreviousObservationUpdater, ::PreviousObservation, action::Action, obs::Observation, b::PreviousObservation=PreviousObservation(obs))
-    # b.observation = deepcopy(obs) # <- this is expensive
-
-    # XXX hack! seems like there should be a better way to do this
-    if typeof(obs) != typeof(b.observation)
-        b.observation = deepcopy(obs)
-    end
-    for n in fieldnames(b.observation)
-        val = getfield(obs,n)
-        if typeof(val).mutable
-            setfield!(b.observation, n, deepcopy(val)) # <- should this be copy or deepcopy?
-        else
-            setfield!(b.observation, n, val)
-        end
-    end
-    return b
-end
-
-

@@ -41,12 +41,20 @@ export
 
 # only include the things that are working
 # export things immediately above the file they are contained in
-export RolloutSimulator
-include("simulators/rollout.jl")
 
+# beliefs
 export
     EmptyBelief,
     EmptyUpdater   
 include("beliefs/empty.jl")
+
+export
+    PreviousObservation,
+    PreviousObservationUpdater
+include("beliefs/previous_observation.jl")
+
+# simulators
+export RolloutSimulator
+include("simulators/rollout.jl")
 
 end # module
