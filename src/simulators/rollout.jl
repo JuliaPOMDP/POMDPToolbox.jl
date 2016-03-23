@@ -28,7 +28,7 @@ The simulation will be terminated when either
 =#
 function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::BeliefUpdater, initial_belief::Belief)
 
-    s = get(sim.initial_state, rand(sim.rng, initial_belief))::S
+    s = get(sim.initial_state, rand(sim.rng, initial_belief))
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
 
@@ -37,6 +37,9 @@ function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Pol
 
     # I think this deepcopy is necessary because the memory will be reused
     b = deepcopy(initial_belief)
+    a = A()
+    sp = S()
+    o = O()
 
     obs_dist = create_observation_distribution(pomdp)
     trans_dist = create_transition_distribution(pomdp)
@@ -44,27 +47,15 @@ function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Pol
     step = 1
 
     while disc > eps && !isterminal(pomdp, s) && step <= max_steps
-        if step == 1
-            a = action(policy, b)
-        else
-            a = action(policy, b, a)
-        end
+        a = action(policy, b, a)
 
         trans_dist = transition(pomdp, s, a, trans_dist)
-        if step == 1
-            sp = rand(sim.rng, trans_dist)
-        else
-            sp = rand(sim.rng, trans_dist, sp)
-        end
+        sp = rand(sim.rng, trans_dist, sp)
 
         r += disc*reward(pomdp, s, a, sp)
 
         obs_dist = observation(pomdp, s, a, sp, obs_dist)
-        if step == 1
-            o = rand(sim.rng, obs_dist)
-        else
-            o = rand(sim.rng, obs_dist, o)
-        end
+        o = rand(sim.rng, obs_dist, o)
 
         # alternates using the memory allocated for s and sp so nothing new has to be allocated
         tmp = s
