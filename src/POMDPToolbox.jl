@@ -53,8 +53,17 @@ export
     PreviousObservationUpdater
 include("beliefs/previous_observation.jl")
 
+# policies
+export
+    RandomPolicy,
+    RandomSolver
+include("policies/random.jl")
+
 # simulators
 export RolloutSimulator
 include("simulators/rollout.jl")
+
+export MDPRolloutSimulator
+include("simulators/mdp_rollout.jl")
 
 end # module

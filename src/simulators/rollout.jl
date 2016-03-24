@@ -1,6 +1,9 @@
-# RolloutSimulator: a fast simulator that just returns the reward
+# RolloutSimulator
 # maintained by @zsunberg
 
+"""
+a fast simulator that just returns the reward
+"""
 type RolloutSimulator <: Simulator
     rng::AbstractRNG
 
@@ -18,14 +21,14 @@ function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
-#=
+"""
 Return the reward for a single simulation of the pomdp.
 
 The simulation will be terminated when either
 1) a terminal state is reached (as determined by `isterminal()` or
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
-=#
+"""
 function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::BeliefUpdater, initial_belief::Belief)
 
     s = get(sim.initial_state, rand(sim.rng, initial_belief))
@@ -46,7 +49,7 @@ function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Pol
     bp = create_belief(updater)
     step = 1
 
-    while disc > eps && !isterminal(pomdp, s) && step <= max_steps
+    while disc > eps && !isterminal(pomdp, s) && step <= max_steps # TODO also check for terminal observation
         a = action(policy, b, a)
 
         trans_dist = transition(pomdp, s, a, trans_dist)

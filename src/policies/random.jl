@@ -1,7 +1,7 @@
 ### RandomPolicy ###
-# a generic policy that uses the actions function to create a list of actions
-# and then randomly samples an action from it.
-
+"""
+a generic policy that uses the actions function to create a list of actions and then randomly samples an action from it.
+"""
 type RandomPolicy <: Policy
     rng::AbstractRNG
     problem::POMDP
@@ -11,22 +11,24 @@ end
 RandomPolicy(problem::POMDP; rng=MersenneTwister()) = RandomPolicy(rng, problem, actions(problem))
 
 ## policy execution ##
-function action(policy::RandomPolicy, b::Belief, action::Action)
-    actions(policy.problem, b, policy.action_space)
-    return rand!(policy.rng, action, policy.action_space)
+function action(policy::RandomPolicy, b, action)
+    policy.action_space = actions(policy.problem, b, policy.action_space)
+    return rand(policy.rng, policy.action_space, action)
 end
 
-function action(policy::RandomPolicy, b::State, action::Action)
-    actions(policy.problem, b, policy.action_space)
-    return rand!(policy.rng, action, policy.action_space)
+function action(policy::RandomPolicy, b::EmptyBelief, action)
+    return rand(policy.rng, policy.action_space, action)
 end
 
-function action(policy::RandomPolicy, b::EmptyBelief, action::Action)
-    return rand!(policy.rng, action, policy.action_space)
+function action(policy::RandomPolicy, b)
+    policy.action_space = actions(policy.problem, b, policy.action_space)
+    return rand(policy.rng, policy.action_space)
 end
 
-action(policy::RandomPolicy, b::Belief) = action(policy, b, create_action(policy.problem))
-action(policy::RandomPolicy, b::State) = action(policy, b, create_action(policy.problem))
+function action(policy::RandomPolicy, b::EmptyBelief)
+    return rand(policy.rng, policy.action_space)
+end
+
 
 ## convenience functions ##
 function updater(policy::RandomPolicy)
@@ -42,8 +44,9 @@ function updater(policy::RandomPolicy)
 end
 
 
-### Random Solver ###
-# solver that produces a random policy
+"""
+solver that produces a random policy
+"""
 type RandomSolver <: Solver
     rng::AbstractRNG
 end
