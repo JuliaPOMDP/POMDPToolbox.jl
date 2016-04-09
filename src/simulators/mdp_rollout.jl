@@ -37,8 +37,8 @@ function simulate{S,A}(sim::MDPRolloutSimulator, mdp::POMDP{S,A}, policy::Policy
 
     # I think this deepcopy is necessary because the memory will be reused
     s = deepcopy(initial_state)
-    a = A()
-    sp = S()
+    a = create_action(mdp)
+    sp = create_state(mdp)
 
     trans_dist = create_transition_distribution(mdp)
     step = 1
