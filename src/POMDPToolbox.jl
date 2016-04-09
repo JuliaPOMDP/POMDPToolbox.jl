@@ -7,6 +7,8 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, solve, create_policy
 import Base: rand, rand!
 
+using GenerativeModels
+
 # old exports... this will get removed
 #=
 export 

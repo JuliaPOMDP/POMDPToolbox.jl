@@ -33,7 +33,7 @@ function simulate{S,A}(sim::MDPRolloutSimulator, mdp::POMDP{S,A}, policy::Policy
     max_steps = get(sim.max_steps, typemax(Int))
 
     disc = 1.0
-    r = 0.0
+    r_total = 0.0
 
     # I think this deepcopy is necessary because the memory will be reused
     s = deepcopy(initial_state)
@@ -46,10 +46,9 @@ function simulate{S,A}(sim::MDPRolloutSimulator, mdp::POMDP{S,A}, policy::Policy
     while disc > eps && !isterminal(mdp, s) && step <= max_steps
         a = action(policy, s, a)
 
-        trans_dist = transition(mdp, s, a, trans_dist)
-        sp = rand(sim.rng, trans_dist, sp)
+        sp, r = generate_sr(mdp, s, a, sim.rng, sp)
 
-        r += disc*reward(mdp, s, a, sp)
+        r_total += disc*r
 
         # alternates using the memory allocated for s and sp so nothing new has to be allocated
         tmp = s
@@ -60,6 +59,6 @@ function simulate{S,A}(sim::MDPRolloutSimulator, mdp::POMDP{S,A}, policy::Policy
         step += 1
     end
 
-    return r
+    return r_total
 end
 
