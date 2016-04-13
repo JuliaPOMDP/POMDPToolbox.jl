@@ -52,7 +52,7 @@ function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Pol
     while disc > eps && !isterminal(pomdp, s) && step <= max_steps # TODO also check for terminal observation
         a = action(policy, b, a)
 
-        sp, o, r = generate_sor(pomdp, s, a, rng, sp, o)
+        sp, o, r = generate_sor(pomdp, s, a, sim.rng, sp, o)
 
         r_total += disc*r
 

@@ -11,8 +11,8 @@ end
 RandomPolicy(problem::POMDP; rng=MersenneTwister()) = RandomPolicy(rng, problem, actions(problem))
 
 ## policy execution ##
-function action(policy::RandomPolicy, b, action)
-    policy.action_space = actions(policy.problem, b, policy.action_space)
+function action(policy::RandomPolicy, s, action)
+    policy.action_space = actions(policy.problem, s, policy.action_space)
     return rand(policy.rng, policy.action_space, action)
 end
 
@@ -20,8 +20,8 @@ function action(policy::RandomPolicy, b::EmptyBelief, action)
     return rand(policy.rng, policy.action_space, action)
 end
 
-function action(policy::RandomPolicy, b)
-    policy.action_space = actions(policy.problem, b, policy.action_space)
+function action(policy::RandomPolicy, s)
+    policy.action_space = actions(policy.problem, s, policy.action_space)
     return rand(policy.rng, policy.action_space)
 end
 
