@@ -78,7 +78,7 @@ Base.sum(b::DiscreteBelief) = sum(b.b)
 create_belief(updater::DiscreteUpdater) = DiscreteBelief(n_states(updater.pomdp))
 
 # Updates the belief given the current action and observation
-function update(updater::DiscreteUpdater, bold::DiscreteBelief, a::Action, o::Observation, bnew::DiscreteBelief=create_belief(updater))
+function update{A,O}(updater::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew::DiscreteBelief=create_belief(updater))
     pomdp = updater.pomdp
     # initialize spaces
     sspace = states(pomdp)

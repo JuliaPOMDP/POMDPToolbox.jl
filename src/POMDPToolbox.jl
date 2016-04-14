@@ -49,6 +49,10 @@ export
     EmptyBelief,
     EmptyUpdater   
 include("beliefs/empty.jl")
+export 
+    DiscreteBelief,
+    DiscreteUpdater
+include("beliefs/beliefs.jl")
 
 export
     PreviousObservation,
