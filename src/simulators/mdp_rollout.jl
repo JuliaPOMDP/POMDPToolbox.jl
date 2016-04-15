@@ -27,7 +27,7 @@ The simulation will be terminated when either
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
 """
-function simulate{S,A}(sim::MDPRolloutSimulator, mdp::POMDP{S,A}, policy::Policy, initial_state::S)
+function simulate{S,A}(sim::MDPRolloutSimulator, mdp::MDP{S,A}, policy::Policy, initial_state::S)
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))

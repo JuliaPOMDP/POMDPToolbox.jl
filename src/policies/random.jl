@@ -4,11 +4,11 @@ a generic policy that uses the actions function to create a list of actions and 
 """
 type RandomPolicy <: Policy
     rng::AbstractRNG
-    problem::POMDP
+    problem::Union{POMDP,MDP}
     action_space # stores the action space so that it does not have to be reallocated each time
 end
 # The constructor below should be used to create the policy so that the action space is initialized correctly
-RandomPolicy(problem::POMDP; rng=MersenneTwister()) = RandomPolicy(rng, problem, actions(problem))
+RandomPolicy(problem::Union{POMDP,MDP}; rng=MersenneTwister()) = RandomPolicy(rng, problem, actions(problem))
 
 ## policy execution ##
 function action(policy::RandomPolicy, s, action)
@@ -51,5 +51,5 @@ type RandomSolver <: Solver
     rng::AbstractRNG
 end
 RandomSolver(;rng=MersenneTwister(rand(UInt32))) = RandomSolver(rng)
-solve(solver::RandomSolver, problem::POMDP, policy::RandomPolicy=create_policy(solver, problem)) = policy
-create_policy(solver::RandomSolver, problem::POMDP) = RandomPolicy(problem, rng=solver.rng)
+solve(solver::RandomSolver, problem::Union{POMDP,MDP}, policy::RandomPolicy=create_policy(solver, problem)) = policy
+create_policy(solver::RandomSolver, problem::Union{POMDP,MDP}) = RandomPolicy(problem, rng=solver.rng)
