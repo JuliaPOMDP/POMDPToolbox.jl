@@ -1,3 +1,5 @@
+# this file is old (pre-parametric)
+
 type DiscreteUpdater <: BeliefUpdater
     # convenience type
     pomdp::POMDP
@@ -76,7 +78,7 @@ Base.sum(b::DiscreteBelief) = sum(b.b)
 create_belief(updater::DiscreteUpdater) = DiscreteBelief(n_states(updater.pomdp))
 
 # Updates the belief given the current action and observation
-function update(updater::DiscreteUpdater, bold::DiscreteBelief, a::Action, o::Observation, bnew::DiscreteBelief=create_belief(updater))
+function update{A,O}(updater::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew::DiscreteBelief=create_belief(updater))
     pomdp = updater.pomdp
     # initialize spaces
     sspace = states(pomdp)
@@ -113,52 +115,4 @@ function update(updater::DiscreteUpdater, bold::DiscreteBelief, a::Action, o::Ob
         for i = 1:length(bnew); bnew[i] /= norm; end
     end
     bnew
-end
-
-# a belief that just stores the previous observation
-# policies based on the previous observation only are often pretty good
-# e.g. for the crying baby problem
-# when a belief is converted, the observation is initially set to nothing, so the policy must be able to handle a belief with nothing
-type PreviousObservation <: Belief
-    observation
-    PreviousObservation(obs) = new(deepcopy(obs))
-end
-
-type PreviousObservationUpdater <: BeliefUpdater
-end
-
-convert_belief(u::PreviousObservationUpdater, b::Belief) = PreviousObservation(nothing)
-create_belief(u::PreviousObservationUpdater) = PreviousObservation(nothing)
-
-function update(bu::PreviousObservationUpdater, ::PreviousObservation, action::Action, obs::Observation, b::PreviousObservation=PreviousObservation(obs))
-    # b.observation = deepcopy(obs) # <- this is expensive
-
-    # XXX hack! seems like there should be a better way to do this
-    if typeof(obs) != typeof(b.observation)
-        b.observation = deepcopy(obs)
-    end
-    for n in fieldnames(b.observation)
-        val = getfield(obs,n)
-        if typeof(val).mutable
-            setfield!(b.observation, n, deepcopy(val)) # <- should this be copy or deepcopy?
-        else
-            setfield!(b.observation, n, val)
-        end
-    end
-    return b
-end
-
-# an empty belief
-# for use with e.g. a random policy
-type EmptyBelief <: Belief
-end
-
-type EmptyUpdater <: BeliefUpdater
-end
-
-convert_belief(::EmptyUpdater, ::BeliefUpdater) = EmptyBelief()
-create_belief(::EmptyUpdater) = EmptyBelief()
-
-function update(::EmptyUpdater, ::Belief, ::Action, ::Observation, b::Belief=EmptyBelief())
-    return b
 end
