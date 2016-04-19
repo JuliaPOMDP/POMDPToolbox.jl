@@ -40,7 +40,6 @@ function simulate{S,A}(sim::MDPRolloutSimulator, mdp::MDP{S,A}, policy::Policy, 
     a = create_action(mdp)
     sp = create_state(mdp)
 
-    trans_dist = create_transition_distribution(mdp)
     step = 1
 
     while disc > eps && !isterminal(mdp, s) && step <= max_steps
