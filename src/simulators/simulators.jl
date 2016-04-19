@@ -10,10 +10,10 @@ type HistoryRecorder <: Simulator
     rng::AbstractRNG
 
     # these will be filled when the simulation is completed
-    state_hist::Vector{Any}
-    action_hist::Vector{Any}
-    observation_hist::Vector{Any}
-    belief_hist::Vector{Any}
+    state_hist::AbstractVector
+    action_hist::AbstractVector
+    observation_hist::AbstractVector
+    belief_hist::AbstractVector
 
     # optional: if these are nothing, they will be ignored
     initial_state
@@ -27,7 +27,7 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
     return HistoryRecorder(rng, Any[], Any[], Any[], Any[], initial_state, eps, max_steps)
 end
 
-function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::BeliefUpdater, initial_belief::Belief)
+function simulate(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy, bu::BeliefUpdater, initial_belief::Belief)
 
     if sim.initial_state == nothing
         sim.initial_state = create_state(pomdp)

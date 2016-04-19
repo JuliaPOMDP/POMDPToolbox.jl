@@ -1,6 +1,5 @@
 using POMDPToolbox
 using Base.Test
 
-# reload("../src/POMDPToolbox.jl")
-
-include("test_interpolants.jl")
+include("test_random_solver.jl")
+include("test_history_recorder.jl")

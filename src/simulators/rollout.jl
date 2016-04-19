@@ -2,7 +2,12 @@
 # maintained by @zsunberg
 
 """
-a fast simulator that just returns the reward
+A fast simulator that just returns the reward
+
+The simulation will be terminated when either
+1) a terminal state is reached (as determined by `isterminal()` or
+2) the discount factor is as small as `eps` or
+3) max_steps have been executed
 """
 type RolloutSimulator <: Simulator
     rng::AbstractRNG
@@ -10,25 +15,17 @@ type RolloutSimulator <: Simulator
     # optional: if these are null, they will be ignored
     initial_state::Nullable{Any}
     eps::Nullable{Float64}
-    max_steps::Nullable{Int}
+    max_steps::Nullable{Integer}
 end
 RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, Nullable{Any}(), Nullable{Float64}(), Nullable{Int}())
 RolloutSimulator() = RolloutSimulator(MersenneTwister(rand(UInt32)))
 function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
                            initial_state=Nullable{Any}(),
                            eps=Nullable{Float64}(),
-                           max_steps=Nullable{Int}())
+                           max_steps=Nullable{Integer}())
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
-"""
-Return the reward for a single simulation of the pomdp.
-
-The simulation will be terminated when either
-1) a terminal state is reached (as determined by `isterminal()` or
-2) the discount factor is as small as `eps` or
-3) max_steps have been executed
-"""
 function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::BeliefUpdater, initial_belief::Belief)
 
     s = get(sim.initial_state, rand(sim.rng, initial_belief))

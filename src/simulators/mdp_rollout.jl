@@ -2,7 +2,12 @@
 # maintained by @zsunberg
 
 """
-a fast MDP simulator that just returns the reward
+A fast MDP simulator that just returns the reward
+
+The simulation will be terminated when either
+1) a terminal state is reached (as determined by `isterminal()` or
+2) the discount factor is as small as `eps` or
+3) max_steps have been executed
 """
 type MDPRolloutSimulator <: Simulator
     rng::AbstractRNG
@@ -19,14 +24,6 @@ function MDPRolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
     return MDPRolloutSimulator(rng, eps, max_steps)
 end
 
-"""
-Return the reward for a single simulation of the mdp.
-
-The simulation will be terminated when either
-1) a terminal state is reached (as determined by `isterminal()` or
-2) the discount factor is as small as `eps` or
-3) max_steps have been executed
-"""
 function simulate{S,A}(sim::MDPRolloutSimulator, mdp::MDP{S,A}, policy::Policy, initial_state::S)
 
     eps = get(sim.eps, 0.0)
