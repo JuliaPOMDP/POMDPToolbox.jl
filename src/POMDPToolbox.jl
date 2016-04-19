@@ -69,9 +69,6 @@ include("policies/random.jl")
 export RolloutSimulator
 include("simulators/rollout.jl")
 
-export MDPRolloutSimulator
-include("simulators/mdp_rollout.jl")
-
 export HistoryRecorder
 include("simulators/history_recorder.jl")
 
