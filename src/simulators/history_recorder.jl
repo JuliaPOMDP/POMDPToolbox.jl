@@ -71,3 +71,40 @@ function simulate{S,A,O}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Poli
 
     return r_total
 end
+
+function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, initial_state::S=get(sim.initial_state))
+
+    eps = get(sim.eps, 0.0)
+    max_steps = get(sim.max_steps, typemax(Int))
+    sizehint = get(sim.sizehint, min(max_steps, 1000))
+
+    # aliases for the histories to make the code more concise
+    sh = sim.state_hist = sizehint!(Vector{S}(0), sizehint)
+    ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
+    oh = sim.observation_hist = Any[]
+    bh = sim.belief_hist = Any[]
+   
+    disc = 1.0
+    r_total = 0.0
+
+    push!(sh, initial_state)
+
+    step = 1
+
+    while disc > eps && !isterminal(mdp, sh[step]) && step <= max_steps
+        push!(ah, action(policy, sh[step]))
+
+        sp, r = generate_sr(mdp, sh[step], ah[step], sim.rng)
+
+        push!(sh, sp)
+
+        r_total += disc*r
+
+        disc *= discount(mdp)
+        step += 1
+    end
+
+    return r_total
+end
+
+
