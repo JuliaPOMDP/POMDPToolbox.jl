@@ -6,7 +6,7 @@ problem = BabyPOMDP()
 policy = RandomPolicy(problem, rng=MersenneTwister(2))
 steps=10
 sim = HistoryRecorder(max_steps=steps)
-simulate(sim, problem, policy, updater(policy), initial_belief(problem))
+simulate(sim, problem, policy, updater(policy), initial_state_distribution(problem))
 
 @test length(sim.state_hist) == steps+1
 @test length(sim.action_hist) == steps

@@ -10,4 +10,4 @@ policy = solve(solver, problem)
 
 sim = RolloutSimulator(max_steps=10)
 
-simulate(sim, problem, policy, updater(policy), initial_belief(problem))
+simulate(sim, problem, policy, updater(policy), initial_state_distribution(problem))

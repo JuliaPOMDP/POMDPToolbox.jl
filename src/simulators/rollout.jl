@@ -26,7 +26,7 @@ function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
-function simulate{S,A,O}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::BeliefUpdater, initial_belief::Belief)
+function simulate{S,A,O,B}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::Updater{B}, initial_belief::AbstractDistribution)
 
     s = get(sim.initial_state, rand(sim.rng, initial_belief))
     eps = get(sim.eps, 0.0)

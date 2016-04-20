@@ -1,11 +1,4 @@
-# this file is old (pre-parametric)
-
-type DiscreteUpdater <: BeliefUpdater
-    # convenience type
-    pomdp::POMDP
-end
-
-type DiscreteBelief <: Belief
+type DiscreteBelief 
     b::Vector{Float64}
     bp::Vector{Float64}
     n::Int64
@@ -25,13 +18,19 @@ function DiscreteBelief(b::Vector{Float64})
     return DiscreteBelief(bpp, bp, n, true)
 end
 
+type DiscreteUpdater <: Updater{DiscreteBelief}
+    # convenience type
+    pomdp::POMDP
+end
+
+
 #Type declarations for particle-based belief representations
 type Particle{T}
     state::T
     weight::Float64
 end
 
-type ParticleBelief{T} <: Belief
+type ParticleBelief{T}
     particles::Vector{Particle{T}}
 end
 
@@ -75,11 +74,22 @@ end
 
 Base.sum(b::DiscreteBelief) = sum(b.b)
 
-create_belief(updater::DiscreteUpdater) = DiscreteBelief(n_states(updater.pomdp))
+create_belief(bu::DiscreteUpdater) = DiscreteBelief(n_states(bu.pomdp))
+
+
+function convert(bu::DiscreteUpdater, dist::AbstractDistribution, belief::DiscreteBelief = create_belief(bu))
+    belief = fill!(belief, 0.0)
+    for s in iterator(dist)
+        sidx = state_index(bu.pomdp, s) 
+        belief[sidx] = pdf(dist, s)  
+    end
+    return belief
+end
+
 
 # Updates the belief given the current action and observation
-function update{A,O}(updater::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew::DiscreteBelief=create_belief(updater))
-    pomdp = updater.pomdp
+function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew::DiscreteBelief=create_belief(bu))
+    pomdp = bu.pomdp
     # initialize spaces
     sspace = states(pomdp)
     pomdp_states = iterator(sspace)

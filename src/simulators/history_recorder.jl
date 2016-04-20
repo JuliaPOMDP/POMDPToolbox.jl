@@ -32,9 +32,10 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
     return HistoryRecorder(rng, Any[], Any[], Any[], Any[], initial_state, eps, max_steps, sizehint)
 end
 
-function simulate{S,A,O}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy, bu::BeliefUpdater, initial_belief::Belief)
+function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy, bu::Updater{B}, initial_state_dist::AbstractDistribution)
 
-    initial_state = get(sim.initial_state, rand(sim.rng, initial_belief))
+    initial_state = get(sim.initial_state, rand(sim.rng, initial_state_dist, create_state(pomdp)))
+    initial_belief = convert(bu, initial_state_dist, create_belief(bu))
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
     sizehint = get(sim.sizehint, min(max_steps, 1000))
@@ -43,7 +44,7 @@ function simulate{S,A,O}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Poli
     sh = sim.state_hist = sizehint!(Vector{S}(0), sizehint)
     ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
     oh = sim.observation_hist = sizehint!(Vector{O}(0), sizehint)
-    bh = sim.belief_hist = sizehint!(Vector{Any}(0), sizehint)
+    bh = sim.belief_hist = sizehint!(Vector{B}(0), sizehint)
    
     disc = 1.0
     r_total = 0.0
