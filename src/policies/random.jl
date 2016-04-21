@@ -16,7 +16,7 @@ function action(policy::RandomPolicy, s, action)
     return rand(policy.rng, policy.action_space, action)
 end
 
-function action(policy::RandomPolicy, b::EmptyBelief, action)
+function action(policy::RandomPolicy, b::Void, action)
     return rand(policy.rng, policy.action_space, action)
 end
 
@@ -25,7 +25,7 @@ function action(policy::RandomPolicy, s)
     return rand(policy.rng, policy.action_space)
 end
 
-function action(policy::RandomPolicy, b::EmptyBelief)
+function action(policy::RandomPolicy, b::Void)
     return rand(policy.rng, policy.action_space)
 end
 
@@ -36,7 +36,7 @@ function updater(policy::RandomPolicy)
         return updater(policy.problem) # this is not standard but if there is an updater defined for the problem, I want to use it
     catch ex
         if isa(ex, MethodError)
-            return EmptyUpdater()
+            return VoidUpdater()
         else
             rethrow(ex)
         end

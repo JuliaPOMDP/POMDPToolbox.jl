@@ -1,3 +1,5 @@
+# Maintained by Max Egorov
+
 type DiscreteBelief 
     b::Vector{Float64}
     bp::Vector{Float64}
@@ -77,7 +79,7 @@ Base.sum(b::DiscreteBelief) = sum(b.b)
 create_belief(bu::DiscreteUpdater) = DiscreteBelief(n_states(bu.pomdp))
 
 
-function convert(bu::DiscreteUpdater, dist::AbstractDistribution, belief::DiscreteBelief = create_belief(bu))
+function initialize_belief(bu::DiscreteUpdater, dist::AbstractDistribution, belief::DiscreteBelief = create_belief(bu))
     belief = fill!(belief, 0.0)
     for s in iterator(dist)
         sidx = state_index(bu.pomdp, s) 

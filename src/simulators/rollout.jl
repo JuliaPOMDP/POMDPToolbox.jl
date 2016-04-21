@@ -26,9 +26,13 @@ function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
-function simulate{S,A,O,B}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::Updater{B}, initial_belief::AbstractDistribution)
+function simulate{S,A,O,B}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::Updater{B}, initial_belief::Union{B,AbstractDistribution})
 
-    s = get(sim.initial_state, rand(sim.rng, initial_belief))
+    if !isnull(sim.initial_state)
+        s = get(sim.initial_state)
+    else
+        s = rand(sim.rng, initial_belief)
+    end
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
 
@@ -36,7 +40,7 @@ function simulate{S,A,O,B}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::P
     r_total = 0.0
 
     # I think this deepcopy is necessary because the memory will be reused
-    b = deepcopy(initial_belief)
+    b = deepcopy(initial_belief) #XXX change this to convert
     a = create_action(pomdp)
     sp = create_state(pomdp)
     o = create_observation(pomdp)

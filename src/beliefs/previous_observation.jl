@@ -3,25 +3,25 @@
 
 # policies based on the previous observation only are often pretty good
 # e.g. for the crying baby problem
-# when there is not an observation available, the observation field may be null, so policies should check for this
-type PreviousObservation{O}
-    observation::Nullable{O}
-    PreviousObservation() = new(Nullable{O}())
-    PreviousObservation(obs) = new(Nullable{O}(obs))
-end
-PreviousObservation{O}(obs::O) = PreviousObservation{O}(Nullable{O}(obs))
+"""
+Updater that stores the most recent observation as the belief.
 
-type PreviousObservationUpdater{O} <: Updater{PreviousObservation} end
+The belief is Nullable and is null if there is no observation available.
+"""
+type PreviousObservationUpdater{O} <: Updater{Nullable{O}} end
 
-convert_belief{O,B}(u::PreviousObservationUpdater{O}, b::B) = PreviousObservation{O}()
-create_belief{O}(u::PreviousObservationUpdater{O}) = PreviousObservation{O}()
-rand(rng::AbstractRNG, b::PreviousObservation, thing=nothing) = nothing
+initialize_belief{O}(u::PreviousObservationUpdater{O}, d::AbstractDistribution, b=nothing) = Nullable{O}()
+initialize_belief{O}(u::PreviousObservationUpdater{O}, o::O, b=nothing) = Nullable{O}(o)
+create_belief{O}(::PreviousObservationUpdater{O}) = Nullable{O}()
 
-function update{O}(bu::PreviousObservationUpdater, ::PreviousObservation{O}, action, obs::O, b::PreviousObservation=PreviousObservation(obs))
-    if O.mutable
-        b.observation = Nullable{O}(deepcopy(obs)) #XXX deepcopy is slow - need to replace this
-    else
-        b.observation = Nullable{O}(obs)
-    end
-    return b
-end
+update{O}(bu::PreviousObservationUpdater{O}, old_b, action, obs::O, b=nothing) = Nullable{O}(obs)
+
+"""
+Updater that stores the most recent observation as the belief.
+"""
+type FastPreviousObservationUpdater{O} <: Updater{O} end
+
+# the only way this belief can be initialized is with a correct observation
+initialize_belief{O}(u::FastPreviousObservationUpdater{O}, o::O, b=nothing) = o
+
+update{O}(bu::FastPreviousObservationUpdater{O}, old_b, action, obs::O, b=nothing) = obs

@@ -35,7 +35,7 @@ end
 function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy, bu::Updater{B}, initial_state_dist::AbstractDistribution)
 
     initial_state = get(sim.initial_state, rand(sim.rng, initial_state_dist, create_state(pomdp)))
-    initial_belief = convert(bu, initial_state_dist, create_belief(bu))
+    initial_belief = initialize_belief(bu, initial_state_dist, create_belief(bu))
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
     sizehint = get(sim.sizehint, min(max_steps, 1000))

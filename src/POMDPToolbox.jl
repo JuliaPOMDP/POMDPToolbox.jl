@@ -2,7 +2,7 @@ module POMDPToolbox
 
 using POMDPs
 
-import POMDPs: Updater, update, convert, create_belief, domain, pdf, updater
+import POMDPs: Updater, update, initialize_belief, create_belief, domain, pdf, updater
 import POMDPs: Simulator, simulate
 import POMDPs: action, solve, create_policy
 import Base: rand, rand!
@@ -30,8 +30,6 @@ export
     # beliefs
     PreviousObservation,
     PreviousObservationUpdater,
-    EmptyBelief,
-    EmptyUpdater,
     # simulators
     RolloutSimulator,
     HistoryRecorder,
@@ -46,17 +44,17 @@ export
 
 # beliefs
 export
-    EmptyBelief,
-    EmptyUpdater   
-include("beliefs/empty.jl")
+    VoidUpdater   
+include("beliefs/void.jl")
+
 export 
     DiscreteBelief,
     DiscreteUpdater
-include("beliefs/beliefs.jl")
+include("beliefs/discrete.jl")
 
 export
-    PreviousObservation,
-    PreviousObservationUpdater
+    PreviousObservationUpdater,
+    FastPreviousObservationUpdater
 include("beliefs/previous_observation.jl")
 
 # policies
