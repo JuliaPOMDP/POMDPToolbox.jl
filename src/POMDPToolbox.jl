@@ -9,36 +9,6 @@ import Base: rand, rand!
 
 using GenerativeModels
 
-# old exports... this will get removed
-#=
-export 
-    # Support for updating beliefs
-    DiscreteUpdater,
-    DiscreteBelief,
-    create_belief,
-    length,
-    index,
-    weight,
-    sum,
-    fill!,
-    setindex!,
-    getindex,
-    copy!,
-    vec,
-    valid,
-    update,
-    # beliefs
-    PreviousObservation,
-    PreviousObservationUpdater,
-    # simulators
-    RolloutSimulator,
-    HistoryRecorder,
-    simulate,
-    # policies
-    RandomPolicy,
-    RandomSolver
-    =#
-
 # only include the things that are working
 # export things immediately above the file they are contained in
 

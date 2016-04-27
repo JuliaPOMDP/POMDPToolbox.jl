@@ -39,14 +39,15 @@ function simulate{S,A,O,B}(sim::RolloutSimulator, pomdp::POMDP{S,A,O}, policy::P
     disc = 1.0
     r_total = 0.0
 
+    b = initialize_belief(updater, initial_belief) #XXX change this to convert
     # I think this deepcopy is necessary because the memory will be reused
-    b = deepcopy(initial_belief) #XXX change this to convert
+    if b === initial_belief
+        b = deepcopy(initial_belief)
+    end
     a = create_action(pomdp)
     sp = create_state(pomdp)
     o = create_observation(pomdp)
 
-    obs_dist = create_observation_distribution(pomdp)
-    trans_dist = create_transition_distribution(pomdp)
     bp = create_belief(updater)
     step = 1
 
