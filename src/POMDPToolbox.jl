@@ -40,4 +40,8 @@ include("simulators/rollout.jl")
 export HistoryRecorder
 include("simulators/history_recorder.jl")
 
+# testing
+export test_solver
+include("testing/solver.jl")
+
 end # module
