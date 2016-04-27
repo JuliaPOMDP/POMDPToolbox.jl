@@ -5,10 +5,13 @@ a generic policy that uses the actions function to create a list of actions and 
 type RandomPolicy <: Policy
     rng::AbstractRNG
     problem::Union{POMDP,MDP}
+    updater::Updater # set this to use a custom updater, by default it will be a void updater
     action_space # stores the action space so that it does not have to be reallocated each time
 end
 # The constructor below should be used to create the policy so that the action space is initialized correctly
-RandomPolicy(problem::Union{POMDP,MDP}; rng=MersenneTwister()) = RandomPolicy(rng, problem, actions(problem))
+RandomPolicy(problem::Union{POMDP,MDP};
+             rng=MersenneTwister(),
+             updater=VoidUpdater()) = RandomPolicy(rng, problem, updater, actions(problem))
 
 ## policy execution ##
 function action(policy::RandomPolicy, s, action)
@@ -31,17 +34,7 @@ end
 
 
 ## convenience functions ##
-function updater(policy::RandomPolicy)
-    try
-        return updater(policy.problem) # this is not standard but if there is an updater defined for the problem, I want to use it
-    catch ex
-        if isa(ex, MethodError)
-            return VoidUpdater()
-        else
-            rethrow(ex)
-        end
-    end
-end
+updater(policy::RandomPolicy) = policy.updater
 
 
 """
