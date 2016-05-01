@@ -25,17 +25,6 @@ type DiscreteUpdater <: Updater{DiscreteBelief}
     pomdp::POMDP
 end
 
-
-#Type declarations for particle-based belief representations
-type Particle{T}
-    state::T
-    weight::Float64
-end
-
-type ParticleBelief{T}
-    particles::Vector{Particle{T}}
-end
-
 vec(b::DiscreteBelief) = b.b
 
 Base.length(b::DiscreteBelief) = b.n

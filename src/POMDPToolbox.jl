@@ -27,6 +27,12 @@ export
     FastPreviousObservationUpdater
 include("beliefs/previous_observation.jl")
 
+export
+    Particle,
+    ParticleBelief,
+    ParticleDistribution
+include("beliefs/particle.jl")
+
 # policies
 export
     RandomPolicy,
