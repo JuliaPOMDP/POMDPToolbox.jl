@@ -1,4 +1,4 @@
 using POMDPs
 
-POMDPs.add("POMDPModels")
-POMDPs.add("GenerativeModels")
+POMDPs.add("POMDPModels". false)
+POMDPs.add("GenerativeModels", false)
