@@ -20,7 +20,8 @@ include("beliefs/void.jl")
 
 export 
     DiscreteBelief,
-    DiscreteUpdater
+    DiscreteUpdater,
+    prod
 include("beliefs/discrete.jl")
 
 export
@@ -46,6 +47,10 @@ include("simulators/rollout.jl")
 
 export HistoryRecorder
 include("simulators/history_recorder.jl")
+
+# model tools
+export uniform_state_distribution
+include("model/initial.jl")
 
 # testing
 export test_solver
