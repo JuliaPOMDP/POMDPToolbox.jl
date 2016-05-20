@@ -1,5 +1,7 @@
 module POMDPToolbox
 
+using GenerativeModels
+using Distributions
 using POMDPs
 
 import POMDPs: Updater, update, initialize_belief, create_belief, domain, pdf, updater
@@ -7,7 +9,6 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, solve, create_policy
 import Base: rand, rand!
 
-using GenerativeModels
 
 # only include the things that are working
 # export things immediately above the file they are contained in
