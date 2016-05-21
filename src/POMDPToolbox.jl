@@ -21,7 +21,7 @@ include("beliefs/void.jl")
 export 
     DiscreteBelief,
     DiscreteUpdater,
-    prod
+    product
 include("beliefs/discrete.jl")
 
 export

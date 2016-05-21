@@ -122,7 +122,7 @@ end
 # alphas are |A|x|S|
 # computes dot product of alpha vectors and belief
 # util is array with utility of each alpha vecotr for belief b
-function prod(alphas::Matrix{Float64}, b::DiscreteBelief)
+function product(alphas::Matrix{Float64}, b::DiscreteBelief)
     @assert size(alphas, 1) == length(b) "Alpha and belief sizes not equal"
     n = size(alphas, 2) 
     util = zeros(n)
