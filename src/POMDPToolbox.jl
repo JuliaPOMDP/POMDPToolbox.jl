@@ -9,6 +9,19 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, solve, create_policy
 import Base: rand, rand!
 
+# export commons
+export
+    update,
+    initialize_belief,
+    create_belief,
+    pdf,
+    updater,
+    simulate,
+    action,
+    solve,
+    create_policy,
+    rand
+
 
 # only include the things that are working
 # export things immediately above the file they are contained in
@@ -32,7 +45,8 @@ include("beliefs/previous_observation.jl")
 export
     Particle,
     ParticleBelief,
-    ParticleDistribution
+    ParticleDistribution,
+    SIRParticleUpdater
 include("beliefs/particle.jl")
 
 # policies

@@ -1,4 +1,3 @@
-using POMDPs
 using POMDPToolbox
 using POMDPModels
 using GenerativeModels
