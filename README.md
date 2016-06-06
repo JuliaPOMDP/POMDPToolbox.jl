@@ -1,13 +1,15 @@
 # POMDPToolbox
 
-Support tools for POMDPs.jl
+Support tools for POMDPs.jl. This is a supported [JuliaPOMDP](https://github.com/JuliaPOMDP) package that provides tools
+for belief updating, problem modeling, 
 
 ## Installation
 
-To install this module run the following command:
+This package requires [POMDPs.jl](https://github.com/JuliaPOMDP). To install this module run the following command:
 
 ```julia
-Pkg.clone("https://github.com/sisl/POMDPToolbox.jl")
+using POMDPs
+POMDPs.add("POMDPToolbox")
 ```
 
 ## Code structure
