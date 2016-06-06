@@ -1,11 +1,22 @@
 # maintained by @ebalaban
 # Particle-based belief and state distribution types
 
+"""
+Belief particle type that contains a state and its probability
+"""
 type Particle{T}
     state::T # particle state
     weight::Float64 # particle prob
 end
 
+"""
+ParticleBelief type (inherits from AbstractDistribution). Fields:
+
+    -particles: a vector particles (state and weight) in the belief 
+    -probs_dict: dictionary maps states to weights (used in pdf only)
+    -probs_arr: weights of each particle in particles (for convenience)
+    -keep_dict: boolean flag for keeping track of dictionary
+"""
 type ParticleBelief{T} <: AbstractDistribution{T}
     particles::Vector{Particle{T}} # array of particles
     probs_dict::Dict{T, Float64} # dict state => prob
@@ -14,6 +25,7 @@ type ParticleBelief{T} <: AbstractDistribution{T}
 end
 
 typealias ParticleDistribution{T} ParticleBelief{T}
+
 
 function pdf{S}(b::ParticleBelief{S}, s::S)
     if !b.keep_dict
@@ -32,6 +44,24 @@ function pdf{S}(b::ParticleBelief{S}, s::S)
     return 0.0
 end
 
+function rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S)
+    cat = Categorical(length(b.probs_arr))
+    k = rand(cat)
+    s = b.particles[k].state
+    return s
+end
+
+"""
+Updater for ParticleBelief that implements 
+the sampling importance resampling (SIR) algorithm. Fields:
+
+    -pomdp: problem model
+    -td: preallocated transition distribution
+    -od: preallocated observation distribution
+    -n: number of particles for this updater
+    -rng: random number generator for generating state and observations from pomdp model
+    -keep_dict: boolean for keeping a dictionary of particles (for pdf only)
+"""
 type SIRParticleUpdater <: Updater{ParticleBelief}
     pomdp::POMDP # POMDP model
     td::AbstractDistribution
