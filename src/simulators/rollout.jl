@@ -29,7 +29,7 @@ end
 function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::Updater, initial_belief::Any)
 
     if !isnull(sim.initial_state)
-        s = get(sim.initial_state)
+        s = deepcopy(get(sim.initial_state))
     else
         s = rand(sim.rng, initial_belief)
     end
