@@ -70,4 +70,10 @@ include("model/initial.jl")
 export test_solver
 include("testing/solver.jl")
 
+export 
+    probability_check,
+    obs_prob_consistancy_check,
+    trans_prob_consistancy_check
+include("testing/model.jl")
+
 end # module
