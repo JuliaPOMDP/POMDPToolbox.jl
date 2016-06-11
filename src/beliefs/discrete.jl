@@ -28,8 +28,8 @@ end
 vec(b::DiscreteBelief) = b.b
 
 Base.length(b::DiscreteBelief) = b.n
-POMDPs.index(b::DiscreteBelief, i::Int64) = i
-POMDPs.weight(b::DiscreteBelief, i::Int64) = b.b[i]
+index(b::DiscreteBelief, i::Int64) = i
+weight(b::DiscreteBelief, i::Int64) = b.b[i]
 valid(b::DiscreteBelief) = b.valid
 
 function Base.fill!(b::DiscreteBelief, x::Float64)
