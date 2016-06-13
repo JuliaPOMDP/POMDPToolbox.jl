@@ -31,7 +31,7 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
     if !isnull(sim.initial_state)
         s = deepcopy(get(sim.initial_state))
     else
-        s = rand(sim.rng, initial_belief)
+        s = rand(sim.rng, initial_belief, create_state(pomdp))
     end
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))

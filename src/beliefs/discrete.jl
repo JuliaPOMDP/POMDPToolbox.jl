@@ -94,7 +94,7 @@ function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew
     # iterate through each state in belief vector
     for (i, sp) in enumerate(pomdp_states)
         # get the distributions
-        observation(pomdp, sp, a, od)
+        od = observation(pomdp, a, sp, od)
         # get prob of observation o from current distribution
         probo = pdf(od, o)
         # if observation prob is 0.0, then skip rest of update b/c bnew[i] is zero

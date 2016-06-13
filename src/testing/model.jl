@@ -20,13 +20,14 @@ function obs_prob_consistancy_check(pomdp::POMDP)
     # initalize space
     sspace = states(pomdp)
     aspace = actions(pomdp)
+    ospace = observations(pomdp)
     # iterate through all s-a pairs
     for s in iterator(sspace)
         for a in iterator(aspace)
-            obs = observation(pomdp, s, a)
+            obs = observation(pomdp, a, s)
             p = 0.0
-            for sp in iterator(sspace)
-                p += pdf(obs, sp)
+            for o in iterator(ospace)
+                p += pdf(obs, o)
             end
             @assert isapprox(p, 1.0) "Observation probability does not sum to unity for state: ", s, " action: ", a
         end
