@@ -101,7 +101,7 @@ function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew
         probo == 0.0 ? (continue) : (nothing)
         b_sum = 0.0 # belief for state sp
         for (j, s) in enumerate(pomdp_states)
-            transition(pomdp, s, a, td)
+            td = transition(pomdp, s, a, td)
             pp = pdf(td, sp)
             b_sum += pp * bold[j]
         end
@@ -110,6 +110,9 @@ function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew
     norm = sum(bnew)
     # if norm is zero, the update was invalid - reset to uniform
     if norm == 0.0
+        println("Invalid update for: ", bold, " ", a, " ", o)
+        #error()
+        # TODO (max): re-normalize and continue here?
         u = 1.0/length(bnew)
         fill!(bnew, u)
     else
