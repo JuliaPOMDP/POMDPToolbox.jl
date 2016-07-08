@@ -35,13 +35,17 @@ end
 function simulate{S,A,O}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy)
     dist = initial_state_distribution(pomdp)
     bu = updater(policy)
-    return simulate(sim, pomdp, policy, bu, dist) 
+    return simulate(sim, pomdp, policy, bu, dist)
 end
 
 function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy, bu::Updater{B}, initial_state_dist::AbstractDistribution)
 
     initial_state = get(sim.initial_state, rand(sim.rng, initial_state_dist, create_state(pomdp)))
-    initial_belief = initialize_belief(bu, initial_state_dist, create_belief(bu))
+    initial_belief = initialize_belief(bu, initial_state_dist)
+    # use of deepcopy inspired from rollout.jl
+    if initial_belief === initial_state_dist
+      initial_belief = deepcopy(initial_belief)
+    end
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
     sizehint = get(sim.sizehint, min(max_steps, 1000))
@@ -51,7 +55,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
     ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
     oh = sim.observation_hist = sizehint!(Vector{O}(0), sizehint)
     bh = sim.belief_hist = sizehint!(Vector{B}(0), sizehint)
-   
+
     disc = 1.0
     r_total = 0.0
 
@@ -90,7 +94,7 @@ function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, init
     ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
     oh = sim.observation_hist = Any[]
     bh = sim.belief_hist = Any[]
-   
+
     disc = 1.0
     r_total = 0.0
 
@@ -113,5 +117,3 @@ function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, init
 
     return r_total
 end
-
-
