@@ -44,7 +44,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
     initial_belief = initialize_belief(bu, initial_state_dist)
     # use of deepcopy inspired from rollout.jl
     if initial_belief === initial_state_dist
-      initial_belief = deepcopy(initial_belief)
+        initial_belief = deepcopy(initial_belief)
     end
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
@@ -82,6 +82,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
 
     return r_total
 end
+
 
 function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, initial_state::S=get(sim.initial_state))
 

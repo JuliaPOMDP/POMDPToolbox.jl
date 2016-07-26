@@ -15,14 +15,14 @@ type RolloutSimulator <: Simulator
     # optional: if these are null, they will be ignored
     initial_state::Nullable{Any}
     eps::Nullable{Float64}
-    max_steps::Nullable{Integer}
+    max_steps::Nullable{Int}
 end
 RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, Nullable{Any}(), Nullable{Float64}(), Nullable{Int}())
 RolloutSimulator() = RolloutSimulator(MersenneTwister(rand(UInt32)))
 function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
                            initial_state=Nullable{Any}(),
                            eps=Nullable{Float64}(),
-                           max_steps=Nullable{Integer}())
+                           max_steps=Nullable{Int}())
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
