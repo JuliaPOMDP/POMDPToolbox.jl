@@ -23,5 +23,6 @@ type FastPreviousObservationUpdater{O} <: Updater{O} end
 
 # the only way this belief can be initialized is with a correct observation
 initialize_belief{O}(u::FastPreviousObservationUpdater{O}, o::O, b=nothing) = o
+create_belief(::FastPreviousObservationUpdater) = nothing # XXX hack
 
 update{O}(bu::FastPreviousObservationUpdater{O}, old_b, action, obs::O, b=nothing) = obs
