@@ -69,6 +69,12 @@ include("simulators/history_recorder.jl")
 export uniform_state_distribution
 include("model/initial.jl")
 
+# tools for random sampling
+export
+    WeightVec,
+    sample
+include("random/weight_vec.jl")
+
 # testing
 export test_solver
 include("testing/solver.jl")
