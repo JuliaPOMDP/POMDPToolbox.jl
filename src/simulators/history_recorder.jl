@@ -18,6 +18,13 @@ type HistoryRecorder <: Simulator
     observation_hist::AbstractVector
     belief_hist::AbstractVector
 
+    # if capture_exception is true and there is an exception, it will be stored here
+    exception::Nullable{Exception}
+    backtrace::Nullable{Any}
+
+    # options
+    capture_exception::Bool
+
     # optional: if these are null, they will be ignored
     initial_state::Nullable{Any}
     eps::Nullable{Any}
@@ -28,8 +35,10 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           initial_state=Nullable{Any}(),
                           eps=Nullable{Any}(),
                           max_steps=Nullable{Any}(),
-                          sizehint=Nullable{Integer}())
-    return HistoryRecorder(rng, Any[], Any[], Any[], Any[], initial_state, eps, max_steps, sizehint)
+                          sizehint=Nullable{Integer}(),
+                          capture_exception=false)
+    return HistoryRecorder(rng, Any[], Any[], Any[], Any[], nothing, nothing,
+                           initial_state, eps, max_steps, sizehint, capture_exception)
 end
 
 function simulate{S,A,O}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy)
@@ -64,20 +73,29 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
 
     step = 1
 
-    while disc > eps && !isterminal(pomdp, sh[step]) && step <= max_steps
-        push!(ah, action(policy, bh[step]))
+    try
+        while disc > eps && !isterminal(pomdp, sh[step]) && step <= max_steps
+            push!(ah, action(policy, bh[step]))
 
-        sp, o, r = generate_sor(pomdp, sh[step], ah[step], sim.rng)
+            sp, o, r = generate_sor(pomdp, sh[step], ah[step], sim.rng)
 
-        push!(sh, sp)
-        push!(oh, o)
+            push!(sh, sp)
+            push!(oh, o)
 
-        r_total += disc*r
+            r_total += disc*r
 
-        push!(bh, update(bu, bh[step], ah[step], oh[step]))
+            push!(bh, update(bu, bh[step], ah[step], oh[step]))
 
-        disc *= discount(pomdp)
-        step += 1
+            disc *= discount(pomdp)
+            step += 1
+        end
+    catch ex
+        if sim.capture_exception
+            sim.exception = ex
+            sim.backtrace = catch_backtrace()
+        else
+            rethrow(ex)
+        end
     end
 
     return r_total
@@ -103,17 +121,26 @@ function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, init
 
     step = 1
 
-    while disc > eps && !isterminal(mdp, sh[step]) && step <= max_steps
-        push!(ah, action(policy, sh[step]))
+    try
+        while disc > eps && !isterminal(mdp, sh[step]) && step <= max_steps
+            push!(ah, action(policy, sh[step]))
 
-        sp, r = generate_sr(mdp, sh[step], ah[step], sim.rng)
+            sp, r = generate_sr(mdp, sh[step], ah[step], sim.rng)
 
-        push!(sh, sp)
+            push!(sh, sp)
 
-        r_total += disc*r
+            r_total += disc*r
 
-        disc *= discount(mdp)
-        step += 1
+            disc *= discount(mdp)
+            step += 1
+        end
+    catch ex
+        if sim.capture_exception
+            sim.exception = ex
+            sim.backtrace = catch_backtrace()
+        else
+            rethrow(ex)
+        end
     end
 
     return r_total
