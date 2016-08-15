@@ -38,7 +38,7 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           sizehint=Nullable{Integer}(),
                           capture_exception=false)
     return HistoryRecorder(rng, Any[], Any[], Any[], Any[], nothing, nothing,
-                           initial_state, eps, max_steps, sizehint, capture_exception)
+                           capture_exception, initial_state, eps, max_steps, sizehint)
 end
 
 function simulate{S,A,O}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy)
