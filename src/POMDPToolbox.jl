@@ -4,7 +4,6 @@ __precompile__()
 module POMDPToolbox
 
 using GenerativeModels
-using Distributions
 using POMDPs
 
 import POMDPs: Updater, update, initialize_belief, create_belief, domain, pdf, updater
