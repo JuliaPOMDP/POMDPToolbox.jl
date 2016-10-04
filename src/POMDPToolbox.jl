@@ -58,6 +58,11 @@ export
     RandomSolver
 include("policies/random.jl")
 
+export
+    VectorPolicy,
+    VectorSolver
+include("policies/vector.jl")
+
 # simulators
 export RolloutSimulator
 include("simulators/rollout.jl")
