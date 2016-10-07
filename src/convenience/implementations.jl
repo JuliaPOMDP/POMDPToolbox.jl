@@ -1,4 +1,5 @@
 # some implementations for convenience
+# maintained by Zach Sunberg
 
 actions{S}(mdp::MDP{S,Bool}) = (true, false)
 actions{S,O}(mdp::POMDP{S,Bool,O}) = (true, false)
