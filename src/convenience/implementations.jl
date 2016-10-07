@@ -1,7 +1,9 @@
 # some implementations for convenience
 
 actions{S}(mdp::MDP{S,Bool}) = (true, false)
+actions{S}(mdp::MDP{S,Bool}, s::S, t::Tuple{Bool,Bool}=(true,false)) = (true,false)
 actions{S,O}(mdp::POMDP{S,Bool,O}) = (true, false)
+actions{S,O}(mdp::POMDP{S,Bool,O}, s::S, t::Tuple{Bool,Bool}=(true,false)) = (true,false)
 
 iterator(s::AbstractVector) = s
 iterator(s::Tuple) = s
