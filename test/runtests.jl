@@ -1,3 +1,4 @@
+using POMDPs
 using POMDPToolbox
 using POMDPModels
 using GenerativeModels
@@ -11,3 +12,4 @@ include("test_particle.jl")
 include("test_solver_test.jl")
 include("test_model.jl")
 include("test_vector_policy.jl")
+include("test_implementations.jl")

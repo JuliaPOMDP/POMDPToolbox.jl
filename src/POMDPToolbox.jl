@@ -9,6 +9,7 @@ using POMDPs
 import POMDPs: Updater, update, initialize_belief, create_belief, domain, pdf, updater
 import POMDPs: Simulator, simulate
 import POMDPs: action, solve, create_policy
+import POMDPs: actions, action_index, state_index, obs_index, iterator, states
 import Base: rand, rand!
 
 # export commons
@@ -50,6 +51,9 @@ export
     ParticleDistribution,
     SIRParticleUpdater
 include("beliefs/particle.jl")
+
+# convenience
+include("convenience/implementations.jl")
 
 # policies
 export
