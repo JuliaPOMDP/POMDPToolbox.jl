@@ -6,6 +6,8 @@ actions{S}(mdp::MDP{S,Bool}, s::S, t::Tuple{Bool,Bool}=(true,false)) = (true,fal
 actions{S,O}(mdp::POMDP{S,Bool,O}) = (true, false)
 actions{S,O}(mdp::POMDP{S,Bool,O}, s::S, t::Tuple{Bool,Bool}=(true,false)) = (true,false)
 
+rand(rng::AbstractRNG, t::Tuple{Bool, Bool}, b::Bool=false) = rand(rng, Bool)
+
 iterator(s::AbstractVector) = s
 iterator(s::Tuple) = s
 
