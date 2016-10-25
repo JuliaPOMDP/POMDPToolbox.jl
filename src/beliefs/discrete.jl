@@ -1,46 +1,39 @@
-# Maintained by Max Egorov
+# Maintained by Max Egorov and Zach Sunberg
 
-type DiscreteBelief 
+"""
+A weight vector to be used as a belief or state distribution.
+
+sum(b)=1 is not enforced at all times, but during the update it is normalized to sum to one.
+
+pdf(b, i) calculates the sum every time it is called. To access the weight directly (for example if you are sure that the sum is 1), use weight(b, i). 
+"""
+type DiscreteBelief <: AbstractDistribution{Int}
     b::Vector{Float64}
-    bp::Vector{Float64}
-    n::Int64
-    valid::Bool
 end
+
 # Constructor with uniform belief
-function DiscreteBelief(n::Int64)
-    b = zeros(n) + 1.0/n
-    bp = zeros(n) + 1.0/n
-    return DiscreteBelief(b, bp, n, true)
-end
-# Constructor for user defined initial belief
-function DiscreteBelief(b::Vector{Float64})
-    n = length(b)
-    bp = deepcopy(b)
-    bpp = deepcopy(b)
-    return DiscreteBelief(bpp, bp, n, true)
-end
+DiscreteBelief(n::Int64) = DiscreteBelief(zeros(n) + 1.0/n)
 
 type DiscreteUpdater <: Updater{DiscreteBelief}
-    # convenience type
     pomdp::POMDP
 end
 
 vec(b::DiscreteBelief) = b.b
 
-Base.length(b::DiscreteBelief) = b.n
+Base.length(b::DiscreteBelief) = length(b.b)
 index(b::DiscreteBelief, i::Int64) = i
 weight(b::DiscreteBelief, i::Int64) = b.b[i]
-valid(b::DiscreteBelief) = b.valid
+iterator(b::DiscreteBelief) = filter(i->b[i]>0.0, 1:length(b))
+rand(rng::AbstractRNG, b::DiscreteBelief, s=0) = sample(rng, WeightVec(b.b))
+pdf(b::DiscreteBelief, s::Int) = b.b[s]/sum(b.b)
 
 function Base.fill!(b::DiscreteBelief, x::Float64)
     fill!(b.b, x)
-    fill!(b.bp, x)
-    b
+    return b
 end
 
 function Base.fill!(b::DiscreteBelief, idxs::Vector{Int64}, vals::Vector{Float64})
     fill!(b.b, 0.0)
-    fill!(b.bp, 0.0)
     for i = 1:length(idxs)
         index = idxs[i]
         index > 0 ? (b[index] = vals[i]) : nothing 
@@ -50,23 +43,19 @@ end
 
 function Base.setindex!(b::DiscreteBelief, x::Float64, i::Int64) 
     b.b[i] = x
-    b.bp[i] = x
     b
 end
 
-function Base.getindex(b::DiscreteBelief, i::Int64)
-    return b.b[i]
-end
+Base.getindex(b::DiscreteBelief, i::Int64) = b.b[i]
 
 function Base.copy!(b1::DiscreteBelief, b2::DiscreteBelief)
     copy!(b1.b, b2.b)
-    copy!(b1.bp, b2.bp)
+    return b1
 end
 
 Base.sum(b::DiscreteBelief) = sum(b.b)
 
 create_belief(bu::DiscreteUpdater) = DiscreteBelief(n_states(bu.pomdp))
-
 
 function initialize_belief(bu::DiscreteUpdater, dist::AbstractDistribution, belief::DiscreteBelief = create_belief(bu))
     belief = fill!(belief, 0.0)
@@ -111,8 +100,6 @@ function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew
     # if norm is zero, the update was invalid - reset to uniform
     if norm == 0.0
         println("Invalid update for: ", bold, " ", a, " ", o)
-        #error()
-        # TODO (max): re-normalize and continue here?
         u = 1.0/length(bnew)
         fill!(bnew, u)
     else
@@ -138,3 +125,10 @@ function product(alphas::Matrix{Float64}, b::DiscreteBelief)
     end
     return util
 end
+
+# function Base.convert(t::Type{DiscreteBelief}, b::AbstractDistribution)
+#     db = DiscreteBelief(zeros(length(b))) # b must support length
+#     for s in iterator(b)
+#         db[index(b,s)] = pdf(b, s)
+#     end
+# end

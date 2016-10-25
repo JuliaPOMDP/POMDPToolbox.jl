@@ -17,6 +17,7 @@ type HistoryRecorder <: Simulator
     action_hist::AbstractVector
     observation_hist::AbstractVector
     belief_hist::AbstractVector
+    reward_hist::Vector{Float64}
 
     # if capture_exception is true and there is an exception, it will be stored here
     exception::Nullable{Exception}
@@ -37,7 +38,7 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           max_steps=Nullable{Any}(),
                           sizehint=Nullable{Integer}(),
                           capture_exception=false)
-    return HistoryRecorder(rng, Any[], Any[], Any[], Any[], nothing, nothing,
+    return HistoryRecorder(rng, Any[], Any[], Any[], Any[], Float64[], nothing, nothing,
                            capture_exception, initial_state, eps, max_steps, sizehint)
 end
 
@@ -64,6 +65,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
     ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
     oh = sim.observation_hist = sizehint!(Vector{O}(0), sizehint)
     bh = sim.belief_hist = sizehint!(Vector{B}(0), sizehint)
+    rh = sim.reward_hist = sizehint!(Vector{Float64}(0), sizehint)
 
     disc = 1.0
     r_total = 0.0
@@ -81,6 +83,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
 
             push!(sh, sp)
             push!(oh, o)
+            push!(rh, r)
 
             r_total += disc*r
 
@@ -113,6 +116,7 @@ function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, init
     ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
     oh = sim.observation_hist = Any[]
     bh = sim.belief_hist = Any[]
+    rh = sim.reward_hist = sizehint!(Vector{Float64}(0), sizehint)
 
     disc = 1.0
     r_total = 0.0
@@ -128,6 +132,7 @@ function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, init
             sp, r = generate_sr(mdp, sh[step], ah[step], sim.rng)
 
             push!(sh, sp)
+            push!(rh, r)
 
             r_total += disc*r
 
