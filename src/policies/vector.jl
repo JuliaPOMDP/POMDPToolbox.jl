@@ -10,6 +10,7 @@ type VectorPolicy{S,A} <: Policy{S}
 end
 
 action(p::VectorPolicy, s) = p.act[state_index(p.mdp, s)]
+action(p::VectorPolicy, s, a) = action(p, s)
 
 """
 Solver for VectorPolicy. Doesn't do any computation - just sets the action vector.
