@@ -3,6 +3,7 @@
 # A WeightVec can often be used in place of a Categorical Distribution
 
 import StatsBase: WeightVec, sample
+import Iterators
 
 function sample(rng::AbstractRNG, wv::WeightVec)
     t = rand(rng) * sum(wv)
@@ -18,3 +19,4 @@ function sample(rng::AbstractRNG, wv::WeightVec)
 end
 
 sample(rng::AbstractRNG, a::AbstractArray, wv::WeightVec) = a[sample(rng,wv)]
+sample(rng::AbstractRNG, iterable, wv::WeightVec) = Iterators.nth(iterable, sample(rng, wv))
