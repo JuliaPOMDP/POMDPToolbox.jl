@@ -66,6 +66,11 @@ export
     VectorSolver
 include("policies/vector.jl")
 
+export
+    FunctionPolicy,
+    FunctionSolver
+include("policies/function.jl")
+
 # simulators
 export RolloutSimulator
 include("simulators/rollout.jl")
