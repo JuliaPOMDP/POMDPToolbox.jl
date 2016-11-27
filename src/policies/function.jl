@@ -23,3 +23,4 @@ end
 solve(s::FunctionSolver, mdp::Union{MDP,POMDP}) = FunctionPolicy(s.f)
 
 action(p::FunctionPolicy, x) = p.f(x)
+action(p::FunctionPolicy, x, a) = p.f(x)
