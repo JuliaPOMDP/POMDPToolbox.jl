@@ -36,7 +36,7 @@ w3 = pdf(b, s)
 s = rand(MersenneTwister(), b, s) 
 
 # dict and array method should give same pdf
-@test_approx_eq w1 w2
+@test_approx_eq_eps w1 w2 0.01
 # after one updater should have ~0.85 prob
 @test_approx_eq_eps w1 0.85 0.01
 # after 10 of each observations should be back to uniform belief
