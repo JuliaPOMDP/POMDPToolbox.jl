@@ -45,7 +45,7 @@ function pdf{S}(b::ParticleBelief{S}, s::S)
 end
 
 function rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S)
-    cat = WeightVec(length(b.probs_arr))
+    cat = WeightVec(b.probs_arr)
     k = sample(rng, cat)
     s = b.particles[k].state
     return s
