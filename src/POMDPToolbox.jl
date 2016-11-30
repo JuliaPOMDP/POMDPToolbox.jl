@@ -22,8 +22,7 @@ export
     simulate,
     action,
     solve,
-    create_policy,
-    rand
+    create_policy
 
 
 # only include the things that are working

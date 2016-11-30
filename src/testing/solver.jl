@@ -19,13 +19,9 @@ function simulate{S,A,O,B}(sim::TestSimulator, pomdp::POMDP{S,A,O}, policy::Poli
     while !isterminal(pomdp, s) && step <= sim.max_steps # TODO also check for terminal observation
         a = action(policy, b)
 
-        trans_dist = transition(pomdp, s, a)
-        sp = rand(sim.rng, trans_dist)
+        (sp, o, r) = generate_sor(pomdp, s, a, sim.rng)
 
-        r_total += disc*reward(pomdp, s, a, sp)
-
-        obs_dist = observation(pomdp, s, a, sp)
-        o = rand(sim.rng, obs_dist)
+        r_total += disc*r
 
         b = update(updater, b, a, o)
 

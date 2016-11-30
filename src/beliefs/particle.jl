@@ -45,8 +45,8 @@ function pdf{S}(b::ParticleBelief{S}, s::S)
 end
 
 function rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S)
-    cat = Categorical(length(b.probs_arr))
-    k = rand(cat)
+    cat = WeightVec(length(b.probs_arr))
+    k = sample(rng, cat)
     s = b.particles[k].state
     return s
 end
@@ -128,13 +128,13 @@ function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, b
     particles = normalize!(particles)
     bnew.probs_arr /= sum(bnew.probs_arr)
 
-    cat = Categorical(bnew.probs_arr)
+    cat = WeightVec(bnew.probs_arr)
 
     w = 1.0 / bu.n
     bu.keep_dict ? (empty!(bnew.probs_dict)) : (nothing)
     # resample
     for i = 1:bu.n
-        k = rand(cat) 
+        k = sample(rng, cat)
         sp = particles[k].state
         bnew.particles[i].state = deepcopy(sp)
         bnew.particles[i].weight = w

@@ -25,6 +25,13 @@ function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
+function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy)
+    dist = initial_state_distribution(pomdp)
+    bu = updater(policy)
+    return simulate(sim, pomdp, policy, bu, dist)
+end
+
+
 function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::Updater, initial_belief)
 
     if !isnull(sim.initial_state)
