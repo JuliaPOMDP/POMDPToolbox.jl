@@ -26,12 +26,13 @@ bp.keep_dict = false
 w2 = pdf(bp, s)
 
 bp.keep_dict = false
-os = [zeros(Bool, 5); ones(Bool, 5)]
+os = [true, false, true, false, true, false, true, false, true, false]
 b = initialize_belief(bu, initial_state_distribution(pomdp))
 for o in os
     b = update(bu, b, a, o)
 end
 w3 = pdf(b, s)
+s
 
 s = rand(MersenneTwister(), b, s) 
 
