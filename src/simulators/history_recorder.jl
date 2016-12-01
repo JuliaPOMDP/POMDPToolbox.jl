@@ -42,9 +42,8 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                            capture_exception, initial_state, eps, max_steps, sizehint)
 end
 
-function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy)
+function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Updater=updater(policy))
     dist = initial_state_distribution(pomdp)
-    bu = updater(policy)
     return simulate(sim, pomdp, policy, bu, dist)
 end
 

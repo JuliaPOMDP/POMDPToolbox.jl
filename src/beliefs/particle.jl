@@ -44,12 +44,13 @@ function pdf{S}(b::ParticleBelief{S}, s::S)
     return 0.0
 end
 
-function rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S)
+function rand{S}(rng::AbstractRNG, b::ParticleBelief{S})
     cat = WeightVec(b.probs_arr)
     k = sample(rng, cat)
     s = b.particles[k].state
     return s
 end
+rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S) = rand(rng, b)
 
 """
 Updater for ParticleBelief that implements 
@@ -64,14 +65,13 @@ the sampling importance resampling (SIR) algorithm. Fields:
 """
 type SIRParticleUpdater <: Updater{ParticleBelief}
     pomdp::POMDP # POMDP model
-    td::AbstractDistribution
     od::AbstractDistribution
     n::Int64 # number of particles
     rng::AbstractRNG
     keep_dict::Bool
 end
 function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=MersenneTwister(), keep_dict::Bool=true) 
-    SIRParticleUpdater(pomdp, create_transition_distribution(pomdp), create_observation_distribution(pomdp), n, rng, keep_dict)
+    SIRParticleUpdater(pomdp, create_observation_distribution(pomdp), n, rng, keep_dict)
 end
 
 function create_belief(up::SIRParticleUpdater) 
@@ -111,14 +111,12 @@ function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, b
     rng = bu.rng
     particles = bold.particles
     pomdp = bu.pomdp
-    td = bu.td
     od = bu.od
 
     for i = 1:bu.n
         # step particles forward
         s = particles[i].state
-        td = transition(pomdp, s, a, td)
-        sp = rand(rng, td, s)
+        sp = generate_s(pomdp, s, a, rng)
         # compute obs likelihoods
         od = observation(pomdp, s, a, sp, od)
         bnew.probs_arr[i] = pdf(od, o)
