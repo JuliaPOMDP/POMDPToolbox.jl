@@ -71,8 +71,7 @@ end
 function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew::DiscreteBelief=create_belief(bu))
     pomdp = bu.pomdp
     # initialize spaces
-    sspace = states(pomdp)
-    pomdp_states = iterator(sspace)
+    pomdp_states = ordered_states(pomdp)
     # ensure belief state sizes match 
     @assert length(bold) == length(bnew)
     # initialize distributions

@@ -85,27 +85,44 @@ function simulate{S,A}(sim::RolloutSimulator, mdp::MDP{S,A}, policy::Policy, ini
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
 
+    if S.mutable
+        s = deepcopy(initial_state)
+        sp = create_state(mdp)
+    else
+        s = initial_state
+    end
+
+    if A.mutable
+        a = create_action(mdp)
+    end
+
     disc = 1.0
     r_total = 0.0
-
-    # I think this deepcopy is necessary because the memory will be reused
-    s = deepcopy(initial_state)
-    a = create_action(mdp)
-    sp = create_state(mdp)
-
     step = 1
 
     while disc > eps && !isterminal(mdp, s) && step <= max_steps
-        a = action(policy, s, a)
+        if A.mutable
+            a = action(policy, s, a)
+        else
+            a = action(policy, s)
+        end
 
-        sp, r = generate_sr(mdp, s, a, sim.rng, sp)
+        if S.mutable
+            sp, r = generate_sr(mdp, s, a, sim.rng, sp)
+        else
+            sp, r = generate_sr(mdp, s, a, sim.rng)
+        end
 
         r_total += disc*r
 
-        # alternates using the memory allocated for s and sp so nothing new has to be allocated
-        tmp = s
-        s = sp
-        sp = tmp
+        if S.mutable
+            # alternates using the memory allocated for s and sp so nothing new has to be allocated
+            tmp = s
+            s = sp
+            sp = tmp
+        else
+            s = sp
+        end
 
         disc *= discount(mdp)
         step += 1

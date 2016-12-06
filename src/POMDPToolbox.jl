@@ -81,6 +81,12 @@ include("simulators/history_recorder.jl")
 export uniform_state_distribution
 include("model/initial.jl")
 
+export
+    ordered_states,
+    ordered_actions,
+    ordered_observations
+include("model/ordered_spaces.jl")
+
 # tools for random sampling
 export
     WeightVec,
