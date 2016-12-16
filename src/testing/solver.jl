@@ -6,7 +6,7 @@ type TestSimulator
     max_steps::Int
 end
 
-function simulate{S,A,O,B}(sim::TestSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::Updater{B}, initial_distribution::AbstractDistribution)
+function simulate{S,A,O,B}(sim::TestSimulator, pomdp::POMDP{S,A,O}, policy::Policy, updater::Updater{B}, initial_distribution::Any)
 
     s = rand(sim.rng, initial_distribution)
     b = initialize_belief(updater, initial_distribution)

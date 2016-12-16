@@ -36,7 +36,7 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
     if !isnull(sim.initial_state)
         s = deepcopy(get(sim.initial_state))
     else
-        s = rand(sim.rng, initial_belief, create_state(pomdp))
+        s = rand(sim.rng, initial_belief)
     end
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
@@ -44,34 +44,21 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
     disc = 1.0
     r_total = 0.0
 
-    b = initialize_belief(updater, initial_belief) #XXX change this to convert
-    # I think this deepcopy is necessary because the memory will be reused
-    if b === initial_belief
-        b = deepcopy(initial_belief)
-    end
-    a = create_action(pomdp)
-    sp = create_state(pomdp)
-    o = create_observation(pomdp)
+    b = initialize_belief(updater, initial_belief)
 
-    bp = create_belief(updater)
     step = 1
 
     while disc > eps && !isterminal(pomdp, s) && step <= max_steps # TODO also check for terminal observation
-        a = action(policy, b, a)
+        a = action(policy, b)
 
-        sp, o, r = generate_sor(pomdp, s, a, sim.rng, sp, o)
+        sp, o, r = generate_sor(pomdp, s, a, sim.rng)
 
         r_total += disc*r
 
-        # alternates using the memory allocated for s and sp so nothing new has to be allocated
-        tmp = s
         s = sp
-        sp = tmp
 
-        bp = update(updater, b, a, o, bp)
-        tmpb = b
+        bp = update(updater, b, a, o)
         b = bp
-        bp = tmpb
 
         disc *= discount(pomdp)
         step += 1
@@ -80,49 +67,26 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
     return r_total
 end
 
+
 function simulate{S,A}(sim::RolloutSimulator, mdp::MDP{S,A}, policy::Policy, initial_state::S=sim.initial_state)
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
 
-    if S.mutable
-        s = deepcopy(initial_state)
-        sp = create_state(mdp)
-    else
-        s = initial_state
-    end
-
-    if A.mutable
-        a = create_action(mdp)
-    end
+    s = initial_state
 
     disc = 1.0
     r_total = 0.0
     step = 1
 
     while disc > eps && !isterminal(mdp, s) && step <= max_steps
-        if A.mutable
-            a = action(policy, s, a)
-        else
-            a = action(policy, s)
-        end
+        a = action(policy, s)
 
-        if S.mutable
-            sp, r = generate_sr(mdp, s, a, sim.rng, sp)
-        else
-            sp, r = generate_sr(mdp, s, a, sim.rng)
-        end
+        sp, r = generate_sr(mdp, s, a, sim.rng)
 
         r_total += disc*r
 
-        if S.mutable
-            # alternates using the memory allocated for s and sp so nothing new has to be allocated
-            tmp = s
-            s = sp
-            sp = tmp
-        else
-            s = sp
-        end
+        s = sp
 
         disc *= discount(mdp)
         step += 1

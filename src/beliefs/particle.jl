@@ -4,20 +4,20 @@
 """
 Belief particle type that contains a state and its probability
 """
-type Particle{T}
+type Particle{T} # should be immutable?
     state::T # particle state
     weight::Float64 # particle prob
 end
 
 """
-ParticleBelief type (inherits from AbstractDistribution). Fields:
+ParticleBelief type. Fields:
 
     -particles: a vector particles (state and weight) in the belief 
     -probs_dict: dictionary maps states to weights (used in pdf only)
     -probs_arr: weights of each particle in particles (for convenience)
     -keep_dict: boolean flag for keeping track of dictionary
 """
-type ParticleBelief{T} <: AbstractDistribution{T}
+type ParticleBelief{T}
     particles::Vector{Particle{T}} # array of particles
     probs_dict::Dict{T, Float64} # dict state => prob
     probs_arr::Vector{Float64} # particle weights
@@ -65,34 +65,28 @@ the sampling importance resampling (SIR) algorithm. Fields:
 """
 type SIRParticleUpdater <: Updater{ParticleBelief}
     pomdp::POMDP # POMDP model
-    od::AbstractDistribution
     n::Int64 # number of particles
     rng::AbstractRNG
     keep_dict::Bool
 end
 function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=MersenneTwister(), keep_dict::Bool=true) 
-    SIRParticleUpdater(pomdp, create_observation_distribution(pomdp), n, rng, keep_dict)
+    SIRParticleUpdater(pomdp, n, rng, keep_dict)
 end
 
 function create_belief(up::SIRParticleUpdater) 
-    s = create_state(up.pomdp)
-    st = typeof(s)
+    st = state_type(typeof(up.pomdp))
     particles = Array(Particle{st}, up.n)
     w = 1.0 / up.n
-    for i = 1:up.n
-        particles[i] = Particle{st}(deepcopy(s), w)
-    end
     probs = Dict{st, Float64}()  
     probs_arr = zeros(up.n)
     return ParticleBelief(particles, probs, probs_arr, up.keep_dict)
 end
 
-function initialize_belief(up::SIRParticleUpdater, d::AbstractDistribution, b::ParticleBelief = create_belief(up))
+function initialize_belief(up::SIRParticleUpdater, d::Any, b::ParticleBelief = create_belief(up))
     w = 1.0 / up.n # start with a uniform weight
     for i = 1:up.n
         # sample a state from initial dist
-        s = create_state(up.pomdp)
-        s = rand(up.rng, d, s)
+        s = rand(up.rng, d)
         # add particle
         p = Particle(s, w)
         b.particles[i] = p 
@@ -111,14 +105,13 @@ function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, b
     rng = bu.rng
     particles = bold.particles
     pomdp = bu.pomdp
-    od = bu.od
 
     for i = 1:bu.n
         # step particles forward
         s = particles[i].state
         sp = generate_s(pomdp, s, a, rng)
         # compute obs likelihoods
-        od = observation(pomdp, s, a, sp, od)
+        od = observation(pomdp, s, a, sp)
         bnew.probs_arr[i] = pdf(od, o)
         particles[i].state = sp
     end
@@ -134,8 +127,7 @@ function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, b
     for i = 1:bu.n
         k = sample(rng, cat)
         sp = particles[k].state
-        bnew.particles[i].state = deepcopy(sp)
-        bnew.particles[i].weight = w
+        bnew.particles[i] = Particle(deepcopy(sp), w) # XXX slow?
         if bu.keep_dict
             haskey(bnew.probs_dict, sp) ? (bnew.probs_dict[sp] += w) : (bnew.probs_dict[deepcopy(sp)] = w) 
         end

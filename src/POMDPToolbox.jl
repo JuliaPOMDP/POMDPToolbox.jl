@@ -6,9 +6,9 @@ module POMDPToolbox
 using GenerativeModels
 using POMDPs
 
-import POMDPs: Updater, update, initialize_belief, create_belief, pdf, updater
+import POMDPs: Updater, update, initialize_belief, pdf, updater
 import POMDPs: Simulator, simulate
-import POMDPs: action, solve, create_policy
+import POMDPs: action, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, states, n_actions, n_states
 import Base: rand, rand!
 

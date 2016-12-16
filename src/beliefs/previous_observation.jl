@@ -10,7 +10,7 @@ The belief is Nullable and is null if there is no observation available.
 """
 type PreviousObservationUpdater{O} <: Updater{Nullable{O}} end
 
-initialize_belief{O}(u::PreviousObservationUpdater{O}, d::AbstractDistribution, b=nothing) = Nullable{O}()
+initialize_belief{O}(u::PreviousObservationUpdater{O}, d::Any, b=nothing) = Nullable{O}()
 initialize_belief{O}(u::PreviousObservationUpdater{O}, o::O, b=nothing) = Nullable{O}(o)
 create_belief{O}(::PreviousObservationUpdater{O}) = Nullable{O}()
 
