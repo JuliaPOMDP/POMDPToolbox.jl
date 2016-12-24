@@ -93,14 +93,16 @@ export
     sample
 include("random/weight_vec.jl")
 
+include("distributions/distributions_jl.jl")
+
 # testing
 export test_solver
 include("testing/solver.jl")
 
 export 
     probability_check,
-    obs_prob_consistancy_check,
-    trans_prob_consistancy_check
+    obs_prob_consistency_check,
+    trans_prob_consistency_check
 include("testing/model.jl")
 
 end # module
