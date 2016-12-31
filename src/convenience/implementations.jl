@@ -24,3 +24,7 @@ n_states(mdp::POMDP{Bool}) = 2
 state_index(mdp::Union{MDP, POMDP}, s::Int) = s
 action_index(mdp::Union{MDP, POMDP}, a::Int) = a
 obs_index(mdp::Union{MDP, POMDP}, o::Int) = o
+
+state_index(mdp::Union{MDP, POMDP}, s::Bool) = s+1
+action_index(mdp::Union{MDP, POMDP}, a::Bool) = a+1
+obs_index(mdp::Union{MDP, POMDP}, o::Bool) = o+1

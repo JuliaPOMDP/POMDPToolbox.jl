@@ -7,7 +7,7 @@ sum(b)=1 is not enforced at all times, but during the update it is normalized to
 
 pdf(b, i) calculates the sum every time it is called. To access the weight directly (for example if you are sure that the sum is 1), use weight(b, i). 
 """
-type DiscreteBelief <: AbstractDistribution{Int}
+type DiscreteBelief
     b::Vector{Float64}
 end
 
@@ -24,8 +24,8 @@ Base.length(b::DiscreteBelief) = length(b.b)
 index(b::DiscreteBelief, i::Int64) = i
 weight(b::DiscreteBelief, i::Int64) = b.b[i]
 iterator(b::DiscreteBelief) = filter(i->b[i]>0.0, 1:length(b))
-rand(rng::AbstractRNG, b::DiscreteBelief, s=0) = sample(rng, WeightVec(b.b))
-pdf(b::DiscreteBelief, s::Int) = b.b[s]/sum(b.b)
+rand(rng::AbstractRNG, b::DiscreteBelief) = sample(rng, WeightVec(b.b)) # This will return an integer - seems like it should actually return an object of the state type of the problem
+pdf(b::DiscreteBelief, s::Int) = b.b[s]/sum(b.b) # only works when the state type is integer
 
 function Base.fill!(b::DiscreteBelief, x::Float64)
     fill!(b.b, x)
@@ -57,7 +57,7 @@ Base.sum(b::DiscreteBelief) = sum(b.b)
 
 create_belief(bu::DiscreteUpdater) = DiscreteBelief(n_states(bu.pomdp))
 
-function initialize_belief(bu::DiscreteUpdater, dist::AbstractDistribution, belief::DiscreteBelief = create_belief(bu))
+function initialize_belief(bu::DiscreteUpdater, dist::Any, belief::DiscreteBelief = create_belief(bu))
     belief = fill!(belief, 0.0)
     for s in iterator(dist)
         sidx = state_index(bu.pomdp, s) 
@@ -68,28 +68,26 @@ end
 
 
 # Updates the belief given the current action and observation
-function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O, bnew::DiscreteBelief=create_belief(bu))
+function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O)
+    bnew = create_belief(bu)
     pomdp = bu.pomdp
     # initialize spaces
     pomdp_states = ordered_states(pomdp)
     # ensure belief state sizes match 
     @assert length(bold) == length(bnew)
-    # initialize distributions
-    od = create_observation_distribution(pomdp)
-    td = create_transition_distribution(pomdp)
     # initialize belief 
     fill!(bnew, 0.0)
     # iterate through each state in belief vector
     for (i, sp) in enumerate(pomdp_states)
         # get the distributions
-        od = observation(pomdp, a, sp, od)
+        od = observation(pomdp, a, sp)
         # get prob of observation o from current distribution
         probo = pdf(od, o)
         # if observation prob is 0.0, then skip rest of update b/c bnew[i] is zero
         probo == 0.0 ? (continue) : (nothing)
         b_sum = 0.0 # belief for state sp
         for (j, s) in enumerate(pomdp_states)
-            td = transition(pomdp, s, a, td)
+            td = transition(pomdp, s, a)
             pp = pdf(td, sp)
             b_sum += pp * bold[j]
         end
@@ -125,7 +123,7 @@ function product(alphas::Matrix{Float64}, b::DiscreteBelief)
     return util
 end
 
-# function Base.convert(t::Type{DiscreteBelief}, b::AbstractDistribution)
+# function Base.convert(t::Type{DiscreteBelief}, b::Any)
 #     db = DiscreteBelief(zeros(length(b))) # b must support length
 #     for s in iterator(b)
 #         db[index(b,s)] = pdf(b, s)

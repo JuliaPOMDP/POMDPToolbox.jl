@@ -47,9 +47,13 @@ function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Update
     return simulate(sim, pomdp, policy, bu, dist)
 end
 
-function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Policy, bu::Updater{B}, initial_state_dist::AbstractDistribution)
+function simulate{S,A,O,B}(sim::HistoryRecorder,
+                           pomdp::POMDP{S,A,O}, 
+                           policy::Policy,
+                           bu::Updater{B},
+                           initial_state_dist::Any)
 
-    initial_state = get(sim.initial_state, rand(sim.rng, initial_state_dist, create_state(pomdp)))
+    initial_state = get(sim.initial_state, rand(sim.rng, initial_state_dist))
     initial_belief = initialize_belief(bu, initial_state_dist)
     # use of deepcopy inspired from rollout.jl
     if initial_belief === initial_state_dist
@@ -104,7 +108,9 @@ function simulate{S,A,O,B}(sim::HistoryRecorder, pomdp::POMDP{S,A,O}, policy::Po
 end
 
 
-function simulate{S,A}(sim::HistoryRecorder, mdp::MDP{S,A}, policy::Policy, initial_state::S=get(sim.initial_state))
+function simulate{S,A}(sim::HistoryRecorder,
+                       mdp::MDP{S,A}, policy::Policy,
+                       initial_state::S=get(sim.initial_state, initial_state(mdp, sim.rng)))
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
