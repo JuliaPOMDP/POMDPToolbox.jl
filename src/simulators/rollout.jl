@@ -25,9 +25,36 @@ function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
     return RolloutSimulator(rng, initial_state, eps, max_steps)
 end
 
+@POMDP_require simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy) begin
+    @req updater(::typeof(policy))
+    bu = updater(policy)
+    @subreq simulate(sim, pomdp, policy, bu)
+end
+
+@POMDP_require simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, bu::Updater) begin
+    @req initial_state_distribution(::typeof(pomdp))
+    dist = initial_state_distribution(pomdp)
+    @subreq simulate(sim, pomdp, policy, bu, dist)
+end
+
 function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, bu::Updater=updater(policy))
     dist = initial_state_distribution(pomdp)
     return simulate(sim, pomdp, policy, bu, dist)
+end
+
+@POMDP_require simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::Updater, initial_belief) begin
+    P = typeof(pomdp)
+    S = state_type(P)
+    A = action_type(P)
+    O = obs_type(P)
+    @req rand(::typeof(sim.rng), ::typeof(initial_belief))
+    @req initialize_belief(::typeof(updater), ::typeof(initial_belief))
+    @req isterminal(::P, ::S)
+    @req discount(::P)
+    @req generate_sor(::P, ::S, ::A, ::typeof(sim.rng))
+    b = initialize_belief(updater, initial_belief)
+    @req action(::typeof(policy), ::typeof(b))
+    @req update(::typeof(updater), ::typeof(b), ::A, ::O)
 end
 
 
@@ -67,8 +94,30 @@ function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::
     return r_total
 end
 
+@POMDP_require simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy) begin
+    if isnull(sim.initial_state)
+        @req initial_state(::typeof(mdp), ::typeof(sim.rng))
+    end
+    istate = initial_state(mdp, sim.rng)
+    @subreq simulate(sim, mdp, policy, istate)
+end
 
-function simulate{S,A}(sim::RolloutSimulator, mdp::MDP{S,A}, policy::Policy, initial_state::S=sim.initial_state)
+@POMDP_require simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy, initial_state) begin
+    P = typeof(mdp)
+    S = typeof(initial_state)
+    A = action_type(mdp)
+    @req isterminal(::P, ::S)
+    @req action(::typeof(policy), ::S)
+    @req generate_sr(::P, ::S, ::A, ::typeof(sim.rng))
+    @req discount(::P)
+end
+
+function simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy)
+    istate=get(sim.initial_state, initial_state(mdp, sim.rng))
+    simulate(sim, mdp, policy, istate)
+end
+
+function simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy, initial_state)
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
