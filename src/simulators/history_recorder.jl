@@ -42,9 +42,39 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                            capture_exception, initial_state, eps, max_steps, sizehint)
 end
 
+@POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy) begin
+    @req updater(::typeof(policy))
+    up = updater(policy)
+    @subreq simulate(sim, pomdp, policy, up)
+end
+
+@POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Updater) begin
+    @req initial_state_distribution(::typeof(pomdp))
+    dist = initial_state_distribution(pomdp)
+    @subreq simulate(sim, pomdp, policy, bu, dist)
+end
+
 function simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Updater=updater(policy))
     dist = initial_state_distribution(pomdp)
     return simulate(sim, pomdp, policy, bu, dist)
+end
+
+@POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy, bu::Updater, dist::Any) begin
+    P = typeof(pomdp)
+    S = state_type(pomdp)
+    A = action_type(pomdp)
+    O = obs_type(pomdp)
+    if isnull(sim.initial_state)
+        @req rand(::typeof(sim.rng), ::typeof(dist))
+    end
+    @req initialize_belief(::typeof(bu), ::typeof(dist))
+    @req isterminal(::P, ::S)
+    @req discount(::P)
+    @req generate_sor(::P, ::S, ::A, ::typeof(sim.rng))
+    b = initialize_belief(bu, dist)
+    B = typeof(b)
+    @req action(::typeof(policy), ::B)
+    @req update(::typeof(bu), ::B, ::A, ::O)
 end
 
 function simulate{S,A,O,B}(sim::HistoryRecorder,
@@ -107,10 +137,27 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
     return r_total
 end
 
+@POMDP_require simulate(sim::HistoryRecorder, mdp::MDP, policy::Policy) begin
+    if isnull(sim.initial_state)
+        @req initial_state(::typeof(mdp), ::typeof(sim.rng))
+    end
+    init_state = get(sim.initial_state, initial_state(mdp, sim.rng))
+    @subreq simulate(sim, mdp, policy, init_state)
+end
+
+@POMDP_require simulate(sim::HistoryRecorder, mdp::MDP, policy::Policy, initial_state::Any) begin
+    P = typeof(mdp)
+    S = state_type(mdp)
+    A = action_type(mdp)
+    @req isterminal(::P, ::S)
+    @req action(::typeof(policy), ::S)
+    @req generate_sr(::P, ::S, ::A, ::typeof(sim.rng))
+    @req discount(::P)
+end
 
 function simulate{S,A}(sim::HistoryRecorder,
                        mdp::MDP{S,A}, policy::Policy,
-                       initial_state::S=get(sim.initial_state, initial_state(mdp, sim.rng)))
+                       init_state::S=get(sim.initial_state, initial_state(mdp, sim.rng)))
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
@@ -126,7 +173,7 @@ function simulate{S,A}(sim::HistoryRecorder,
     disc = 1.0
     r_total = 0.0
 
-    push!(sh, initial_state)
+    push!(sh, init_state)
 
     step = 1
 
