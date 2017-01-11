@@ -1,5 +1,5 @@
 ### Vector Policy ###
-# maintained by @zsunberg
+# maintained by @zsunberg and @etotheipluspi
 
 """
 A generic MDP policy that consists of a vector of actions. The entry at `state_index(mdp, s)` is the action that will be taken in state `s`.
@@ -26,3 +26,23 @@ function solve{S,A}(s::VectorSolver{A}, mdp::MDP{S,A}, p::VectorPolicy=create_po
     p.act = s.act
     return p
 end
+
+
+"""
+A generic MDP policy that consists of a value table. The entry at `state_index(mdp, s)` is the action that will be taken in state `s`.
+"""
+type ValuePolicy{A} <: Policy
+    mdp::Union{MDP,POMDP}
+    value_table::Matrix{Float64}
+    act::Vector{A}
+end
+function ValuePolicy(mdp::Union{MDP,POMDP})
+    acts = Any[]
+    for a in iterator(actions(mdp))
+        push!(acts, a)
+    end
+    return ValuePolicy(mdp, zeros(n_states(mdp), n_actions(mdp)), acts)
+end
+
+action(p::ValuePolicy, s) = p.act[indmax(p.value_table[state_index(p.mdp, s),:])]
+action(p::ValuePolicy, s, a) = action(p, s)
