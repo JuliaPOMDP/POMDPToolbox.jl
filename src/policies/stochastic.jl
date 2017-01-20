@@ -22,6 +22,9 @@ function action(policy::StochasticPolicy, b::Void)
     return rand(policy.rng, policy.distribution)
 end
 
+## convenience functions ##
+updater(policy::StochasticPolicy) = policy.updater
+
 
 # Samples actions uniformly
 UniformRandomPolicy(problem::Union{POMDP,MDP};
@@ -30,7 +33,7 @@ UniformRandomPolicy(problem::Union{POMDP,MDP};
 
 
 
-type CategoricalTabularPolicy
+type CategoricalTabularPolicy <: Policy
     stochastic::StochasticPolicy
     value::ValuePolicy
 end
@@ -41,7 +44,7 @@ CategoricalTabularPolicy(mdp::Union{POMDP,MDP};
 
 function action(policy::CategoricalTabularPolicy, s)
     policy.stochastic.distribution = WeightVec(policy.value.value_table[state_index(policy.stochastic.problem, s),:])
-    return p.value.act[sample(policy.stochastic.rng, policy.stochastic.distribution)]
+    return policy.value.act[sample(policy.stochastic.rng, policy.stochastic.distribution)]
 end
 
 
