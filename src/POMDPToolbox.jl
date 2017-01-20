@@ -56,14 +56,26 @@ include("convenience/implementations.jl")
 
 # policies
 export
+    VectorPolicy,
+    VectorSolver,
+    ValuePolicy
+include("policies/vector.jl")
+
+export
     RandomPolicy,
     RandomSolver
 include("policies/random.jl")
 
 export
-    VectorPolicy,
-    VectorSolver
-include("policies/vector.jl")
+    StochasticPolicy,
+    UniformRandomPolicy,
+    CategoricalTabularPolicy,
+    EpsGreedyPolicy
+include("policies/stochastic.jl")
+
+#export
+#    EpsGreedyPolicy
+#include("policies/exploration.jl")
 
 export
     FunctionPolicy,
