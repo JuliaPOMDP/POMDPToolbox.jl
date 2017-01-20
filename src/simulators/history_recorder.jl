@@ -12,7 +12,18 @@ The simulation will be terminated when either
 type HistoryRecorder <: Simulator
     rng::AbstractRNG
 
-    # these will be filled when the simulation is completed
+    # options
+    capture_exception::Bool
+
+    # optional: if these are null, they will be ignored
+    initial_state::Nullable{Any}
+    eps::Nullable{Any}
+    max_steps::Nullable{Any}
+    sizehint::Nullable{Integer}
+
+    # ALL FIELDS BELOW ARE DEPRECATED
+    # Instead, use the fields in the SimHistory object returned by simulate
+    # these fields will be deleted on 
     state_hist::AbstractVector
     action_hist::AbstractVector
     observation_hist::AbstractVector
@@ -23,14 +34,10 @@ type HistoryRecorder <: Simulator
     exception::Nullable{Exception}
     backtrace::Nullable{Any}
 
-    # options
-    capture_exception::Bool
-
-    # optional: if these are null, they will be ignored
-    initial_state::Nullable{Any}
-    eps::Nullable{Any}
-    max_steps::Nullable{Any}
-    sizehint::Nullable{Integer}
+    HistoryRecorder(rng, capture_exception, initial_state,
+                    eps, max_steps, sizehint) = new(rng, capture_exception, initial_state,
+                                                    eps, max_steps, sizehint,
+                                                    Any[], Any[], Any[], Any[], Float64[], nothing, nothing)
 end
 function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           initial_state=Nullable{Any}(),
@@ -38,8 +45,7 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           max_steps=Nullable{Any}(),
                           sizehint=Nullable{Integer}(),
                           capture_exception=false)
-    return HistoryRecorder(rng, Any[], Any[], Any[], Any[], Float64[], nothing, nothing,
-                           capture_exception, initial_state, eps, max_steps, sizehint)
+    return HistoryRecorder(rng, capture_exception, initial_state, eps, max_steps, sizehint)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy) begin
@@ -100,12 +106,10 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
     bh = sim.belief_hist = sizehint!(Vector{B}(0), sizehint)
     rh = sim.reward_hist = sizehint!(Vector{Float64}(0), sizehint)
 
-    disc = 1.0
-    r_total = 0.0
-
     push!(sh, initial_state)
     push!(bh, initial_belief)
 
+    disc = 1.0
     step = 1
 
     try
@@ -117,8 +121,6 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
             push!(sh, sp)
             push!(oh, o)
             push!(rh, r)
-
-            r_total += disc*r
 
             push!(bh, update(bu, bh[step], ah[step], oh[step]))
 
@@ -134,7 +136,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
         end
     end
 
-    return r_total
+    return POMDPHistory(sh, ah, oh, bh, rh, sim.exception, sim.backtrace)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, mdp::MDP, policy::Policy) begin
@@ -170,11 +172,9 @@ function simulate{S,A}(sim::HistoryRecorder,
     bh = sim.belief_hist = Any[]
     rh = sim.reward_hist = sizehint!(Vector{Float64}(0), sizehint)
 
-    disc = 1.0
-    r_total = 0.0
-
     push!(sh, init_state)
 
+    disc = 1.0
     step = 1
 
     try
@@ -185,8 +185,6 @@ function simulate{S,A}(sim::HistoryRecorder,
 
             push!(sh, sp)
             push!(rh, r)
-
-            r_total += disc*r
 
             disc *= discount(mdp)
             step += 1
@@ -200,5 +198,5 @@ function simulate{S,A}(sim::HistoryRecorder,
         end
     end
 
-    return r_total
+    return MDPHistory(sh, ah, rh, sim.exception, sim.backtrace)
 end

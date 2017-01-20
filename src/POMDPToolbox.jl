@@ -74,6 +74,22 @@ include("policies/function.jl")
 export RolloutSimulator
 include("simulators/rollout.jl")
 
+export
+    SimHistory,
+    POMDPHistory,
+    MDPHistory,
+    state_hist,
+    action_hist,
+    observation_hist,
+    belief_hist,
+    reward_hist,
+    exception,
+    backtrace,
+    undiscounted_reward,
+    discounted_reward,
+    n_steps
+include("simulators/history.jl")
+
 export HistoryRecorder
 include("simulators/history_recorder.jl")
 
