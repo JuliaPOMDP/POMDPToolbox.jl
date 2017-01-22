@@ -73,10 +73,6 @@ export
     EpsGreedyPolicy
 include("policies/stochastic.jl")
 
-#export
-#    EpsGreedyPolicy
-#include("policies/exploration.jl")
-
 export
     FunctionPolicy,
     FunctionSolver

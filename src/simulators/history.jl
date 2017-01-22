@@ -13,8 +13,8 @@ Returned by simulate when called with a HistoryRecorder. Iterate through the (s,
     end
 """
 immutable MDPHistory{S,A} <: SimHistory
-    state_hist::AbstractVector{S}
-    action_hist::AbstractVector{A}
+    state_hist::Vector{S}
+    action_hist::Vector{A}
     reward_hist::Vector{Float64}
 
     # if capture_exception is true and there is an exception, it will be stored here
@@ -32,10 +32,10 @@ Returned by simulate when called with a HistoryRecorder. Iterate through the (s,
     end
 """
 immutable POMDPHistory{S,A,O,B} <: SimHistory
-    state_hist::AbstractVector{S}
-    action_hist::AbstractVector{A}
-    observation_hist::AbstractVector{O}
-    belief_hist::AbstractVector{B}
+    state_hist::Vector{S}
+    action_hist::Vector{A}
+    observation_hist::Vector{O}
+    belief_hist::Vector{B}
     reward_hist::Vector{Float64}
 
     # if capture_exception is true and there is an exception, it will be stored here
