@@ -10,7 +10,8 @@ n_actions{S,O}(mdp::POMDP{S,Bool,O}) = 2
 
 actions{S}(mdp::MDP{S,Int}, s::S, r::Range) = actions(mdp)
 
-rand(rng::AbstractRNG, t::Tuple{Bool, Bool}, b::Bool=false) = rand(rng, Bool)
+rand(rng::AbstractRNG, t::Tuple{Bool, Bool}) = rand(rng, Bool)
+rand(t::Tuple{Bool, Bool}) = rand(Bool)
 
 iterator(s::AbstractVector) = s
 iterator(s::Tuple) = s
@@ -20,6 +21,10 @@ states(mdp::MDP{Bool}) = (true, false)
 states(mdp::POMDP{Bool}) = (true, false)
 n_states(mdp::MDP{Bool}) = 2
 n_states(mdp::POMDP{Bool}) = 2
+
+observations{S,A}(::POMDP{S,A,Bool}) = (true,false)
+observations{S,A}(::POMDP{S,A,Bool}, s::S) = (true,false)
+n_observations{S,A}(::POMDP{S,A,Bool}) = 2
 
 state_index(mdp::Union{MDP, POMDP}, s::Int) = s
 action_index(mdp::Union{MDP, POMDP}, a::Int) = a

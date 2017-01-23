@@ -89,7 +89,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
                            bu::Updater{B},
                            initial_state_dist::Any)
 
-    initial_state = get(sim.initial_state, rand(sim.rng, initial_state_dist))
+    initial_state = get_initial_state(sim, initial_state_dist)
     initial_belief = initialize_belief(bu, initial_state_dist)
     # use of deepcopy inspired from rollout.jl
     if initial_belief === initial_state_dist
@@ -159,7 +159,7 @@ end
 
 function simulate{S,A}(sim::HistoryRecorder,
                        mdp::MDP{S,A}, policy::Policy,
-                       init_state::S=get(sim.initial_state, initial_state(mdp, sim.rng)))
+                       init_state::S=get_initial_state(sim, mdp))
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
@@ -199,4 +199,20 @@ function simulate{S,A}(sim::HistoryRecorder,
     end
 
     return MDPHistory(sh, ah, rh, sim.exception, sim.backtrace)
+end
+
+function get_initial_state(sim::HistoryRecorder, initial_state_dist)
+    if isnull(sim.initial_state)
+        return rand(sim.rng, initial_state_dist)
+    else
+        return get(sim.initial_state)
+    end
+end
+
+function get_initial_state(sim::HistoryRecorder, mdp::Union{MDP,POMDP})
+    if isnull(sim.initial_state)
+        return initial_state(mdp, sim.rng)
+    else
+        return get(sim.initial_state)
+    end
 end
