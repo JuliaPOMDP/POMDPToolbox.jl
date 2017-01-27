@@ -6,6 +6,6 @@ pomdp = TigerPOMDP()
 
 probability_check(pomdp)
 
-ordered_states(pomdp)
-ordered_observations(pomdp)
-ordered_actions(pomdp)
+@test ordered_states(pomdp) == [false, true]
+@test ordered_observations(pomdp) == [false, true]
+@test ordered_actions(pomdp) == [0,1,2]
