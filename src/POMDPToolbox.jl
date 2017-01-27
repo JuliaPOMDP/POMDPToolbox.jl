@@ -12,6 +12,8 @@ import POMDPs: action, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, states, n_actions, n_states, observations, n_observations
 import Base: rand, rand!
 
+using ProgressMeter
+
 # export commons
 export
     update,

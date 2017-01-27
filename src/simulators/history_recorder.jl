@@ -14,6 +14,7 @@ type HistoryRecorder <: Simulator
 
     # options
     capture_exception::Bool
+    show_progress::Bool
 
     # optional: if these are null, they will be ignored
     initial_state::Nullable{Any}
@@ -34,8 +35,8 @@ type HistoryRecorder <: Simulator
     exception::Nullable{Exception}
     backtrace::Nullable{Any}
 
-    HistoryRecorder(rng, capture_exception, initial_state,
-                    eps, max_steps, sizehint) = new(rng, capture_exception, initial_state,
+    HistoryRecorder(rng, capture_exception, show_progress, initial_state,
+                    eps, max_steps, sizehint) = new(rng, capture_exception, show_progress, initial_state,
                                                     eps, max_steps, sizehint,
                                                     Any[], Any[], Any[], Any[], Float64[], nothing, nothing)
 end
@@ -44,8 +45,9 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           eps=Nullable{Any}(),
                           max_steps=Nullable{Any}(),
                           sizehint=Nullable{Integer}(),
-                          capture_exception=false)
-    return HistoryRecorder(rng, capture_exception, initial_state, eps, max_steps, sizehint)
+                          capture_exception=false,
+                          show_progress=false)
+    return HistoryRecorder(rng, capture_exception, show_progress, initial_state, eps, max_steps, sizehint)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy) begin
@@ -95,8 +97,10 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
     if initial_belief === initial_state_dist
         initial_belief = deepcopy(initial_belief)
     end
-    eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
+    if !isnull(sim.eps)
+        max_steps = min(max_steps, ceil(Int,log(get(sim.eps))/log(discount(pomdp))))
+    end
     sizehint = get(sim.sizehint, min(max_steps, 1000))
 
     # aliases for the histories to make the code more concise
@@ -109,11 +113,15 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
     push!(sh, initial_state)
     push!(bh, initial_belief)
 
+    if sim.show_progress
+        prog = Progress(max_steps, "Simulating..." )
+    end
+
     disc = 1.0
     step = 1
 
     try
-        while disc > eps && !isterminal(pomdp, sh[step]) && step <= max_steps
+        while !isterminal(pomdp, sh[step]) && step <= max_steps
             push!(ah, action(policy, bh[step]))
 
             sp, o, r = generate_sor(pomdp, sh[step], ah[step], sim.rng)
@@ -124,8 +132,11 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
 
             push!(bh, update(bu, bh[step], ah[step], oh[step]))
 
-            disc *= discount(pomdp)
             step += 1
+
+            if sim.show_progress
+                next!(prog)
+            end
         end
     catch ex
         if sim.capture_exception
@@ -161,8 +172,10 @@ function simulate{S,A}(sim::HistoryRecorder,
                        mdp::MDP{S,A}, policy::Policy,
                        init_state::S=get_initial_state(sim, mdp))
 
-    eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
+    if !isnull(sim.eps)
+        max_steps = min(max_steps, ceil(Int,log(get(sim.eps))/log(discount(mdp))))
+    end
     sizehint = get(sim.sizehint, min(max_steps, 1000))
 
     # aliases for the histories to make the code more concise
@@ -172,13 +185,17 @@ function simulate{S,A}(sim::HistoryRecorder,
     bh = sim.belief_hist = Any[]
     rh = sim.reward_hist = sizehint!(Vector{Float64}(0), sizehint)
 
+    if sim.show_progress
+        prog = Progress(max_steps, "Simulating..." )
+    end
+
     push!(sh, init_state)
 
     disc = 1.0
     step = 1
 
     try
-        while disc > eps && !isterminal(mdp, sh[step]) && step <= max_steps
+        while !isterminal(mdp, sh[step]) && step <= max_steps
             push!(ah, action(policy, sh[step]))
 
             sp, r = generate_sr(mdp, sh[step], ah[step], sim.rng)
@@ -188,6 +205,10 @@ function simulate{S,A}(sim::HistoryRecorder,
 
             disc *= discount(mdp)
             step += 1
+
+            if sim.show_progress
+                next!(prog)
+            end
         end
     catch ex
         if sim.capture_exception
