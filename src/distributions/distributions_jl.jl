@@ -10,7 +10,7 @@ import Distributions: Distribution, UnivariateDistribution, Categorical
 
          For more information, or to encourage Distributions.jl to support this, see https://github.com/JuliaStats/Distributions.jl/issues/436
 
-         To disable this warning, use `rand(rng::AbstractRNG, d::$d) = rand(d))` (you will still not be able to repeat simulations).
+         To disable this warning, use `rand(rng::AbstractRNG, d::$d) = rand(d)` (you will still not be able to repeat simulations).
          """)
     return quote
         rand(d)
