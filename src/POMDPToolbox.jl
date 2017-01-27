@@ -41,7 +41,8 @@ include("beliefs/discrete.jl")
 
 export
     PreviousObservationUpdater,
-    FastPreviousObservationUpdater
+    FastPreviousObservationUpdater,
+    PrimedPreviousObservationUpdater
 include("beliefs/previous_observation.jl")
 
 export

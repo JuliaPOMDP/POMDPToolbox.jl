@@ -8,7 +8,7 @@ Updater that stores the most recent observation as the belief.
 
 The belief is Nullable and is null if there is no observation available.
 """
-type PreviousObservationUpdater{O} <: Updater{Nullable{O}} end
+immutable PreviousObservationUpdater{O} <: Updater{Nullable{O}} end
 
 initialize_belief{O}(u::PreviousObservationUpdater{O}, d::Any, b=nothing) = Nullable{O}()
 initialize_belief{O}(u::PreviousObservationUpdater{O}, o::O, b=nothing) = Nullable{O}(o)
@@ -18,8 +18,19 @@ update{O}(bu::PreviousObservationUpdater{O}, old_b, action, obs::O, b=nothing) =
 """
 Updater that stores the most recent observation as the belief.
 """
-type FastPreviousObservationUpdater{O} <: Updater{O} end
+immutable FastPreviousObservationUpdater{O} <: Updater{O} end
 
 # the only way this belief can be initialized is with a correct observation
-initialize_belief(u::FastPreviousObservationUpdater, o) = o
+initialize_belief{O}(u::FastPreviousObservationUpdater{O}, o::O) = o
 update{O}(bu::FastPreviousObservationUpdater{O}, old_b, action, obs::O) = obs
+
+"""
+Updater that stores the most recent observation as the belief.
+
+On the first step (when initialize_belief is called), it uses the default.
+"""
+immutable PrimedPreviousObservationUpdater{O} <: Updater{O}
+    default::O
+end
+initialize_belief(u::PrimedPreviousObservationUpdater, b) = u.default
+update{O}(u::PrimedPreviousObservationUpdater{O}, old_b, action, obs::O) = obs
