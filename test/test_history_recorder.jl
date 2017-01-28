@@ -30,7 +30,7 @@ let
 
     @test n_steps(r1) == n_steps(r2)
     @test undiscounted_reward(r1) == undiscounted_reward(r2)
-    @test discounted_reward(r1, problem) == discounted_reward(r2, problem)
+    @test discounted_reward(r1) == discounted_reward(r2)
 
     @test length(collect(r1)) == n_steps(r1)
     @test length(collect(r2)) == n_steps(r2)
