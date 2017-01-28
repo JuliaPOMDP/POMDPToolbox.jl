@@ -17,6 +17,8 @@ immutable MDPHistory{S,A} <: SimHistory
     action_hist::Vector{A}
     reward_hist::Vector{Float64}
 
+    discount::Float64
+
     # if capture_exception is true and there is an exception, it will be stored here
     exception::Nullable{Exception}
     backtrace::Nullable{Any}
@@ -38,6 +40,8 @@ immutable POMDPHistory{S,A,O,B} <: SimHistory
     belief_hist::Vector{B}
     reward_hist::Vector{Float64}
 
+    discount::Float64
+
     # if capture_exception is true and there is an exception, it will be stored here
     exception::Nullable{Exception}
     backtrace::Nullable{Any}
@@ -54,15 +58,17 @@ reward_hist(h::SimHistory) = h.reward_hist
 
 exception(h::SimHistory) = h.exception
 Base.backtrace(h::SimHistory) = h.backtrace
+discount(h::SimHistory) = h.discount
 
 undiscounted_reward(h::SimHistory) = sum(h.reward_hist)
-function discounted_reward(h::SimHistory, problem::Union{MDP,POMDP})
+function discounted_reward(h::SimHistory)
     disc = 1.0
     r_total = 0.0
     for i in 1:length(h.reward_hist)
         r_total += disc*h.reward_hist[i]
-        disc *= discount(problem)
+        disc *= discount(h)
     end
+    return r_total
 end
 
 # iteration

@@ -153,7 +153,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
         end
     end
 
-    return POMDPHistory(sh, ah, oh, bh, rh, sim.exception, sim.backtrace)
+    return POMDPHistory(sh, ah, oh, bh, rh, discount(pomdp), sim.exception, sim.backtrace)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, mdp::MDP, policy::Policy) begin
@@ -225,7 +225,7 @@ function simulate{S,A}(sim::HistoryRecorder,
         end
     end
 
-    return MDPHistory(sh, ah, rh, sim.exception, sim.backtrace)
+    return MDPHistory(sh, ah, rh, discount(mdp), sim.exception, sim.backtrace)
 end
 
 function get_initial_state(sim::HistoryRecorder, initial_state_dist)

@@ -9,7 +9,7 @@ using POMDPs
 import POMDPs: Updater, update, initialize_belief, pdf, updater
 import POMDPs: Simulator, simulate
 import POMDPs: action, solve
-import POMDPs: actions, action_index, state_index, obs_index, iterator, states, n_actions, n_states, observations, n_observations
+import POMDPs: actions, action_index, state_index, obs_index, iterator, states, n_actions, n_states, observations, n_observations, discount
 import Base: rand, rand!
 
 using ProgressMeter
