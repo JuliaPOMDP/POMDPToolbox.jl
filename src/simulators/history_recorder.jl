@@ -8,6 +8,12 @@ The simulation will be terminated when either
 1) a terminal state is reached (as determined by `isterminal()` or
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
+
+Other options
+    capture_exception::Bool
+
+    show_progress::Bool
+        show a progress bar for the simulation
 """
 type HistoryRecorder <: Simulator
     rng::AbstractRNG
