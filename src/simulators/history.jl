@@ -60,12 +60,12 @@ exception(h::SimHistory) = h.exception
 Base.backtrace(h::SimHistory) = h.backtrace
 discount(h::SimHistory) = h.discount
 
-undiscounted_reward(h::SimHistory) = sum(h.reward_hist)
+undiscounted_reward(h::SimHistory) = sum(reward_hist(h))
 function discounted_reward(h::SimHistory)
     disc = 1.0
     r_total = 0.0
-    for i in 1:length(h.reward_hist)
-        r_total += disc*h.reward_hist[i]
+    for i in 1:length(reward_hist(h))
+        r_total += disc*reward_hist(h)[i]
         disc *= discount(h)
     end
     return r_total
@@ -76,21 +76,46 @@ end
 Base.length(h::SimHistory) = n_steps(h)
 Base.start(h::SimHistory) = 1
 Base.done(h::SimHistory, i::Int) = i > n_steps(h)
-function Base.next(h::MDPHistory, i::Int)
-    return ((h.state_hist[i],
-             h.action_hist[i],
-             h.reward_hist[i],
-             h.state_hist[i+1]
-            ), i+1
+Base.next(h::SimHistory, i::Int) = (step_tuple(h, i), i+1)
+
+function step_tuple(h::MDPHistory, i::Int)
+    return (state_hist(h)[i],
+            action_hist(h)[i],
+            reward_hist(h)[i],
+            state_hist(h)[i+1]
            )
 end
-function Base.next(h::POMDPHistory, i::Int)
-    return ((h.state_hist[i],
-             h.belief_hist[i],
-             h.action_hist[i],
-             h.reward_hist[i],
-             h.state_hist[i+1],
-             h.observation_hist[i]
-            ), i+1
+function step_tuple(h::POMDPHistory, i::Int)
+    return (state_hist(h)[i],
+            belief_hist(h)[i],
+            action_hist(h)[i],
+            reward_hist(h)[i],
+            state_hist(h)[i+1],
+            observation_hist(h)[i]
            )
 end
+
+
+
+typealias Inds Union{AbstractArray,Colon,Real}
+
+Base.view(h::SimHistory, inds::Inds) = SubHistory(h, inds)
+
+immutable SubHistory{H<:SimHistory, I<:Inds} <: SimHistory
+    parent::H
+    inds::I
+end
+
+n_steps(h::SubHistory) = length(h.inds)
+
+state_hist(h::SubHistory) = state_hist(h.parent)[h.inds]
+action_hist(h::SubHistory) = action_hist(h.parent)[h.inds]
+observation_hist(h::SubHistory) = observation_hist(h.parent)[h.inds]
+belief_hist(h::SubHistory) = belief_hist(h.parent)[h.inds]
+reward_hist(h::SubHistory) = reward_hist(h.parent)[h.inds]
+
+step_tuple(h::SubHistory, i::Int) = step_tuple(h.parent, h.inds[i])
+
+exception(h::SubHistory) = exception(h.parent)
+Base.backtrace(h::SubHistory) = backtrace(h.parent)
+discount(h::SubHistory) = discount(h.parent)

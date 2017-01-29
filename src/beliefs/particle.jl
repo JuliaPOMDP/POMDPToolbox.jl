@@ -57,8 +57,6 @@ Updater for ParticleBelief that implements
 the sampling importance resampling (SIR) algorithm. Fields:
 
     -pomdp: problem model
-    -td: preallocated transition distribution
-    -od: preallocated observation distribution
     -n: number of particles for this updater
     -rng: random number generator for generating state and observations from pomdp model
     -keep_dict: boolean for keeping a dictionary of particles (for pdf only)

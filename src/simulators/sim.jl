@@ -36,7 +36,7 @@ will limit the simulation to 100 steps
 function sim end
 
 function sim(polfunc::Function, mdp::MDP,
-             init_state=initial_state(mdp, Base.GLOBAL_RNG);
+             initial_state=default_init_state(mdp);
              simulator=nothing,
              kwargs...
             )
@@ -44,18 +44,18 @@ function sim(polfunc::Function, mdp::MDP,
         simulator = HistoryRecorder(;kwargs...)
     end
     policy = FunctionPolicy(polfunc)
-    simulate(simulator, mdp, policy, init_state)
+    simulate(simulator, mdp, policy, initial_state)
 end
 
 function sim(polfunc::Function, pomdp::POMDP,
-             init_state=initial_state(pomdp, Base.GLOBAL_RNG);
+             initial_state=default_init_state(pomdp);
              simulator=nothing,
-             init_obs=default_init_obs(pomdp, init_state),
-             updater=PrimedPreviousObservationUpdater{Any}(init_obs),
+             initial_obs=default_init_obs(pomdp, initial_state),
+             updater=PrimedPreviousObservationUpdater{Any}(initial_obs),
              kwargs...
             )
     if simulator==nothing
-        simulator = HistoryRecorder(;initial_state=init_state, kwargs...)
+        simulator = HistoryRecorder(;initial_state=initial_state, kwargs...)
     end
     policy = FunctionPolicy(polfunc)
     simulate(simulator, pomdp, policy, updater)
@@ -66,5 +66,20 @@ function default_init_obs(p::POMDP, s)
         return generate_o(p, s, Base.GLOBAL_RNG)
     else
         return nothing
+    end
+end
+
+@generated function default_init_state(p::Union{MDP,POMDP})
+    if implemented(initial_state, Tuple{p, typeof(Base.GLOBAL_RNG)})
+        return :(initial_state(p, Base.GLOBAL_RNG))
+    else
+        return quote
+            error("""
+                  Error in sim(::$(typeof(p))): No initial state specified.
+                  
+                  Please supply it as an argument after the mdp or define the method GenerativeModels.initial_state(::$(typeof(p)), ::$(typeof(Base.GLOBAL_RNG))) or define the method POMDPs.initial_state_distribution(::$(typeof(p))).
+
+                  """)
+        end
     end
 end

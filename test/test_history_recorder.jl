@@ -59,4 +59,8 @@ let
     end
 
     @test length(collect(r1)) == n_steps(r1)
+
+    hv = view(r1, 2:length(r1))
+    @test n_steps(hv) == n_steps(r1)-1
+    @test undiscounted_reward(r1) == undiscounted_reward(hv) + reward_hist(r1)[1]
 end
