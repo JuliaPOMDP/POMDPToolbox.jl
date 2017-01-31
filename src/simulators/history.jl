@@ -2,17 +2,19 @@
 # maintained by @zsunberg
 
 abstract SimHistory
+abstract AbstractMDPHistory{S,A} <: SimHistory
+abstract AbstractPOMDPHistory{S,A,O,B} <: SimHistory
 
 """
 An object that contains a MDP simulation history
 
-Returned by simulate when called with a HistoryRecorder. Iterate through the (s, a, r, s') tuples in MDPSimHistory h like this:
+Returned by simulate when called with a HistoryRecorder. Iterate through the (s, a, r, s') tuples in MDPHistory h like this:
 
     for (s, a, r, sp) in h
         # do something
     end
 """
-immutable MDPHistory{S,A} <: SimHistory
+immutable MDPHistory{S,A} <: AbstractMDPHistory{S,A}
     state_hist::Vector{S}
     action_hist::Vector{A}
     reward_hist::Vector{Float64}
@@ -27,13 +29,13 @@ end
 """
 An object that contains a POMDP simulation history
 
-Returned by simulate when called with a HistoryRecorder. Iterate through the (s, b, a, r, s', o') tuples in POMDPSimHistory h like this:
+Returned by simulate when called with a HistoryRecorder. Iterate through the (s, b, a, r, s', o') tuples in POMDPHistory h like this:
 
     for (s, b, a, r, sp, op) in h
         # do something
     end
 """
-immutable POMDPHistory{S,A,O,B} <: SimHistory
+immutable POMDPHistory{S,A,O,B} <: AbstractPOMDPHistory{S,A,O,B}
     state_hist::Vector{S}
     action_hist::Vector{A}
     observation_hist::Vector{O}
@@ -99,12 +101,22 @@ end
 
 typealias Inds Union{AbstractArray,Colon,Real}
 
-Base.view(h::SimHistory, inds::Inds) = SubHistory(h, inds)
+Base.view(h::AbstractMDPHistory, inds::Inds) = SubMDPHistory(h, inds)
+Base.view(h::AbstractPOMDPHistory, inds::Inds) = SubPOMDPHistory(h, inds)
 
-immutable SubHistory{H<:SimHistory, I<:Inds} <: SimHistory
+immutable SubMDPHistory{S,A,H<:AbstractMDPHistory,I<:Inds} <: AbstractMDPHistory{S,A}
     parent::H
     inds::I
 end
+SubMDPHistory{S,A,I<:Inds}(h::AbstractMDPHistory{S,A}, inds::I) = SubMDPHistory{S,A,typeof(h),I}(h, inds)
+
+immutable SubPOMDPHistory{S,A,O,B,H<:AbstractPOMDPHistory,I<:Inds} <: AbstractPOMDPHistory{S,A,O,B}
+    parent::H
+    inds::I
+end
+SubPOMDPHistory{S,A,O,B,I<:Inds}(h::AbstractPOMDPHistory{S,A,O,B}, inds::I) = SubPOMDPHistory{S,A,O,B,typeof(h),I}(h, inds)
+
+typealias SubHistory Union{SubMDPHistory, SubPOMDPHistory}
 
 n_steps(h::SubHistory) = length(h.inds)
 

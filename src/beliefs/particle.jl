@@ -52,6 +52,26 @@ function rand{S}(rng::AbstractRNG, b::ParticleBelief{S})
 end
 rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S) = rand(rng, b)
 
+mean(b::ParticleBelief) = sum(p.weight*p.state for p in b.particles)/sum(p.weight for p in b.particles)
+
+function mode{T}(b::ParticleBelief{T}) # don't know if this is efficient
+    d = Dict{T, Float64}()
+    best_weight = first(b.particles).weight
+    most_likely = first(b.particles).state
+    for p in b.particles
+        if haskey(d, p.state)
+            d[p.state] += p.weight
+        else
+            d[p.state] = p.weight
+        end
+        if d[p.state] > best_weight
+            best_weight = d[p.state]
+            most_likely = p.state
+        end
+    end
+    return most_likely
+end
+
 """
 Updater for ParticleBelief that implements 
 the sampling importance resampling (SIR) algorithm. Fields:
