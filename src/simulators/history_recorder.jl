@@ -153,6 +153,10 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
         end
     end
 
+    if sim.show_progress
+        finish!(prog)
+    end
+
     return POMDPHistory(sh, ah, oh, bh, rh, discount(pomdp), sim.exception, sim.backtrace)
 end
 
@@ -223,6 +227,10 @@ function simulate{S,A}(sim::HistoryRecorder,
         else
             rethrow(ex)
         end
+    end
+
+    if sim.show_progress
+        finish!(prog)
     end
 
     return MDPHistory(sh, ah, rh, discount(mdp), sim.exception, sim.backtrace)

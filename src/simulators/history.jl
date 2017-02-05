@@ -99,7 +99,7 @@ end
 
 
 
-typealias Inds Union{AbstractArray,Colon,Real}
+typealias Inds Union{Range,Colon,Real}
 
 Base.view(h::AbstractMDPHistory, inds::Inds) = SubMDPHistory(h, inds)
 Base.view(h::AbstractPOMDPHistory, inds::Inds) = SubPOMDPHistory(h, inds)
@@ -120,7 +120,7 @@ typealias SubHistory Union{SubMDPHistory, SubPOMDPHistory}
 
 n_steps(h::SubHistory) = length(h.inds)
 
-state_hist(h::SubHistory) = state_hist(h.parent)[h.inds]
+state_hist(h::SubHistory) = state_hist(h.parent)[minimum(h.inds):maximum(h.inds)+1]
 action_hist(h::SubHistory) = action_hist(h.parent)[h.inds]
 observation_hist(h::SubHistory) = observation_hist(h.parent)[h.inds]
 belief_hist(h::SubHistory) = belief_hist(h.parent)[h.inds]
