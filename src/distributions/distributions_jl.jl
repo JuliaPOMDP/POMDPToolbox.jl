@@ -5,8 +5,8 @@ import Distributions
 import Distributions: Distribution, UnivariateDistribution, Categorical
 
 @generated function rand(rng::AbstractRNG, d::Distribution)
-    warn("""
-         You are using a $d distribution from Distributions.jl. This will work, but simulations will not be repeatable because Distributions.jl does not support arbitrary random number generators (i.e. there is no `rand(rng::AbstractRNG, d::$d)`)
+    Core.println("""
+         WARNING: You are using a $d distribution from Distributions.jl. This will work, but simulations will not be repeatable because Distributions.jl does not support arbitrary random number generators (i.e. there is no `rand(rng::AbstractRNG, d::$d)`)
 
          For more information, or to encourage Distributions.jl to support this, see https://github.com/JuliaStats/Distributions.jl/issues/436
 
