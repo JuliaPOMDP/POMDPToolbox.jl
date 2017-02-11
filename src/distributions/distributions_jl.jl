@@ -2,7 +2,7 @@
 # maintained by @zsunberg
 
 import Distributions
-import Distributions: Distribution, UnivariateDistribution, Categorical
+import Distributions: Distribution, UnivariateDistribution, Categorical, MvNormal
 
 @generated function rand(rng::AbstractRNG, d::Distribution)
     Core.println("""
@@ -21,3 +21,11 @@ rand(rng::AbstractRNG, d::UnivariateDistribution) = Distributions.quantile(d, ra
 
 pdf(d::Distribution, x) = Distributions.pdf(d,x)
 iterator(d::Categorical) = 1:Distributions.ncategories(d)
+
+
+#XXX Hack - this may break if the Distributions.jl internal implementation breaks
+rand(rng::AbstractRNG, d::MvNormal) = _rand!(rng, d, Vector{eltype(d)}(length(d)))
+
+function _rand!(rng::AbstractRNG, d::MvNormal, x::VecOrMat)
+    Distributions.add!(Distributions.unwhiten!(d.Σ, randn!(rng, x)), d.μ)
+end
