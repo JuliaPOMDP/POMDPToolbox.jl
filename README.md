@@ -19,3 +19,34 @@ POMDPs.add("POMDPToolbox")
 Within src, there are three directories representing classes of tools, beliefs, policies, and simulators.
 
 Within each class directory, each file contains one tool. Each file should clearly indicate who is the maintainer of that file.
+
+## Tools
+
+### Beliefs
+  discrete.jl
+  particle.jl
+  previous_observation.jl
+  void.jl
+### Convenience
+  implementations.jl
+### Distributions
+  distributions_jl.jl
+### Model
+  initial.jl
+  ordered_spaces.jl
+### Policies
+  function.jl
+  random.jl
+  stochastic.jl
+  vector.jl
+### Random
+  weight_vec.jl
+### Simulators
+  history.jl
+  history_recorder.jl
+  rollout.jl
+  sim.jl
+### Testing
+  model.jl
+  solver.jl
+
