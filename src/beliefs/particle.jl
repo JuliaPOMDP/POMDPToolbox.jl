@@ -23,7 +23,7 @@ type ParticleBelief{T}
     probs_arr::Vector{Float64} # particle weights
     keep_dict::Bool # for more efficient pdf
 end
-ParticleBelief{S}(particles::Vector{Particle{S}}) = ParticleBelief(particles, Dict{S,Float64}(), Float64[], false)
+ParticleBelief{S}(particles::Vector{Particle{S}}) = ParticleBelief(particles, Dict{S,Float64}(), Float64[p.weight for p in particles], false)
 typealias ParticleDistribution{T} ParticleBelief{T}
 
 
