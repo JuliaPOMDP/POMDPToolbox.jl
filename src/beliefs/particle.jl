@@ -1,7 +1,10 @@
+# DEPRECATED Please use https://github.com/JuliaPOMDP/ParticleFilters.jl instead
 # maintained by @ebalaban
 # Particle-based belief and state distribution types
 
 """
+DEPRECATED: Please use https://github.com/JuliaPOMDP/ParticleFilters.jl instead
+
 Belief particle type that contains a state and its probability
 """
 type Particle{T} # should be immutable?
@@ -10,6 +13,8 @@ type Particle{T} # should be immutable?
 end
 
 """
+DEPRECATED: Please use https://github.com/JuliaPOMDP/ParticleFilters.jl instead
+
 ParticleBelief type. Fields:
 
     -particles: a vector particles (state and weight) in the belief 
@@ -23,7 +28,10 @@ type ParticleBelief{T}
     probs_arr::Vector{Float64} # particle weights
     keep_dict::Bool # for more efficient pdf
 end
-ParticleBelief{S}(particles::Vector{Particle{S}}) = ParticleBelief(particles, Dict{S,Float64}(), Float64[p.weight for p in particles], false)
+function ParticleBelief{S}(particles::Vector{Particle{S}})
+    warn("POMDPToolbox.ParticleBelief is deprecated, please use the beliefs from https://github.com/JuliaPOMDP/ParticleFilters.jl instead.")
+    return ParticleBelief(particles, Dict{S,Float64}(), Float64[p.weight for p in particles], false)
+end
 typealias ParticleDistribution{T} ParticleBelief{T}
 
 
@@ -73,6 +81,8 @@ function mode{T}(b::ParticleBelief{T}) # don't know if this is efficient
 end
 
 """
+DEPRECATED: Please use https://github.com/JuliaPOMDP/ParticleFilters.jl instead
+
 Updater for ParticleBelief that implements 
 the sampling importance resampling (SIR) algorithm. Fields:
 
@@ -86,6 +96,10 @@ type SIRParticleUpdater <: Updater{ParticleBelief}
     n::Int64 # number of particles
     rng::AbstractRNG
     keep_dict::Bool
+    function SIRParticleUpdater(pomdp::POMDP, n::Int64, rng::AbstractRNG, keep_dict::Bool)
+        warn("POMDPToolbox.SIRParticleUpdater is deprecated. Please use https://github.com/JuliaPOMDP/ParticleFilters.jl instead.")
+        new(pomdp, n, rng, keep_dict)
+    end
 end
 function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=MersenneTwister(), keep_dict::Bool=true) 
     SIRParticleUpdater(pomdp, n, rng, keep_dict)
