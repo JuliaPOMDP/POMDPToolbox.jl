@@ -50,12 +50,14 @@ test_solver(solver, BabyPOMDP())
 
 ```
 """
-function test_solver(solver::Solver, problem::POMDP; max_steps=10)
+function test_solver(solver::Solver, problem::POMDP; max_steps=10, updater=nothing)
     
     policy = solve(solver, problem)
-    up = updater(policy)
+    if updater==nothing
+        updater = POMDPs.updater(policy)
+    end
 
     sim = TestSimulator(MersenneTwister(1), max_steps)
 
-    simulate(sim, problem, policy, up, initial_state_distribution(problem))
+    simulate(sim, problem, policy, updater, initial_state_distribution(problem))
 end
