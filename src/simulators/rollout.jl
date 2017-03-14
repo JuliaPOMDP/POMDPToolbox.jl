@@ -9,8 +9,8 @@ The simulation will be terminated when either
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
 """
-type RolloutSimulator <: Simulator
-    rng::AbstractRNG
+immutable RolloutSimulator{RNG<:AbstractRNG} <: Simulator
+    rng::RNG
 
     # optional: if these are null, they will be ignored
     initial_state::Nullable{Any}
@@ -22,7 +22,7 @@ function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
                            initial_state=Nullable{Any}(),
                            eps=Nullable{Float64}(),
                            max_steps=Nullable{Int}())
-    return RolloutSimulator(rng, initial_state, eps, max_steps)
+    return RolloutSimulator{typeof(rng)}(rng, initial_state, eps, max_steps)
 end
 
 @POMDP_require simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy) begin
@@ -58,10 +58,10 @@ end
 end
 
 
-function simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy, updater::Updater, initial_belief)
+function simulate{S}(sim::RolloutSimulator, pomdp::POMDP{S}, policy::Policy, updater::Updater, initial_belief)
 
     if !isnull(sim.initial_state)
-        s = deepcopy(get(sim.initial_state))
+        s = get(sim.initial_state)::S
     else
         s = rand(sim.rng, initial_belief)
     end
