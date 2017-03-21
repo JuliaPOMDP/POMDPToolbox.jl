@@ -36,26 +36,48 @@ will limit the simulation to 100 steps
 function sim end
 
 function sim(polfunc::Function, mdp::MDP,
-             initial_state=default_init_state(mdp);
+             initial_state=nothing;
              simulator=nothing,
              kwargs...
             )
+    kwargd = Dict(kwargs)
     if simulator==nothing
         simulator = HistoryRecorder(;kwargs...)
+    end
+    if initial_state==nothing && state_type(mdp) != Void
+        if haskey(kwargd, :initial_state)
+            initial_state = kwargd[:initial_state]
+        else
+            initial_state = default_init_state(mdp)
+        end    
     end
     policy = FunctionPolicy(polfunc)
     simulate(simulator, mdp, policy, initial_state)
 end
 
 function sim(polfunc::Function, pomdp::POMDP,
-             initial_state=default_init_state(pomdp);
+             initial_state=nothing;
              simulator=nothing,
-             initial_obs=default_init_obs(pomdp, initial_state),
-             updater=PrimedPreviousObservationUpdater{Any}(initial_obs),
+             initial_obs=nothing,
+             updater=nothing,
              kwargs...
             )
+    kwargd = Dict(kwargs)
     if simulator==nothing
         simulator = HistoryRecorder(;initial_state=initial_state, kwargs...)
+    end
+    if initial_state==nothing && state_type(pomdp) != Void
+        if haskey(kwargd, :initial_state)
+            initial_state = kwargd[:initial_state]
+        else
+            initial_state = default_init_state(pomdp)
+        end    
+    end
+    if initial_obs==nothing && obs_type(pomdp) != Void
+        initial_obs = default_init_obs(pomdp, initial_state)
+    end
+    if updater==nothing
+        updater = PrimedPreviousObservationUpdater{Any}(initial_obs)
     end
     policy = FunctionPolicy(polfunc)
     simulate(simulator, pomdp, policy, updater)

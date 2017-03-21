@@ -13,3 +13,15 @@ sim(pomdp, max_steps=100) do obs
     acts = actions(pomdp)
     return rand(acts)
 end
+
+sim(pomdp, false, max_steps=100) do obs
+    @assert isa(obs, Bool)
+    acts = actions(pomdp)
+    return rand(acts)
+end
+
+sim(pomdp, initial_state=true, max_steps=100) do obs
+    @assert isa(obs, Bool)
+    acts = actions(pomdp)
+    return rand(acts)
+end
