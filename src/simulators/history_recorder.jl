@@ -120,6 +120,9 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
     push!(bh, initial_belief)
 
     if sim.show_progress
+        if isnull(sim.max_steps) && isnull(sim.eps)
+            error("If show_progress=true in a HistoryRecorder, you must also specify max_steps or eps.")
+        end
         prog = Progress(max_steps, "Simulating..." )
     end
 

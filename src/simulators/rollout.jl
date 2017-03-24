@@ -117,7 +117,7 @@ function simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy)
     simulate(sim, mdp, policy, istate)
 end
 
-function simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy, initial_state)
+function simulate{S}(sim::RolloutSimulator, mdp::Union{MDP{S}, POMDP{S}}, policy::Policy, initial_state::S)
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
