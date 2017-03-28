@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/JuliaPOMDP/POMDPToolbox.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaPOMDP/POMDPToolbox.jl?branch=master)
 
 Support tools for POMDPs.jl. This is a supported [JuliaPOMDP](https://github.com/JuliaPOMDP) package that provides tools
-for belief updating, problem modeling, 
+for belief updating, problem modeling, and running simulations. 
 
 ## Installation
 
@@ -14,8 +14,6 @@ using POMDPs
 POMDPs.add("POMDPToolbox")
 ```
 
-## Code structure
+## Content
 
-Within src, there are three directories representing classes of tools, beliefs, policies, and simulators.
-
-Within each class directory, each file contains one tool. Each file should clearly indicate who is the maintainer of that file.
+POMDPToolbox contains tools for updating POMDP beliefs, defining POMDP models, and simulating POMDP policies. 
