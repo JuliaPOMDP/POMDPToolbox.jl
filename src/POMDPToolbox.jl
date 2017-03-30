@@ -3,7 +3,6 @@ __precompile__()
 
 module POMDPToolbox
 
-using GenerativeModels
 using POMDPs
 
 import POMDPs: Updater, update, initialize_belief, pdf, mode, updater
