@@ -9,11 +9,14 @@ The simulation will be terminated when either
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
 
-Other options
-    capture_exception::Bool
-
-    show_progress::Bool
-        show a progress bar for the simulation
+Keyword Arguments:
+    - `rng`: The random number generator for the simulation
+    - `capture_exception::Bool`: whether to capture an exception and store it in the history, or let it go uncaught, potentially killing the script
+    - `show_progress::Bool`: show a progress bar for the simulation
+    - `initial_state`
+    - `eps`
+    - `max_steps`
+    - `sizehint::Int`: the expected length of the simulation (for preallocation)
 """
 type HistoryRecorder <: Simulator
     rng::AbstractRNG

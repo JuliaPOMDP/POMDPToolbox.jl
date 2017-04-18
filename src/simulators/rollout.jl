@@ -8,6 +8,14 @@ The simulation will be terminated when either
 1) a terminal state is reached (as determined by `isterminal()` or
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
+
+Keyword arguments are:
+
+    initial_state
+    
+    eps
+
+    max_steps
 """
 immutable RolloutSimulator{RNG<:AbstractRNG} <: Simulator
     rng::RNG
