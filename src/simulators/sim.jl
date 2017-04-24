@@ -99,7 +99,7 @@ end
             error("""
                   Error in sim(::$(typeof(p))): No initial state specified.
                   
-                  Please supply it as an argument after the mdp or define the method GenerativeModels.initial_state(::$(typeof(p)), ::$(typeof(Base.GLOBAL_RNG))) or define the method POMDPs.initial_state_distribution(::$(typeof(p))).
+                  Please supply it as an argument after the mdp or define the method POMDPs.initial_state(::$(typeof(p)), ::$(typeof(Base.GLOBAL_RNG))) or define the method POMDPs.initial_state_distribution(::$(typeof(p))).
 
                   """)
         end
