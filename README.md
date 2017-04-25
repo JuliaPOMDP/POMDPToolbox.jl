@@ -5,7 +5,7 @@
 Support tools for POMDPs.jl. This is a supported [JuliaPOMDP](https://github.com/JuliaPOMDP) package that provides tools
 for belief updating, problem modeling, and running simulations. 
 
-The most important tools from this package are the [simulators](#Simulators)
+The most important tools in this package are the [simulators](#Simulators). They can be used to easily run simulations of POMDP problems and policies.
 
 ## Installation
 
@@ -21,8 +21,6 @@ POMDPs.add("POMDPToolbox")
 Within src, there are three directories representing classes of tools, beliefs, policies, and simulators.
 
 Within each class directory, each file contains one tool. Each file should clearly indicate who is the maintainer of that file.
-
-The most important tools in this package are the [simulators](#Simulators). They can be used to easily run simulations of POMDP problems and policies.
 
 ## Tools
 
