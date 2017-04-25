@@ -1,7 +1,6 @@
 using POMDPs
 using POMDPToolbox
 using POMDPModels
-using GenerativeModels
 using Base.Test
 
 include("test_random_solver.jl")

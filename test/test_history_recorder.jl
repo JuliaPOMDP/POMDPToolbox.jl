@@ -1,6 +1,6 @@
 using POMDPToolbox
+using POMDPs
 using POMDPModels
-using GenerativeModels
 using Base.Test
 
 let
