@@ -1,4 +1,4 @@
-# (begrudgingly) provides compatibility with Distributions.jl
+# provides compatibility with Distributions.jl
 # maintained by @zsunberg
 
 import Distributions
