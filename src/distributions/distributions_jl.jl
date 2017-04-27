@@ -6,9 +6,9 @@ import Distributions: Distribution, UnivariateDistribution, Categorical, MvNorma
 
 @generated function rand(rng::AbstractRNG, d::Distribution)
     Core.println("""
-         WARNING: You are using a $d distribution from Distributions.jl. This will work, but simulations will not be repeatable because Distributions.jl does not support arbitrary random number generators (i.e. there is no `rand(rng::AbstractRNG, d::$d)`)
+         WARNING: You are using a $d distribution from Distributions.jl. This will work, but simulations will not be repeatable because Distributions.jl does not support non-global random number generators (i.e. there is no `rand(rng::AbstractRNG, d::$d)`)
 
-         For more information, or to encourage Distributions.jl to support this, see https://github.com/JuliaStats/Distributions.jl/issues/436
+         For more information, or help Distributions.jl to support this, see https://github.com/JuliaStats/Distributions.jl/issues/436
 
          To disable this warning, use `rand(rng::AbstractRNG, d::$d) = rand(d)` (you will still not be able to repeat simulations).
          """)
