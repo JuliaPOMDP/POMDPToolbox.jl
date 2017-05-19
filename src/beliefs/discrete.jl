@@ -14,8 +14,8 @@ end
 # Constructor with uniform belief
 DiscreteBelief(n::Int64) = DiscreteBelief(zeros(n) + 1.0/n)
 
-type DiscreteUpdater <: Updater{DiscreteBelief}
-    pomdp::POMDP
+type DiscreteUpdater{P<:POMDP} <: Updater{DiscreteBelief}
+    pomdp::P
 end
 
 vec(b::DiscreteBelief) = b.b
@@ -84,7 +84,9 @@ function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O)
         # get prob of observation o from current distribution
         probo = pdf(od, o)
         # if observation prob is 0.0, then skip rest of update b/c bnew[i] is zero
-        probo == 0.0 ? (continue) : (nothing)
+        if probo == 0.0
+            continue
+        end
         b_sum = 0.0 # belief for state sp
         for (j, s) in enumerate(pomdp_states)
             td = transition(pomdp, s, a)
