@@ -10,11 +10,9 @@ println("There should NOT be a warning between here")
 rand(MersenneTwister(12), mvn)
 println("and here.")
 
-mn = Multinomial(4, 8)
 println("There should be a warning below.")
+mn = Multinomial(4, 8)
 rand(MersenneTwister(12), mn)
 
 cat = Categorical(3)
-println("There should NOT be a warning between here")
 rand(MersenneTwister(12), cat)
-println("and here.")

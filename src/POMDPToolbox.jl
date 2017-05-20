@@ -13,6 +13,8 @@ import Base: rand, rand!, mean
 
 using ProgressMeter
 
+using StatsBase
+
 # export commons
 export
     update,
@@ -118,12 +120,7 @@ export
     ordered_observations
 include("model/ordered_spaces.jl")
 
-# tools for random sampling
-export
-    WeightVec,
-    sample
-include("random/weight_vec.jl")
-
+# tools for distributions
 include("distributions/distributions_jl.jl")
 
 # testing

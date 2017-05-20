@@ -40,10 +40,10 @@ end
 CategoricalTabularPolicy(mdp::Union{POMDP,MDP};
                  rng=Base.GLOBAL_RNG,
                  updater=VoidUpdater()) = CategoricalTabularPolicy(StochasticPolicy(mdp,
-                 WeightVec(zeros(n_actions(mdp)))), ValuePolicy(mdp))
+                 Weights(zeros(n_actions(mdp)))), ValuePolicy(mdp))
 
 function action(policy::CategoricalTabularPolicy, s)
-    policy.stochastic.distribution = WeightVec(policy.value.value_table[state_index(policy.stochastic.problem, s),:])
+    policy.stochastic.distribution = Weights(policy.value.value_table[state_index(policy.stochastic.problem, s),:])
     return policy.value.act[sample(policy.stochastic.rng, policy.stochastic.distribution)]
 end
 

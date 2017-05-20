@@ -24,7 +24,7 @@ Base.length(b::DiscreteBelief) = length(b.b)
 index(b::DiscreteBelief, i::Int64) = i
 weight(b::DiscreteBelief, i::Int64) = b.b[i]
 iterator(b::DiscreteBelief) = filter(i->b[i]>0.0, 1:length(b))
-rand(rng::AbstractRNG, b::DiscreteBelief) = sample(rng, WeightVec(b.b)) # This will return an integer - seems like it should actually return an object of the state type of the problem
+rand(rng::AbstractRNG, b::DiscreteBelief) = sample(rng, Weights(b.b)) # This will return an integer - seems like it should actually return an object of the state type of the problem
 pdf(b::DiscreteBelief, s::Int) = b.b[s]/sum(b.b) # only works when the state type is integer
 
 function Base.fill!(b::DiscreteBelief, x::Float64)

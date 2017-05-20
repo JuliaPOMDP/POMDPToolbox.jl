@@ -53,7 +53,7 @@ function pdf{S}(b::ParticleBelief{S}, s::S)
 end
 
 function rand{S}(rng::AbstractRNG, b::ParticleBelief{S})
-    cat = WeightVec(b.probs_arr)
+    cat = Weights(b.probs_arr)
     k = sample(rng, cat)
     s = b.particles[k].state
     return s
@@ -151,7 +151,7 @@ function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, b
     particles = normalize!(particles)
     bnew.probs_arr /= sum(bnew.probs_arr)
 
-    cat = WeightVec(bnew.probs_arr)
+    cat = Weights(bnew.probs_arr)
 
     w = 1.0 / bu.n
     bu.keep_dict ? (empty!(bnew.probs_dict)) : (nothing)

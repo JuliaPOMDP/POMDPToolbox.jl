@@ -17,7 +17,7 @@ import Distributions: Distribution, UnivariateDistribution, Categorical, MvNorma
     end
 end
 
-rand(rng::AbstractRNG, d::UnivariateDistribution) = Distributions.quantile(d, rand(rng))
+rand(rng::AbstractRNG, d::UnivariateDistribution) = Distributions.quantile(d, rand(rng)) # fallback
 
 iterator(d::Categorical) = 1:Distributions.ncategories(d)
 

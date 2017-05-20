@@ -53,9 +53,6 @@ Within each class directory, each file contains one tool. Each file should clear
     - `VectorPolicy` holds a vector of actions, one for each state, ordered according to `state_index`.
     - `ValuePolicy` holds a matrix of values for state-action pairs and chooses the action with the highest value at the given state
 
-### Random
-  - `weight_vec.jl`: contains an implementation of `sample` for `StatsBase.WeightVec` that can use an arbitrary random number generator
-
 ### Simulators
   - `rollout.jl`: `RolloutSimulator` is the simplest MDP or POMDP simulator. When `simulate` is called, it simply simulates a single trajectory of the process and returns the discounted reward.
     ```julia
