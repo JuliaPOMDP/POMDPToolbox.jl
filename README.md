@@ -37,7 +37,7 @@ Within each class directory, each file contains one tool. Each file should clear
   - `implementations.jl`: default implementations for simple cases (e.g. `states(::MDP{Bool, Bool})`).
 
 ### Distributions
-  - `distributions_jl.jl`: provides some compatibility with ([Distributions.jl](https://github.com/JuliaStats/Distributions.jl)).
+  - `distributions_jl.jl`: provides some compatibility with [Distributions.jl](https://github.com/JuliaStats/Distributions.jl).
 
 ### Model
   - `initial.jl`: a uniform distribution for discrete problems.
@@ -74,24 +74,45 @@ Within each class directory, each file contains one tool. Each file should clear
     ```
     See the output of `?HistoryRecorder` for a list of keyword arguments.
 
-  - `history.jl`: contains types for representing simulation histories (i.e. trajectories).
-    An `MDPHistory` represents a state-action-reward history from simulating an MDP. The (s,a,r,s') tuples in the history can be iterated through as follows:
+  - `history.jl`: contains types for representing simulation histories (i.e. trajectories or episodes).
+
+    An `MDPHistory` represents a state-action-reward history from simulating an MDP. A `POMDPHistory` contains a record of the states, actions, observations, rewards, and beliefs encountered during a simulation of a POMDP. Both of these are subtypes of `SimHistory`.
+    
+    The steps of any `SimHistory` object `h` can be iterated through as follows:
+
     ```julia
-    for (s, a, r, sp) in h
-        # do something
+    for (s, a, r, sp) in iterator(h, "(s, a, r, sp)")    
+        println("reward $r received when state $sp was reached after action $a was taken in state $s")
     end
     ```
-    where `h` is an `MDPHistory`. Moreover, `state_hist(h)`, `action_hist(h)`, and `reward_hist(h)` will return vectors of the states, actions, and rewards, and `undiscounted_reward(h)` and `discounted_reward(h)` will return the total rewards collected over the trajectory. `n_steps(h)` returns the number of steps in the history. `exception(h)` and `backtrace(h)` can be used to hold an exception if the simulation failed to finish.
+    
+    The iterator specification string may or may-not include commas and parentheses the possible valid elements in a step tuple are
+    - `s` - the initial state in a step
+    - `b` - the initial belief in the step (for POMDPs only)
+    - `a` - the action taken in the step
+    - `r` - the reward received for the step
+    - `sp` - the final state at the end of the step (s')
+    - `o` - the observation received during the step (note that this is usually based on `sp` instead of `s`)
 
-    A `POMDPHistory` contains a record of the states, actions, observations, rewards, and beliefs encountered during a simulation of a POMDP. It can be iterated through as follows:
+    Examples:
     ```julia
-    for (s, b, a, r, sp, op) in h
-        # do something
-    end
+    collect(iterator(h, "ao"))
     ```
-    where `h` is a `POMDPHistory`. `state_hist(h)`, `action_hist(h)`, `observation_hist(h)`, `belief_hist(h)`, `reward_hist(h)`, `undiscounted_reward(h)`, `discounted_reward(h)`, `n_steps(h)`, `exception(h)`, and `backtrace(h)` may be used to access different parts of the history.
+    will produce a vector of action-observation tuples.
 
-    `view(h, range)` (e.g. `view(h, 1:n_steps(h)-4)`) can be used to create a view of the history object `h` that only contains a certain range of steps.
+    ```julia
+    collect(norm(sp-s) for (s,sp) in iterator(h, "s,sp"))
+    ```
+    will produce a vector of the distances traveled on each step (assuming the state is a Euclidean vector).
+
+    Notes:
+    - The iteration specification can be specified as a tuple of symbols (e.g. `(:s, :a)`) instead of a string.
+    - For type stability in performance-critical code, one should construct an iterator directly using `HistoryIterator{typeof(h), (:a,:r)}(h)` rather than `iterator(h, "ar")`.
+    
+    `state_hist(h)`, `action_hist(h)`, `observation_hist(h)` `belief_hist(h)`, and `reward_hist(h)` will return vectors of the states, actions, and rewards, and `undiscounted_reward(h)` and `discounted_reward(h)` will return the total rewards collected over the trajectory. `n_steps(h)` returns the number of steps in the history. `exception(h)` and `backtrace(h)` can be used to hold an exception if the simulation failed to finish.
+
+    `view(h, range)` (e.g. `view(h, 1:n_steps(h)-4)`) can be used to create a view of the history object `h` that only contains a certain range of steps. The object returned by `view` is a `SimHistory` that can be iterated through and manipulated just like a complete `SimHistory`.
+
 
   - `sim.jl`: The `sim` function provides a convenient way to interact with a POMDP or MDP environment. The first argument is a function that is called at every time step and takes a state (in the case of an MDP) or an observation (in the case of a POMDP) as the argument and then returns an action. The second argument is a pomdp or mdp. It is intended to be used with Julia's `do` syntax as follows:
     ```julia
@@ -102,6 +123,8 @@ Within each class directory, each file contains one tool. Each file should clear
     end
     ```
     This allows a flexible and general way to interact with a POMDP environment without creating new `Policy` types.
+
+    Note: by default, since there is no observation before the first action, on the first call to the `do` block, `obs` is `nothing`.
 
 ### Testing
   - `model.jl`: generic functions for testing POMDP models.

@@ -10,7 +10,7 @@ An object that contains a MDP simulation history
 
 Returned by simulate when called with a HistoryRecorder. Iterate through the (s, a, r, s') tuples in MDPHistory h like this:
 
-    for (s, a, r, sp) in h
+    for (s, a, r, sp) in iterator(h)
         # do something
     end
 """
@@ -160,6 +160,8 @@ function HistoryIterator(history::SimHistory, spec::Tuple)
 end
 
 iterator(hist::SimHistory, spec) = HistoryIterator(hist, spec)
+iterator(mh::AbstractMDPHistory) = iterator(mh, (:s, :a, :r, :sp))
+iterator(mh::AbstractPOMDPHistory) = iterator(mh, (:a, :o))
 
 @generated function step_tuple(it::HistoryIterator, i::Int)
     spec = it.parameters[2]
@@ -175,10 +177,8 @@ iterator(hist::SimHistory, spec) = HistoryIterator(hist, spec)
             push!(calls, :(state_hist(it.history)[i+1]))
         elseif sym == :b
             push!(calls, :(belief_hist(it.history)[i]))
-        elseif sym == :bp
-            push!(calls, :(belief_hist(it.history)[i+1]))
         elseif sym == :o
-            push!(calls, :(observation_hist(it.history)[i+1]))
+            push!(calls, :(observation_hist(it.history)[i]))
         end
     end
 
