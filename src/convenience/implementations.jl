@@ -16,6 +16,7 @@ rand(t::Tuple{Bool, Bool}) = rand(Bool)
 iterator(s::AbstractVector) = s
 iterator(s::Tuple) = s
 iterator(r::Range) = r
+iterator(g::Base.Generator) = g
 
 states(mdp::MDP{Bool}) = (true, false)
 states(mdp::POMDP{Bool}) = (true, false)
