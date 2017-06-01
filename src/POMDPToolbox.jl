@@ -92,6 +92,7 @@ export
     MDPHistory,
     AbstractPOMDPHistory,
     AbstractMDPHistory,
+    HistoryIterator,
     state_hist,
     action_hist,
     observation_hist,
@@ -101,7 +102,8 @@ export
     backtrace,
     undiscounted_reward,
     discounted_reward,
-    n_steps
+    n_steps,
+    step_tuple
 include("simulators/history.jl")
 
 export sim

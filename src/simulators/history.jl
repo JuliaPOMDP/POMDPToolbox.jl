@@ -29,9 +29,9 @@ end
 """
 An object that contains a POMDP simulation history
 
-Returned by simulate when called with a HistoryRecorder. Iterate through the (s, b, a, r, s', o') tuples in POMDPHistory h like this:
+Returned by simulate when called with a HistoryRecorder. Iterate through the (s, b, a, r, s', o) tuples in POMDPHistory h like this:
 
-    for (s, b, a, r, sp, op) in h
+    for (s, b, a, r, sp, o) in iterator(h, "s,b,a,r,sp,o")
         # do something
     end
 """
@@ -131,3 +131,65 @@ step_tuple(h::SubHistory, i::Int) = step_tuple(h.parent, h.inds[i])
 exception(h::SubHistory) = exception(h.parent)
 Base.backtrace(h::SubHistory) = backtrace(h.parent)
 discount(h::SubHistory) = discount(h.parent)
+
+
+# iterators
+immutable HistoryIterator{H<:SimHistory, SPEC}
+    history::H
+end
+
+function HistoryIterator(history::SimHistory, spec::String)
+    # hack - is there a way to do this with a single regular expression?
+    syms = Symbol[]
+    offset = 1
+    while offset <= length(spec)
+        m = match(r"(sp|bp|s|a|r|b|o)", spec, offset)
+        if m === nothing
+            break
+        else
+            push!(syms, Symbol(m.match))
+            offset = m.offset + length(m.match)
+        end
+    end
+    return HistoryIterator{typeof(history), tuple(syms...)}(history)
+end
+
+function HistoryIterator(history::SimHistory, spec::Tuple)
+    @assert all(isa(s, Symbol) for s in spec)
+    return HistoryIterator{typeof(history), spec}(history)
+end
+
+iterator(hist::SimHistory, spec) = HistoryIterator(hist, spec)
+
+@generated function step_tuple(it::HistoryIterator, i::Int)
+    spec = it.parameters[2]
+    calls = []
+    for sym in spec
+        if sym == :s
+            push!(calls, :(state_hist(it.history)[i]))
+        elseif sym == :a
+            push!(calls, :(action_hist(it.history)[i]))
+        elseif sym == :r
+            push!(calls, :(reward_hist(it.history)[i]))
+        elseif sym == :sp
+            push!(calls, :(state_hist(it.history)[i+1]))
+        elseif sym == :b
+            push!(calls, :(belief_hist(it.history)[i]))
+        elseif sym == :bp
+            push!(calls, :(belief_hist(it.history)[i+1]))
+        elseif sym == :o
+            push!(calls, :(observation_hist(it.history)[i+1]))
+        end
+    end
+
+    return quote
+        return tuple($(calls...))
+    end
+end
+
+Base.length(it::HistoryIterator) = n_steps(it.history)
+Base.start(it::HistoryIterator) = 1
+Base.done(it::HistoryIterator, i::Int) = i > length(it)
+Base.next(it::HistoryIterator, i::Int) = (step_tuple(it, i), i+1)
+
+Base.getindex(it::HistoryIterator, i) = step_tuple(it, i)
