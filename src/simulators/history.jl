@@ -10,7 +10,7 @@ An object that contains a MDP simulation history
 
 Returned by simulate when called with a HistoryRecorder. Iterate through the (s, a, r, s') tuples in MDPHistory h like this:
 
-    for (s, a, r, sp) in iterator(h)
+    for (s, a, r, sp) in eachstep(h)
         # do something
     end
 """
@@ -31,7 +31,7 @@ An object that contains a POMDP simulation history
 
 Returned by simulate when called with a HistoryRecorder. Iterate through the (s, b, a, r, s', o) tuples in POMDPHistory h like this:
 
-    for (s, b, a, r, sp, o) in iterator(h, "s,b,a,r,sp,o")
+    for (s, b, a, r, sp, o) in eachstep(h, "s,b,a,r,sp,o")
         # do something
     end
 """
@@ -139,19 +139,8 @@ immutable HistoryIterator{H<:SimHistory, SPEC}
 end
 
 function HistoryIterator(history::SimHistory, spec::String)
-    # XXX hack - is there a way to do this with a single regular expression?
-    # XXX also, should throw warnings for unrecognized specification characters
-    syms = Symbol[]
-    offset = 1
-    while offset <= length(spec)
-        m = match(r"(sp|s|a|r|b|o)", spec, offset)
-        if m === nothing
-            break
-        else
-            push!(syms, Symbol(m.match))
-            offset = m.offset + length(m.match)
-        end
-    end
+    # XXX should throw warnings for unrecognized specification characters
+    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|s|a|r|b|o)", spec)]
     return HistoryIterator{typeof(history), tuple(syms...)}(history)
 end
 
@@ -160,9 +149,9 @@ function HistoryIterator(history::SimHistory, spec::Tuple)
     return HistoryIterator{typeof(history), spec}(history)
 end
 
-iterator(hist::SimHistory, spec) = HistoryIterator(hist, spec)
-iterator(mh::AbstractMDPHistory) = iterator(mh, (:s, :a, :r, :sp))
-iterator(mh::AbstractPOMDPHistory) = iterator(mh, (:a, :o))
+eachstep(hist::SimHistory, spec) = HistoryIterator(hist, spec)
+eachstep(mh::AbstractMDPHistory) = eachstep(mh, (:s, :a, :r, :sp))
+eachstep(mh::AbstractPOMDPHistory) = eachstep(mh, (:a, :o))
 
 @generated function step_tuple(it::HistoryIterator, i::Int)
     spec = it.parameters[2]
@@ -180,6 +169,8 @@ iterator(mh::AbstractPOMDPHistory) = iterator(mh, (:a, :o))
             push!(calls, :(belief_hist(it.history)[i]))
         elseif sym == :o
             push!(calls, :(observation_hist(it.history)[i]))
+        elseif sym == :bp
+            push!(calls, :(belief_hist(it.history)[i+1]))
         end
     end
 

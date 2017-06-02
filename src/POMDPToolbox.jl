@@ -93,6 +93,7 @@ export
     AbstractPOMDPHistory,
     AbstractMDPHistory,
     HistoryIterator,
+    eachstep,
     state_hist,
     action_hist,
     observation_hist,

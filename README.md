@@ -81,7 +81,7 @@ Within each class directory, each file contains one tool. Each file should clear
     The steps of any `SimHistory` object `h` can be iterated through as follows:
 
     ```julia
-    for (s, a, r, sp) in iterator(h, "(s, a, r, sp)")    
+    for (s, a, r, sp) in eachstep(h, "(s, a, r, sp)")    
         println("reward $r received when state $sp was reached after action $a was taken in state $s")
     end
     ```
@@ -96,18 +96,18 @@ Within each class directory, each file contains one tool. Each file should clear
 
     Examples:
     ```julia
-    collect(iterator(h, "ao"))
+    collect(eachstep(h, "ao"))
     ```
     will produce a vector of action-observation tuples.
 
     ```julia
-    collect(norm(sp-s) for (s,sp) in iterator(h, "s,sp"))
+    collect(norm(sp-s) for (s,sp) in eachstep(h, "s,sp"))
     ```
     will produce a vector of the distances traveled on each step (assuming the state is a Euclidean vector).
 
     Notes:
     - The iteration specification can be specified as a tuple of symbols (e.g. `(:s, :a)`) instead of a string.
-    - For type stability in performance-critical code, one should construct an iterator directly using `HistoryIterator{typeof(h), (:a,:r)}(h)` rather than `iterator(h, "ar")`.
+    - For type stability in performance-critical code, one should construct an iterator directly using `HistoryIterator{typeof(h), (:a,:r)}(h)` rather than `eachstep(h, "ar")`.
     
     `state_hist(h)`, `action_hist(h)`, `observation_hist(h)` `belief_hist(h)`, and `reward_hist(h)` will return vectors of the states, actions, and rewards, and `undiscounted_reward(h)` and `discounted_reward(h)` will return the total rewards collected over the trajectory. `n_steps(h)` returns the number of steps in the history. `exception(h)` and `backtrace(h)` can be used to hold an exception if the simulation failed to finish.
 
