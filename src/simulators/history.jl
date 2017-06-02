@@ -139,11 +139,12 @@ immutable HistoryIterator{H<:SimHistory, SPEC}
 end
 
 function HistoryIterator(history::SimHistory, spec::String)
-    # hack - is there a way to do this with a single regular expression?
+    # XXX hack - is there a way to do this with a single regular expression?
+    # XXX also, should throw warnings for unrecognized specification characters
     syms = Symbol[]
     offset = 1
     while offset <= length(spec)
-        m = match(r"(sp|bp|s|a|r|b|o)", spec, offset)
+        m = match(r"(sp|s|a|r|b|o)", spec, offset)
         if m === nothing
             break
         else
