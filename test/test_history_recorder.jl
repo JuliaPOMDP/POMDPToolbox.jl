@@ -87,6 +87,8 @@ let
     tuples = collect(eachstep(hv, "rspsa"))
     @test sum(first(t) for t in tuples) == undiscounted_reward(hv)
 
+    @test collect(eachstep(hv, "r")) == reward_hist(hv)
+
     #=
     function f(hv)
         rs = 0.0

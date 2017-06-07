@@ -138,44 +138,61 @@ immutable HistoryIterator{H<:SimHistory, SPEC}
     history::H
 end
 
+# Note this particular function is not type-stable
 function HistoryIterator(history::SimHistory, spec::String)
     # XXX should throw warnings for unrecognized specification characters
     syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|s|a|r|b|o)", spec)]
-    return HistoryIterator{typeof(history), tuple(syms...)}(history)
+    if length(syms) == 1
+        return HistoryIterator{typeof(history), first(syms)}(history)
+    else
+        return HistoryIterator{typeof(history), tuple(syms...)}(history)
+    end
 end
 
 function HistoryIterator(history::SimHistory, spec::Tuple)
     @assert all(isa(s, Symbol) for s in spec)
     return HistoryIterator{typeof(history), spec}(history)
 end
+HistoryIterator(h::SimHistory, spec::Symbol) = HistoryIterator{typeof(h), spec}(h)
 
 eachstep(hist::SimHistory, spec) = HistoryIterator(hist, spec)
 eachstep(mh::AbstractMDPHistory) = eachstep(mh, (:s, :a, :r, :sp))
 eachstep(mh::AbstractPOMDPHistory) = eachstep(mh, (:a, :o))
 
+function sym_to_call(sym::Symbol)
+    if sym == :s
+        return :(state_hist(it.history)[i])
+    elseif sym == :a
+        return :(action_hist(it.history)[i])
+    elseif sym == :r
+        return :(reward_hist(it.history)[i])
+    elseif sym == :sp
+        return :(state_hist(it.history)[i+1])
+    elseif sym == :b
+        return :(belief_hist(it.history)[i])
+    elseif sym == :o
+        return :(observation_hist(it.history)[i])
+    elseif sym == :bp
+        return :(belief_hist(it.history)[i+1])
+    end
+end
+
 @generated function step_tuple(it::HistoryIterator, i::Int)
     spec = it.parameters[2]
-    calls = []
-    for sym in spec
-        if sym == :s
-            push!(calls, :(state_hist(it.history)[i]))
-        elseif sym == :a
-            push!(calls, :(action_hist(it.history)[i]))
-        elseif sym == :r
-            push!(calls, :(reward_hist(it.history)[i]))
-        elseif sym == :sp
-            push!(calls, :(state_hist(it.history)[i+1]))
-        elseif sym == :b
-            push!(calls, :(belief_hist(it.history)[i]))
-        elseif sym == :o
-            push!(calls, :(observation_hist(it.history)[i]))
-        elseif sym == :bp
-            push!(calls, :(belief_hist(it.history)[i+1]))
+    if isa(spec, Tuple)
+        calls = []
+        for sym in spec
+            push!(calls, sym_to_call(sym))
         end
-    end
 
-    return quote
-        return tuple($(calls...))
+        return quote
+            return tuple($(calls...))
+        end
+    else
+        @assert isa(spec, Symbol)
+        return quote
+            return $(sym_to_call(spec))
+        end
     end
 end
 
