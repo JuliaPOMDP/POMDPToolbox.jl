@@ -63,6 +63,17 @@ immutable POMDPSimIterator{SPEC, M<:POMDP, P<:Policy, U<:Updater, RNG<:AbstractR
     init_state::S
 end
 
+Base.done{S,B}(it::POMDPSimIterator, is::Tuple{Int, S, B}) = isterminal(it.mdp, is[2]) || is[1] > max_steps
+Base.start(it::POMDPSimIterator) = (1, it.init_state, it.init_belief)
+function Base.step(it::POMDPSimIterator, is::Tuple{Int, S, B})
+    s = is[2]
+    b = is[3]
+    a = action(it.policy, b)
+    sp, o, r = generate_sor(it.mdp, s, a, it.rng)
+    bp = updater(it.updater, b, a, o)
+    return (out_tuple(it, (s, a, r, sp, b, o, bp)), (is[1]+1, sp, bp))
+end
+
 # all is (s, a, r, sp) for mdps, (s, a, r, sp, b, o, bp) for POMDPs
 sym_to_ind = Dict(sym=>i for (i, sym) in enumerate([:s,:a,:r,:sp,:b,:o,:bp]))
 
@@ -85,12 +96,16 @@ sym_to_ind = Dict(sym=>i for (i, sym) in enumerate([:s,:a,:r,:sp,:b,:o,:bp]))
     end
 end
 
-function convert_spec(spec, T::Type{POMDP})
-    st = convert_spec(spec)
-end
+convert_spec(spec, T::Type{POMDP}) = convert_spec(spec, Set(:sp, :bp, :s, :a, :r, :b, :o))
+convert_spec(spec, T::Type{MDP}) = convert_spec(spec, Set(:sp, :s, :a, :r))
 
-function convert_spec(spec, T::Type{MDP})
-    st = convert_spec(spec)
+function convert_spec(spec, recognized::Set{Symbol})
+    conv = convert_spec(spec)
+    for s in conv
+        if !(s in recognized)
+            warn("uncrecognized symbol $s in step iteration specification $spec.")
+        end
+    end
 end
 
 function convert_spec(spec::String)
@@ -106,10 +121,13 @@ function convert_spec(spec::String)
 end
 
 function convert_spec(spec::Tuple)
+    for s in spec
+        @assert isa(s, Symbol)
+    end
+    return spec
 end
 
-function convert_spec(spec::Symbol)
-end
+convert_spec(spec::Symbol) = spec
 
 function get_initial_state(sim::Simulator, initial_state_dist)
     if isnull(sim.initial_state)
