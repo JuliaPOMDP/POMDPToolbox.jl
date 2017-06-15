@@ -242,7 +242,7 @@ function simulate{S,A}(sim::HistoryRecorder,
     return MDPHistory(sh, ah, rh, discount(mdp), sim.exception, sim.backtrace)
 end
 
-function get_initial_state(sim::HistoryRecorder, initial_state_dist)
+function get_initial_state(sim::Simulator, initial_state_dist)
     if isnull(sim.initial_state)
         return rand(sim.rng, initial_state_dist)
     else
@@ -250,7 +250,7 @@ function get_initial_state(sim::HistoryRecorder, initial_state_dist)
     end
 end
 
-function get_initial_state(sim::HistoryRecorder, mdp::Union{MDP,POMDP})
+function get_initial_state(sim::Simulator, mdp::Union{MDP,POMDP})
     if isnull(sim.initial_state)
         return initial_state(mdp, sim.rng)
     else

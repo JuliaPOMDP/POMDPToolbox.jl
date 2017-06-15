@@ -113,6 +113,11 @@ include("simulators/sim.jl")
 export HistoryRecorder
 include("simulators/history_recorder.jl")
 
+export
+    StepSimulator,
+    stepthrough
+include("simulators/stepthrough.jl")
+
 # model tools
 export uniform_state_distribution
 include("model/initial.jl")
