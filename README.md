@@ -126,6 +126,27 @@ Within each class directory, each file contains one tool. Each file should clear
 
     Note: by default, since there is no observation before the first action, on the first call to the `do` block, `obs` is `nothing`.
 
+  - `stepthrough.jl`: The `stepthrough` function exposes a simulation as an iterator so that the steps can be iterated through with a for loop syntax as follows:
+    ```julia
+    pomdp = BabyPOMDP()
+    policy = RandomPolicy(pomdp)
+
+    for (s, a, o, r) in stepthrough(pomdp, policy, "s,a,o,r", max_steps=10)
+        println("in state $s")
+        println("took action $o")
+        println("received observation $o and reward $r")
+    end
+    ```
+    For more information, see the documentation for the `stepthrough` function.
+
+    The `StepSimulator` contained in this file can provide the same functionality with the following syntax:
+    ```julia
+    sim = StepSimulator("s,a,r,sp")
+    for (s,a,r,sp) in simulate(sim, problem, policy)
+        # do something
+    end
+    ```
+
 ### Testing
   - `model.jl`: generic functions for testing POMDP models.
   - `solver.jl`: standard functions for testing solvers. New solvers should be able to be used with the functions in this file.
