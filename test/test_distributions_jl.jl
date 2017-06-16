@@ -14,5 +14,7 @@ println("There should be a warning below.")
 mn = Multinomial(4, 8)
 rand(MersenneTwister(12), mn)
 
+println("There should NOT be a warning between here")
 cat = Categorical(3)
 rand(MersenneTwister(12), cat)
+println("and here.")

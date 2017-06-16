@@ -20,10 +20,3 @@ end
 rand(rng::AbstractRNG, d::UnivariateDistribution) = Distributions.quantile(d, rand(rng)) # fallback
 
 iterator(d::Categorical) = 1:Distributions.ncategories(d)
-
-#XXX Hack - this may break if the Distributions.jl internal implementation breaks
-rand(rng::AbstractRNG, d::MvNormal) = _rand!(rng, d, Vector{eltype(d)}(length(d)))
-
-function _rand!(rng::AbstractRNG, d::MvNormal, x::VecOrMat)
-    Distributions.add!(Distributions.unwhiten!(d.Σ, randn!(rng, x)), d.μ)
-end
