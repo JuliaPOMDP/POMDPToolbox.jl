@@ -3,4 +3,4 @@ POMDPs
 Iterators
 ProgressMeter
 Distributions
-StatsBase
+StatsBase 0.15
