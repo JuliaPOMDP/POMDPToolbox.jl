@@ -2,7 +2,8 @@
 # maintained by @zsunberg
 
 import Distributions
-import Distributions: Distribution, UnivariateDistribution, Categorical, MvNormal
+import Distributions: Distribution, UnivariateDistribution, MultivariateDistribution, Matrixvariate
+import Distributions: Categorical, MvNormal
 
 @generated function rand(rng::AbstractRNG, d::Distribution)
     Core.println("""
@@ -20,6 +21,10 @@ end
 rand(rng::AbstractRNG, d::UnivariateDistribution) = Distributions.quantile(d, rand(rng)) # fallback
 
 iterator(d::Categorical) = 1:Distributions.ncategories(d)
+
+sampletype(d::UnivariateDistribution) = eltype(d)
+sampletype(d::MultivariateDistribution) = Vector{eltype(d)}
+sampletype(d::Distribution{Matrixvariate}) = Matrix{eltype(d)}
 
 # for MvNormal - this should be removed once Distributions.jl PR #597 is in a tagged Distributions.jl release
 rand(rng::AbstractRNG, d::MvNormal) = _rand!(rng, d, Vector{eltype(d)}(length(d)))
