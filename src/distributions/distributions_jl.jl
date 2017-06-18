@@ -22,9 +22,9 @@ rand(rng::AbstractRNG, d::UnivariateDistribution) = Distributions.quantile(d, ra
 
 iterator(d::Categorical) = 1:Distributions.ncategories(d)
 
-sampletype(d::UnivariateDistribution) = eltype(d)
-sampletype(d::MultivariateDistribution) = Vector{eltype(d)}
-sampletype(d::Distribution{Matrixvariate}) = Matrix{eltype(d)}
+# sampletype(d::UnivariateDistribution) = eltype(d)
+# sampletype(d::MultivariateDistribution) = Vector{eltype(d)}
+# sampletype(d::Distribution{Matrixvariate}) = Matrix{eltype(d)}
 
 # for MvNormal - this should be removed once Distributions.jl PR #597 is in a tagged Distributions.jl release
 rand(rng::AbstractRNG, d::MvNormal) = _rand!(rng, d, Vector{eltype(d)}(length(d)))
