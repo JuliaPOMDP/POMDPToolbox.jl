@@ -28,7 +28,7 @@ function simulate(sim::StepSimulator, pomdp::POMDP, policy::Policy, bu::Updater,
     return POMDPSimIterator(symtuple, pomdp, policy, bu, sim.rng, initial_belief, initial_state, get(sim.max_steps, typemax(Int64)))
 end
 
-immutable MDPSimIterator{SPEC, M<:MDP, P<:Policy, RNG<:AbstractRNG, S}
+struct MDPSimIterator{SPEC, M<:MDP, P<:Policy, RNG<:AbstractRNG, S}
     mdp::M
     policy::P
     rng::RNG
@@ -49,7 +49,7 @@ function Base.next{S}(it::MDPSimIterator, is::Tuple{Int, S})
     return (out_tuple(it, (s, a, r, sp)), (is[1]+1, sp))
 end
 
-immutable POMDPSimIterator{SPEC, M<:POMDP, P<:Policy, U<:Updater, RNG<:AbstractRNG, B, S}
+struct POMDPSimIterator{SPEC, M<:POMDP, P<:Policy, U<:Updater, RNG<:AbstractRNG, B, S}
     pomdp::M
     policy::P
     updater::U
