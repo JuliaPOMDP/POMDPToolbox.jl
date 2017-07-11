@@ -1,7 +1,7 @@
 ### StochasticPolicy ###
 # maintained by @etotheipluspi
 
-type StochasticPolicy <: Policy
+mutable struct StochasticPolicy <: Policy
     rng::AbstractRNG
     distribution
     problem::Union{POMDP,MDP}
@@ -33,7 +33,7 @@ UniformRandomPolicy(problem::Union{POMDP,MDP};
 
 
 
-type CategoricalTabularPolicy <: Policy
+mutable struct CategoricalTabularPolicy <: Policy
     stochastic::StochasticPolicy
     value::ValuePolicy
 end
@@ -48,7 +48,7 @@ function action(policy::CategoricalTabularPolicy, s)
 end
 
 
-type EpsGreedyPolicy <: Policy
+mutable struct EpsGreedyPolicy <: Policy
     eps::Float64
     val::ValuePolicy
     uni::StochasticPolicy

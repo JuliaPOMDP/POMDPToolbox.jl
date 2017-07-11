@@ -18,7 +18,7 @@ Keyword Arguments:
     - `max_steps`
     - `sizehint::Int`: the expected length of the simulation (for preallocation)
 """
-type HistoryRecorder <: Simulator
+mutable struct HistoryRecorder <: Simulator
     rng::AbstractRNG
 
     # options

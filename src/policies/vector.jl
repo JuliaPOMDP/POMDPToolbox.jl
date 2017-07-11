@@ -4,7 +4,7 @@
 """
 A generic MDP policy that consists of a vector of actions. The entry at `state_index(mdp, s)` is the action that will be taken in state `s`.
 """
-type VectorPolicy{S,A} <: Policy{S}
+mutable struct VectorPolicy{S,A} <: Policy
     mdp::MDP{S,A}
     act::Vector{A}
 end
@@ -15,7 +15,7 @@ action(p::VectorPolicy, s, a) = action(p, s)
 """
 Solver for VectorPolicy. Doesn't do any computation - just sets the action vector.
 """
-type VectorSolver{A}
+mutable struct VectorSolver{A}
     act::Vector{A}
 end
 
@@ -31,7 +31,7 @@ end
 """
 A generic MDP policy that consists of a value table. The entry at `state_index(mdp, s)` is the action that will be taken in state `s`.
 """
-type ValuePolicy{A} <: Policy
+mutable struct ValuePolicy{A} <: Policy
     mdp::Union{MDP,POMDP}
     value_table::Matrix{Float64}
     act::Vector{A}

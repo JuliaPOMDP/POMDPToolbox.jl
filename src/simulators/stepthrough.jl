@@ -1,7 +1,7 @@
 # StepSimulator
 # maintained by @zsunberg
 
-type StepSimulator <: Simulator
+mutable struct StepSimulator <: Simulator
     rng::AbstractRNG
     initial_state::Nullable{Any}
     max_steps::Nullable{Any}

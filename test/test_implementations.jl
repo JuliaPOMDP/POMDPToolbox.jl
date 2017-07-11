@@ -1,6 +1,6 @@
 
-type TestMDP <: MDP{Bool, Bool} end
-type TestPOMDP <: POMDP{Bool, Bool, Bool} end
+mutable struct TestMDP <: MDP{Bool, Bool} end
+mutable struct TestPOMDP <: POMDP{Bool, Bool, Bool} end
 
 @test actions(TestMDP()) == (true, false)
 @test actions(TestPOMDP()) == (true, false)

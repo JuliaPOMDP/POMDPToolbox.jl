@@ -1,9 +1,9 @@
 # SimHistory
 # maintained by @zsunberg
 
-abstract SimHistory
-abstract AbstractMDPHistory{S,A} <: SimHistory
-abstract AbstractPOMDPHistory{S,A,O,B} <: SimHistory
+abstract type SimHistory end
+abstract type AbstractMDPHistory{S,A} <: SimHistory end
+abstract type AbstractPOMDPHistory{S,A,O,B} <: SimHistory end
 
 """
 An object that contains a MDP simulation history
@@ -99,7 +99,7 @@ end
 
 
 
-typealias Inds Union{Range,Colon,Real}
+const Inds = Union{Range,Colon,Real}
 
 Base.view(h::AbstractMDPHistory, inds::Inds) = SubMDPHistory(h, inds)
 Base.view(h::AbstractPOMDPHistory, inds::Inds) = SubPOMDPHistory(h, inds)
@@ -116,7 +116,7 @@ struct SubPOMDPHistory{S,A,O,B,H<:AbstractPOMDPHistory,I<:Inds} <: AbstractPOMDP
 end
 SubPOMDPHistory{S,A,O,B,I<:Inds}(h::AbstractPOMDPHistory{S,A,O,B}, inds::I) = SubPOMDPHistory{S,A,O,B,typeof(h),I}(h, inds)
 
-typealias SubHistory Union{SubMDPHistory, SubPOMDPHistory}
+const SubHistory = Union{SubMDPHistory, SubPOMDPHistory}
 
 n_steps(h::SubHistory) = length(h.inds)
 
