@@ -19,7 +19,7 @@ mutable struct VectorSolver{A}
     act::Vector{A}
 end
 
-create_policy{S,A}(s::VectorSolver{A}, mdp::MDP{S,A}) = VectorPolicy(mdp, Array(A,0))
+create_policy{S,A}(s::VectorSolver{A}, mdp::MDP{S,A}) = VectorPolicy(mdp, Array{A}(0))
 
 function solve{S,A}(s::VectorSolver{A}, mdp::MDP{S,A}, p::VectorPolicy=create_policy(s,mdp))
     p.mdp = mdp

@@ -101,13 +101,13 @@ mutable struct SIRParticleUpdater <: Updater
         new(pomdp, n, rng, keep_dict)
     end
 end
-function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=MersenneTwister(), keep_dict::Bool=true) 
+function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=Base.GLOBAL_RNG, keep_dict::Bool=true) 
     SIRParticleUpdater(pomdp, n, rng, keep_dict)
 end
 
 function create_belief(up::SIRParticleUpdater) 
     st = state_type(typeof(up.pomdp))
-    particles = Array(Particle{st}, up.n)
+    particles = Array{Particle{st}}(up.n)
     w = 1.0 / up.n
     probs = Dict{st, Float64}()  
     probs_arr = zeros(up.n)
