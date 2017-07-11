@@ -91,7 +91,7 @@ the sampling importance resampling (SIR) algorithm. Fields:
     -rng: random number generator for generating state and observations from pomdp model
     -keep_dict: boolean for keeping a dictionary of particles (for pdf only)
 """
-mutable struct SIRParticleUpdater <: Updater{ParticleBelief}
+mutable struct SIRParticleUpdater <: Updater
     pomdp::POMDP # POMDP model
     n::Int64 # number of particles
     rng::AbstractRNG

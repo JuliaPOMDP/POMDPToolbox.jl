@@ -14,7 +14,7 @@ end
 # Constructor with uniform belief
 DiscreteBelief(n::Int64) = DiscreteBelief(zeros(n) + 1.0/n)
 
-mutable struct DiscreteUpdater{P<:POMDP} <: Updater{DiscreteBelief}
+mutable struct DiscreteUpdater{P<:POMDP} <: Updater
     pomdp::P
 end
 
