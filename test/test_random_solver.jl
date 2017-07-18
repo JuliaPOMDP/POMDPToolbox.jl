@@ -13,5 +13,5 @@ let
 
     r = simulate(sim, problem, policy, updater(policy), initial_state_distribution(problem))
 
-    @test_approx_eq_eps r -27.27829 1e-3
+    @test isapprox(r, -27.27829, atol=1e-3)
 end

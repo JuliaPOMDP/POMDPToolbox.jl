@@ -17,7 +17,7 @@ Keyword arguments are:
 
     max_steps
 """
-immutable RolloutSimulator{RNG<:AbstractRNG} <: Simulator
+struct RolloutSimulator{RNG<:AbstractRNG} <: Simulator
     rng::RNG
 
     # optional: if these are null, they will be ignored

@@ -7,7 +7,7 @@ FunctionPolicy
 
 Policy `p=FunctionPolicy(f)` returns `f(x)` when `action(p, x)` is called.
 """
-type FunctionPolicy <: Policy
+mutable struct FunctionPolicy <: Policy
     f::Function
 end
 
@@ -16,7 +16,7 @@ FunctionSolver
 
 Solver for a FunctionPolicy.
 """
-type FunctionSolver <: Solver
+mutable struct FunctionSolver <: Solver
     f::Function
 end
 

@@ -7,14 +7,14 @@ sum(b)=1 is not enforced at all times, but during the update it is normalized to
 
 pdf(b, i) calculates the sum every time it is called. To access the weight directly (for example if you are sure that the sum is 1), use weight(b, i). 
 """
-type DiscreteBelief
+mutable struct DiscreteBelief
     b::Vector{Float64}
 end
 
 # Constructor with uniform belief
 DiscreteBelief(n::Int64) = DiscreteBelief(zeros(n) + 1.0/n)
 
-type DiscreteUpdater{P<:POMDP} <: Updater{DiscreteBelief}
+mutable struct DiscreteUpdater{P<:POMDP} <: Updater
     pomdp::P
 end
 

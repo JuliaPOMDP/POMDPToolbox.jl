@@ -1,7 +1,7 @@
 # A test for solvers
 # Maintained by @zsunberg
 
-type TestSimulator
+mutable struct TestSimulator
     rng::AbstractRNG
     max_steps::Int
 end

@@ -15,6 +15,6 @@ let
     sim = RolloutSimulator(max_steps=10, rng=MersenneTwister(1))
     r2 = simulate(sim, problem, policy, initial_state(problem, sim.rng))
 
-    @test_approx_eq_eps r1 -27.27829 1e-3
-    @test_approx_eq_eps r2 0.0 1e-3
+    @test isapprox(r1, -27.27829, atol=1e-3)
+    @test isapprox(r2, 0.0, atol=1e-3)
 end

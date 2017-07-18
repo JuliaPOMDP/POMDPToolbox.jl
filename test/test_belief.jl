@@ -10,6 +10,6 @@ a = 0
 o = true
 bnew = update(bu, bold, a, o)
 
-@test_approx_eq bnew.b [0.15, 0.85]
-@test_approx_eq pdf(bnew, 1) 0.15
-@test_approx_eq pdf(bnew, 2) 0.85
+@test isapprox(bnew.b, [0.15, 0.85])
+@test isapprox(pdf(bnew, 1), 0.15)
+@test isapprox(pdf(bnew, 2), 0.85)

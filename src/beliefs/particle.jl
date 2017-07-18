@@ -7,7 +7,7 @@ DEPRECATED: Please use https://github.com/JuliaPOMDP/ParticleFilters.jl instead
 
 Belief particle type that contains a state and its probability
 """
-type Particle{T} # should be immutable?
+mutable struct Particle{T} # should be immutable?
     state::T # particle state
     weight::Float64 # particle prob
 end
@@ -22,7 +22,7 @@ ParticleBelief type. Fields:
     -probs_arr: weights of each particle in particles (for convenience)
     -keep_dict: boolean flag for keeping track of dictionary
 """
-type ParticleBelief{T}
+mutable struct ParticleBelief{T}
     particles::Vector{Particle{T}} # array of particles
     probs_dict::Dict{T, Float64} # dict state => prob
     probs_arr::Vector{Float64} # particle weights
@@ -32,7 +32,7 @@ function ParticleBelief{S}(particles::Vector{Particle{S}})
     warn("POMDPToolbox.ParticleBelief is deprecated, please use the beliefs from https://github.com/JuliaPOMDP/ParticleFilters.jl instead.")
     return ParticleBelief(particles, Dict{S,Float64}(), Float64[p.weight for p in particles], false)
 end
-typealias ParticleDistribution{T} ParticleBelief{T}
+const ParticleDistribution{T} = ParticleBelief{T}
 
 
 function pdf{S}(b::ParticleBelief{S}, s::S)
@@ -91,7 +91,7 @@ the sampling importance resampling (SIR) algorithm. Fields:
     -rng: random number generator for generating state and observations from pomdp model
     -keep_dict: boolean for keeping a dictionary of particles (for pdf only)
 """
-type SIRParticleUpdater <: Updater{ParticleBelief}
+mutable struct SIRParticleUpdater <: Updater
     pomdp::POMDP # POMDP model
     n::Int64 # number of particles
     rng::AbstractRNG
@@ -101,13 +101,13 @@ type SIRParticleUpdater <: Updater{ParticleBelief}
         new(pomdp, n, rng, keep_dict)
     end
 end
-function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=MersenneTwister(), keep_dict::Bool=true) 
+function SIRParticleUpdater(pomdp::POMDP, n::Int64; rng::AbstractRNG=Base.GLOBAL_RNG, keep_dict::Bool=true) 
     SIRParticleUpdater(pomdp, n, rng, keep_dict)
 end
 
 function create_belief(up::SIRParticleUpdater) 
     st = state_type(typeof(up.pomdp))
-    particles = Array(Particle{st}, up.n)
+    particles = Array{Particle{st}}(up.n)
     w = 1.0 / up.n
     probs = Dict{st, Float64}()  
     probs_arr = zeros(up.n)

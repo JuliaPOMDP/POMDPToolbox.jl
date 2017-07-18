@@ -1,9 +1,9 @@
 # SimHistory
 # maintained by @zsunberg
 
-abstract SimHistory
-abstract AbstractMDPHistory{S,A} <: SimHistory
-abstract AbstractPOMDPHistory{S,A,O,B} <: SimHistory
+abstract type SimHistory end
+abstract type AbstractMDPHistory{S,A} <: SimHistory end
+abstract type AbstractPOMDPHistory{S,A,O,B} <: SimHistory end
 
 """
 An object that contains a MDP simulation history
@@ -14,7 +14,7 @@ Returned by simulate when called with a HistoryRecorder. Iterate through the (s,
         # do something
     end
 """
-immutable MDPHistory{S,A} <: AbstractMDPHistory{S,A}
+struct MDPHistory{S,A} <: AbstractMDPHistory{S,A}
     state_hist::Vector{S}
     action_hist::Vector{A}
     reward_hist::Vector{Float64}
@@ -35,7 +35,7 @@ Returned by simulate when called with a HistoryRecorder. Iterate through the (s,
         # do something
     end
 """
-immutable POMDPHistory{S,A,O,B} <: AbstractPOMDPHistory{S,A,O,B}
+struct POMDPHistory{S,A,O,B} <: AbstractPOMDPHistory{S,A,O,B}
     state_hist::Vector{S}
     action_hist::Vector{A}
     observation_hist::Vector{O}
@@ -99,24 +99,24 @@ end
 
 
 
-typealias Inds Union{Range,Colon,Real}
+const Inds = Union{Range,Colon,Real}
 
 Base.view(h::AbstractMDPHistory, inds::Inds) = SubMDPHistory(h, inds)
 Base.view(h::AbstractPOMDPHistory, inds::Inds) = SubPOMDPHistory(h, inds)
 
-immutable SubMDPHistory{S,A,H<:AbstractMDPHistory,I<:Inds} <: AbstractMDPHistory{S,A}
+struct SubMDPHistory{S,A,H<:AbstractMDPHistory,I<:Inds} <: AbstractMDPHistory{S,A}
     parent::H
     inds::I
 end
 SubMDPHistory{S,A,I<:Inds}(h::AbstractMDPHistory{S,A}, inds::I) = SubMDPHistory{S,A,typeof(h),I}(h, inds)
 
-immutable SubPOMDPHistory{S,A,O,B,H<:AbstractPOMDPHistory,I<:Inds} <: AbstractPOMDPHistory{S,A,O,B}
+struct SubPOMDPHistory{S,A,O,B,H<:AbstractPOMDPHistory,I<:Inds} <: AbstractPOMDPHistory{S,A,O,B}
     parent::H
     inds::I
 end
 SubPOMDPHistory{S,A,O,B,I<:Inds}(h::AbstractPOMDPHistory{S,A,O,B}, inds::I) = SubPOMDPHistory{S,A,O,B,typeof(h),I}(h, inds)
 
-typealias SubHistory Union{SubMDPHistory, SubPOMDPHistory}
+const SubHistory = Union{SubMDPHistory, SubPOMDPHistory}
 
 n_steps(h::SubHistory) = length(h.inds)
 
@@ -134,7 +134,7 @@ discount(h::SubHistory) = discount(h.parent)
 
 
 # iterators
-immutable HistoryIterator{H<:SimHistory, SPEC}
+struct HistoryIterator{H<:SimHistory, SPEC}
     history::H
 end
 

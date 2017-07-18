@@ -3,7 +3,7 @@
 """
 a generic policy that uses the actions function to create a list of actions and then randomly samples an action from it.
 """
-type RandomPolicy <: Policy
+mutable struct RandomPolicy <: Policy
     rng::AbstractRNG
     problem::Union{POMDP,MDP}
     updater::Updater # set this to use a custom updater, by default it will be a void updater
@@ -29,7 +29,7 @@ updater(policy::RandomPolicy) = policy.updater
 """
 solver that produces a random policy
 """
-type RandomSolver <: Solver
+mutable struct RandomSolver <: Solver
     rng::AbstractRNG
 end
 RandomSolver(;rng=Base.GLOBAL_RNG) = RandomSolver(rng)

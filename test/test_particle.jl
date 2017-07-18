@@ -33,11 +33,11 @@ end
 w3 = pdf(b, s)
 s
 
-s = rand(MersenneTwister(), b, s) 
+s = rand(MersenneTwister(0), b, s) 
 
 # dict and array method should give same pdf
-@test_approx_eq_eps w1 w2 0.01
+@test isapprox(w1, w2, atol=0.01)
 # after one update should have ~0.85 prob
-@test_approx_eq_eps w1 0.85 0.01
+@test isapprox(w1, 0.85, atol=0.01)
 # after 10 of each observations should be back to uniform belief
-@test_approx_eq_eps w3 0.5 0.05
+@test isapprox(w3, 0.5, atol=0.05)

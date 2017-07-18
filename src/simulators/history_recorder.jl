@@ -18,7 +18,7 @@ Keyword Arguments:
     - `max_steps`
     - `sizehint::Int`: the expected length of the simulation (for preallocation)
 """
-type HistoryRecorder <: Simulator
+mutable struct HistoryRecorder <: Simulator
     rng::AbstractRNG
 
     # options
@@ -94,10 +94,10 @@ end
     @req update(::typeof(bu), ::B, ::A, ::O)
 end
 
-function simulate{S,A,O,B}(sim::HistoryRecorder,
+function simulate{S,A,O}(sim::HistoryRecorder,
                            pomdp::POMDP{S,A,O}, 
                            policy::Policy,
-                           bu::Updater{B},
+                           bu::Updater,
                            initial_state_dist::Any)
 
     initial_state = get_initial_state(sim, initial_state_dist)
@@ -116,7 +116,7 @@ function simulate{S,A,O,B}(sim::HistoryRecorder,
     sh = sim.state_hist = sizehint!(Vector{S}(0), sizehint)
     ah = sim.action_hist = sizehint!(Vector{A}(0), sizehint)
     oh = sim.observation_hist = sizehint!(Vector{O}(0), sizehint)
-    bh = sim.belief_hist = sizehint!(Vector{B}(0), sizehint)
+    bh = sim.belief_hist = sizehint!(Vector{typeof(initial_belief)}(0), sizehint)
     rh = sim.reward_hist = sizehint!(Vector{Float64}(0), sizehint)
 
     push!(sh, initial_state)

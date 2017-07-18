@@ -5,7 +5,7 @@ ordered_states(mdp::Union{MDP,POMDP}) = ordered_vector(state_type(typeof(mdp)), 
 ordered_observations(pomdp::POMDP) = ordered_vector(obs_type(typeof(pomdp)), o->obs_index(pomdp,o), iterator(observations(pomdp)), n_observations(pomdp))
 
 function ordered_vector(T::Type, index::Function, iterator, len=length(iterator))
-    a = Array(T, len)
+    a = Array{T}(len)
     gotten = falses(len)
     for x in iterator
         id = index(x)
