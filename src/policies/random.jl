@@ -3,10 +3,10 @@
 """
 a generic policy that uses the actions function to create a list of actions and then randomly samples an action from it.
 """
-mutable struct RandomPolicy <: Policy
-    rng::AbstractRNG
-    problem::Union{POMDP,MDP}
-    updater::Updater # set this to use a custom updater, by default it will be a void updater
+mutable struct RandomPolicy{RNG<:AbstractRNG, P<:Union{POMDP,MDP}, U<:Updater} <: Policy
+    rng::RNG
+    problem::P
+    updater::U # set this to use a custom updater, by default it will be a void updater
 end
 # The constructor below should be used to create the policy so that the action space is initialized correctly
 RandomPolicy(problem::Union{POMDP,MDP};
