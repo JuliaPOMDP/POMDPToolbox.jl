@@ -9,6 +9,7 @@ import POMDPs: Updater, update, initialize_belief, pdf, mode, updater
 import POMDPs: Simulator, simulate
 import POMDPs: action, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount
+import POMDPs: generate_sr, initial_state
 import Base: rand, rand!, mean
 
 using ProgressMeter
@@ -127,6 +128,9 @@ export
     ordered_actions,
     ordered_observations
 include("model/ordered_spaces.jl")
+
+export GenerativeBeliefMDP
+include("model/generative_belief_mdp.jl")
 
 # tools for distributions
 include("distributions/distributions_jl.jl")
