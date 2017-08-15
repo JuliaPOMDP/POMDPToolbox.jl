@@ -23,5 +23,5 @@ function initial_state(bmdp::GenerativeBeliefMDP, rng::AbstractRNG)
     return initialize_belief(bmdp.updater, initial_state_distribution(bmdp.pomdp))
 end
 
-actions(bmdp::GenerativeBeliefMDP, b) = actions(bmdp.pomdp, b)
+actions(bmdp::GenerativeBeliefMDP{P,U,B,A}, b::B) where {P,U,B,A} = actions(bmdp.pomdp, b)
 actions(bmdp::GenerativeBeliefMDP) = actions(bmdp.pomdp)
