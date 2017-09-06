@@ -98,9 +98,10 @@ function simulate{S,A,O}(sim::HistoryRecorder,
                            pomdp::POMDP{S,A,O}, 
                            policy::Policy,
                            bu::Updater,
-                           initial_state_dist::Any)
+                           initial_state_dist::Any,
+                           initial_state::Any=get_initial_state(sim, initial_state_dist)
+                          )
 
-    initial_state = get_initial_state(sim, initial_state_dist)
     initial_belief = initialize_belief(bu, initial_state_dist)
     # use of deepcopy inspired from rollout.jl
     if initial_belief === initial_state_dist
