@@ -83,6 +83,10 @@ export
     FunctionSolver
 include("policies/function.jl")
 
+export
+    PolicyWrapper
+include("policies/utility_wrapper.jl")    
+
 # simulators
 export RolloutSimulator
 include("simulators/rollout.jl")
