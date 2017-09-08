@@ -44,3 +44,5 @@ end
 action(p::PolicyWrapper, s) = p.f(p.policy, p.payload, s)
 
 updater(p::PolicyWrapper) = updater(p.policy)
+
+Base.srand(p::PolicyWrapper, seed) = srand(p.policy, seed)
