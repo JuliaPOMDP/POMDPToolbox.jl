@@ -139,6 +139,14 @@ include("model/generative_belief_mdp.jl")
 # tools for distributions
 include("distributions/distributions_jl.jl")
 
+export
+    weighted_iterator
+include("distributions/weighted_iteration.jl")
+
+export
+    SparseCat
+include("distributions/sparse_cat.jl")
+
 # testing
 export test_solver
 include("testing/solver.jl")
