@@ -39,6 +39,10 @@ Within each class directory, each file contains one tool. Each file should clear
 ### Distributions
   - `distributions_jl.jl`: provides some compatibility with [Distributions.jl](https://github.com/JuliaStats/Distributions.jl).
 
+  - `sparse_cat.jl`: provides a sparse categorical distribution `SparseCat`. This distribution simply stores a vector of objects and a vector of their associated probabilities. It is optimized for value iteration with a fast implementation of `weighted_iterator`. Both `pdf` and `rand` are order n.
+
+  - `weighted_iterator.jl`: function for iterating through pairs of values and their probabilities in a distribution.
+
 ### Model
   - `initial.jl`: a uniform distribution for discrete problems.
   - `ordered_spaces.jl`: functions that return vectors of all the items in a space correctly ordered. For example `ordered_actions(mdp)` will return a vector `v`, containing all of the actions in `actions(mdp)` in the order such that  `action_index(v[i]) == i`.
