@@ -25,10 +25,22 @@ function pdf(d::SparseCat, s)
     return zero(eltype(d.probs))
 end
 
+function pdf(d::SparseCat{V,P}, s) where {V<:AbstractArray, P<:AbstractArray}
+    for (i,v) in enumerate(d.vals)
+        if v == s
+            return d.probs[i]
+        end
+    end
+    return zero(eltype(d.probs))
+end
+
+
+
 iterator(d::SparseCat) = d.vals
 
 weighted_iterator(d::SparseCat) = d
 
+# iterator for general SparseCat
 Base.start(d::SparseCat) = (start(d.vals), start(d.probs))
 function Base.next(d::SparseCat, state::Tuple)
     val, vstate = next(d.vals, first(state))
@@ -36,6 +48,15 @@ function Base.next(d::SparseCat, state::Tuple)
     return (val=>prob, (vstate, pstate))
 end
 Base.done(d::SparseCat, state::Tuple) = done(d.vals, first(state)) || done(d.vals, last(state))
+
+# iterator for SparseCat with AbstractArrays
+Base.start(d::SparseCat{V,P}) where {V<:AbstractArray, P<:AbstractArray} = 1
+function Base.next(d::SparseCat{V,P}, state::Integer) where {V<:AbstractArray, P<:AbstractArray}
+    return (d.vals[state]=>d.probs[state], state+1)
+end
+Base.done(d::SparseCat{V,P}, state::Integer) where {V<:AbstractArray, P<:AbstractArray} = state > length(d)
+
+
 Base.length(d::SparseCat) = min(length(d.vals), length(d.probs))
 Base.eltype(D::Type{SparseCat{V,P}}) where {V, P} = Pair{eltype(V), eltype(P)}
 
