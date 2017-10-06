@@ -14,14 +14,14 @@ end
 
 function rand(rng::AbstractRNG, d::SparseCat)
     r = sum(d.probs)*rand(rng)
-    tot = first(d.probs)
+    tot = zero(eltype(d.probs))
     for (v, p) in d
+        tot += p
         if r < tot
             return v
         end
-        tot += p
     end
-    return v
+    error("Execution should never reach here.") # for type stability
 end
 
 # slow linear search :(
