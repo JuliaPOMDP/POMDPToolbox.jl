@@ -5,6 +5,8 @@ let
     @test pdf(d, :c) == 0.0
     @test pdf(d, :a) == 0.4
     @test mode(d) == :b
+    @test sampletype(d) == Symbol
+    @test sampletype(typeof(d)) == Symbol
     @inferred rand(Base.GLOBAL_RNG, d)
 
     rng = MersenneTwister(14)

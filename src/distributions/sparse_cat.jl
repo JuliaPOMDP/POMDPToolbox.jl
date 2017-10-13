@@ -68,6 +68,7 @@ Base.done(d::SparseCat{V,P}, state::Integer) where {V<:AbstractArray, P<:Abstrac
 
 Base.length(d::SparseCat) = min(length(d.vals), length(d.probs))
 Base.eltype(D::Type{SparseCat{V,P}}) where {V, P} = Pair{eltype(V), eltype(P)}
+sampletype(D::Type{SparseCat{V,P}}) where {V, P} = eltype(V)
 
 function Base.mean(d::SparseCat)
     vsum = zero(eltype(d.vals))
