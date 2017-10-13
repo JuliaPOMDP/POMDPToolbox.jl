@@ -25,13 +25,13 @@ Within each class directory, each file contains one tool. Each file should clear
 ## Tools
 
 ### Beliefs
-  - [`discrete.jl`](src/discrete.jl): dense discrete probability distribution and updater.
-  - `particle.jl`: basic particle filter (deprecated; use [ParticleFilters.jl](https://github.com/JuliaPOMDP/ParticleFilters.jl))
-  - `previous_observation.jl`: beliefs (and updaters) that only deal with the most recent observation
+  - [`discrete.jl`](src/beliefs/discrete.jl): dense discrete probability distribution and updater.
+  - [`particle.jl`](src/beliefs/particle.jl): basic particle filter (deprecated; use [ParticleFilters.jl](https://github.com/JuliaPOMDP/ParticleFilters.jl))
+  - [`previous_observation.jl`](src/beliefs/previous_observation.jl): beliefs (and updaters) that only deal with the most recent observation
     - `PreviousObservationUpdater` maintains a "belief" that is a `Nullable{O}` where `O` is the observation type. The "belief" is null if there is no observation available, and contains the previous observation if there is one.
     - `FastPreviousObservationUpdater` just returns the previous observation when `update` is called. There is no mechanism for representing the case when an observation is not available.
     - `PrimedPreviousObservationUpdater` also returns the previous observation, but if an observation is not available, it returns a default.
-  - `void.jl`: an updater useful for when a belief is not necessary (i.e. for a random policy). `update` always returns `nothing`.
+  - [`void.jl`](src/beliefs/void.jl): an updater useful for when a belief is not necessary (i.e. for a random policy). `update` always returns `nothing`.
 
 ### Convenience
   - `implementations.jl`: default implementations for simple cases (e.g. `states(::MDP{Bool, Bool})`).
