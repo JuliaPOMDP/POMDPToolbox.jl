@@ -25,7 +25,7 @@ Within each class directory, each file contains one tool. Each file should clear
 ## Tools
 
 ### Beliefs
-  - `discrete.jl`: dense discrete probability distribution and updater.
+  - [`discrete.jl`](src/discrete.jl): dense discrete probability distribution and updater.
   - `particle.jl`: basic particle filter (deprecated; use [ParticleFilters.jl](https://github.com/JuliaPOMDP/ParticleFilters.jl))
   - `previous_observation.jl`: beliefs (and updaters) that only deal with the most recent observation
     - `PreviousObservationUpdater` maintains a "belief" that is a `Nullable{O}` where `O` is the observation type. The "belief" is null if there is no observation available, and contains the previous observation if there is one.
