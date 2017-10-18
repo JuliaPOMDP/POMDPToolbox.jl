@@ -41,7 +41,7 @@ Within each class directory, each file contains one tool. Each file should clear
 
   - [`sparse_cat.jl`](src/distributions/sparse_cat.jl): provides a sparse categorical distribution `SparseCat`. This distribution simply stores a vector of objects and a vector of their associated probabilities. It is optimized for value iteration with a fast implementation of `weighted_iterator`. Both `pdf` and `rand` are order n.
 
-  - [`weighted_iterator.jl`](src/distributions/weighted_iterator.jl): function for iterating through pairs of values and their probabilities in a distribution.
+  - [`weighted_iteration.jl`](src/distributions/weighted_iteration.jl): function for iterating through pairs of values and their probabilities in a distribution.
 
 ### Model
   - [`initial.jl`](src/model/initial.jl): a uniform distribution for discrete problems.
