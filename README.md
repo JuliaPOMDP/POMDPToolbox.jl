@@ -44,6 +44,7 @@ Within each class directory, each file contains one tool. Each file should clear
   - [`weighted_iteration.jl`](src/distributions/weighted_iteration.jl): function for iterating through pairs of values and their probabilities in a distribution.
 
 ### Model
+  - [`generative_belief_mdp.jl`](src/model/generative_belief_mdp.jl): transforms a pomdp (and a belief updater) into a belief-space MDP.
   - [`initial.jl`](src/model/initial.jl): a uniform distribution for discrete problems.
   - [`ordered_spaces.jl`](src/model/ordered_spaces.jl): functions that return vectors of all the items in a space correctly ordered. For example `ordered_actions(mdp)` will return a vector `v`, containing all of the actions in `actions(mdp)` in the order such that  `action_index(v[i]) == i`.
 
