@@ -13,8 +13,8 @@ import POMDPs: generate_sr, initial_state
 import Base: rand, rand!, mean
 
 using ProgressMeter
-
 using StatsBase
+using DataFrames
 
 # export commons
 export
@@ -122,6 +122,12 @@ export
     StepSimulator,
     stepthrough
 include("simulators/stepthrough.jl")
+
+export
+    Sim,
+    run,
+    run_parallel
+include("simulators/parallel.jl")
 
 # model tools
 export uniform_state_distribution
