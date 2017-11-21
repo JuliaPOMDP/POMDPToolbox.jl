@@ -15,7 +15,8 @@ end
 function generate_sr(bmdp::GenerativeBeliefMDP, b, a, rng::AbstractRNG)
     s = rand(rng, b)
     if isterminal(bmdp.pomdp, s)
-        return gbmdp_handle_terminal(bmdp.pomdp, bmdp.updater, b, s, a, rng::AbstractRNG)::typeof(b)
+        bp = gbmdp_handle_terminal(bmdp.pomdp, bmdp.updater, b, s, a, rng::AbstractRNG)::typeof(b)
+        return bp, 0.0
     end
     sp, o, r = generate_sor(bmdp.pomdp, s, a, rng) # maybe this should have been generate_or?
     bp = update(bmdp.updater, b, a, o)
@@ -47,5 +48,5 @@ function gbmdp_handle_terminal(pomdp::POMDP, updater::Updater, b, s, a, rng)
     end
     sp, o, r = generate_sor(pomdp, s, a, rng)
     bp = update(updater, b, a, o)
-    return bp, r
+    return bp
 end
