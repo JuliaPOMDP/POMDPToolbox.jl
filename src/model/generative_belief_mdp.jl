@@ -14,6 +14,9 @@ end
 
 function generate_sr(bmdp::GenerativeBeliefMDP, b, a, rng::AbstractRNG)
     s = rand(rng, b)
+    if isterminal(bmdp.pomdp, s)
+        return gbmdp_handle_terminal(bmdp.pomdp, bmdp.updater, b, s, a, rng::AbstractRNG)::typeof(b)
+    end
     sp, o, r = generate_sor(bmdp.pomdp, s, a, rng) # maybe this should have been generate_or?
     bp = update(bmdp.updater, b, a, o)
     return bp, r
@@ -25,3 +28,24 @@ end
 
 actions(bmdp::GenerativeBeliefMDP{P,U,B,A}, b::B) where {P,U,B,A} = actions(bmdp.pomdp, b)
 actions(bmdp::GenerativeBeliefMDP) = actions(bmdp.pomdp)
+
+isterminal(bmdp::GenerativeBeliefMDP, b) = all(isterminal(bmdp.pomdp, s) for s in iterator(b))
+
+const warned_about_gbmdp_terminal=false
+
+# override this if you want to handle it in a special way
+function gbmdp_handle_terminal(pomdp::POMDP, updater::Updater, b, s, a, rng)
+    global warned_about_gbmdp_terminal
+    if !warned_about_gbmdp_terminal
+        warn("""
+             Sampled a terminal state for a GenerativeBeliefMDP transition - not sure how to proceed, but will try.
+
+             See $(@__FILE__) and implement a new method of POMDPToolbox.gbmdp_handle_terminal if you want special behavior in this case.
+
+             """)
+        warned_about_gbmdp_terminal = true
+    end
+    sp, o, r = generate_sor(pomdp, s, a, rng)
+    bp = update(updater, b, a, o)
+    return bp, r
+end
