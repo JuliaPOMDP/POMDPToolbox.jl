@@ -21,7 +21,16 @@ function rand(rng::AbstractRNG, d::SparseCat)
             return v
         end
     end
-    error("Execution should never reach here.") # for type stability
+    if sum(d.probs) <= 0.0
+        error("""
+              Tried to sample from a SparseCat distribution with probabilities that sum to $(sum(d.probs)).
+
+              vals = $(d.vals)
+
+              probs = $(d.probs)
+              """)
+    end
+    error("Error sampling from SparseCat distribution with vals $(d.vals) and probs $(d.probs)") # for type stability
 end
 
 # slow linear search :(

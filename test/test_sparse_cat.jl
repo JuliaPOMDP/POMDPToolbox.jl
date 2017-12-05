@@ -19,4 +19,6 @@ let
     @test isapprox(count(samples.==:b)/N, pdf(d,:b), atol=0.005)
     @test isapprox(count(samples.==:c)/N, pdf(d,:c), atol=0.005)
     @test isapprox(count(samples.==:d)/N, pdf(d,:d), atol=0.005)
+
+    @test_throws ErrorException rand(Base.GLOBAL_RNG, SparseCat([1], [0.0]))
 end
