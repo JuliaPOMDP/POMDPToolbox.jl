@@ -4,4 +4,4 @@ Iterators
 ProgressMeter
 Distributions
 StatsBase 0.15
-DataFrames 0.1 0.11
+DataFrames 0.1
