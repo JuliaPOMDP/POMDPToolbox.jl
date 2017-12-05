@@ -191,14 +191,14 @@ append_metadata(d::Dict, metadata::Dict) = merge!(d, metadata)
 metadata_as_pairs(s::Sim) = convert(Array{Any}, collect(s.metadata))
 
 function create_dataframe(lines::Vector)
-    master = Dict{Symbol, DataArray}()
+    master = Dict{Symbol, AbstractVector}()
     for line in lines
         push_line!(master, line)
     end
     return DataFrame(master)
 end
 
-function _push_line!(d::Dict{Symbol, DataArray}, line)
+function _push_line!(d::Dict{Symbol, AbstractVector}, line)
     if isempty(d)
         len = 0
     else
@@ -206,23 +206,23 @@ function _push_line!(d::Dict{Symbol, DataArray}, line)
     end
     for (key, val) in line
         if !haskey(d, key)
-            d[key] = DataArray(typeof(val), len)
+            d[key] = Array{Any}(len)
         end
         data = d[key]
         if !(typeof(val) <: eltype(data))
-            d[key] = convert(DataArray{Any,1}, data)
+            d[key] = convert(Array{Any,1}, data)
         end
         push!(d[key], val)
     end
     for da in values(d)
         if length(da) < len + 1
-            push!(da, NA)
+            push!(da, missing)
         end
     end
     return d
 end
-push_line!(d::Dict{Symbol, DataArray}, line::Dict) = _push_line!(d, line)
-push_line!(d::Dict{Symbol, DataArray}, line::DataFrame) = _push_line!(d, n=>first(line[n]) for n in names(line))
-push_line!(d::Dict{Symbol, DataArray}, line::AbstractVector) = _push_line!(d, line)
-push_line!(d::Dict{Symbol, DataArray}, line::Tuple) = _push_line!(d, line)
-push_line!(d::Dict{Symbol, DataArray}, line::Pair) = _push_line!(d, (line,))
+push_line!(d::Dict{Symbol, AbstractVector}, line::Dict) = _push_line!(d, line)
+push_line!(d::Dict{Symbol, AbstractVector}, line::DataFrame) = _push_line!(d, n=>first(line[n]) for n in names(line))
+push_line!(d::Dict{Symbol, AbstractVector}, line::AbstractVector) = _push_line!(d, line)
+push_line!(d::Dict{Symbol, AbstractVector}, line::Tuple) = _push_line!(d, line)
+push_line!(d::Dict{Symbol, AbstractVector}, line::Pair) = _push_line!(d, (line,))
