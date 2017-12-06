@@ -114,6 +114,7 @@ A wrapper for policies to collect statistics and handle errors.
 #### [`rollout.jl`](src/simulators/rollout.jl)
 
 `RolloutSimulator` is the simplest MDP or POMDP simulator. When `simulate` is called, it simply simulates a single trajectory of the process and returns the discounted reward.
+
     > ```julia
     > rs = RolloutSimulator()
     > mdp = GridWorld()
@@ -126,6 +127,7 @@ A wrapper for policies to collect statistics and handle errors.
 #### [`history_recorder.jl`](src/simulators/history_recorder.jl)
 
 `HistoryRecorder` runs a simulation and records the trajectory. It returns an `MDPHistory` or `POMDPHistory` (see `history.jl` below).
+
     > ```julia
     > hr = HistoryRecorder(max_steps=100)
     > pomdp = TigerPOMDP()
@@ -178,6 +180,7 @@ Contains types for representing simulation histories (i.e. trajectories or episo
 
 #### [`sim.jl`](src/simulators/sim.jl)
 The `sim` function provides a convenient way to interact with a POMDP or MDP environment. The first argument is a function that is called at every time step and takes a state (in the case of an MDP) or an observation (in the case of a POMDP) as the argument and then returns an action. The second argument is a pomdp or mdp. It is intended to be used with Julia's `do` syntax as follows:
+
     > ```julia
     > pomdp = TigerPOMDP()
     > history = sim(pomdp, max_steps=10) do obs
@@ -191,6 +194,7 @@ The `sim` function provides a convenient way to interact with a POMDP or MDP env
 
 #### [`stepthrough.jl`](src/simulators/stepthrough.jl)
 The `stepthrough` function exposes a simulation as an iterator so that the steps can be iterated through with a for loop syntax as follows:
+
     > ```julia
     > pomdp = BabyPOMDP()
     > policy = RandomPolicy(pomdp)
@@ -213,6 +217,7 @@ The `stepthrough` function exposes a simulation as an iterator so that the steps
 
 #### [`parallel.jl`](src/simulators/parallel.jl)
 The `run_parallel` function can be used to conveniently run simulations in parallel. Example:
+
     > ```julia
     > using POMDPToolbox
     > using POMDPModels
