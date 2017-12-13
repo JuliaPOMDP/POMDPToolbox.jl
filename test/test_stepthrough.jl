@@ -3,13 +3,14 @@ let
     mdp = GridWorld()
     solver = RandomSolver(MersenneTwister(2))
     policy = solve(solver, mdp)
-    sim = StepSimulator("s,sp,r,a", rng=MersenneTwister(3), max_steps=100)
+    sim = StepSimulator("s,sp,r,a,ai", rng=MersenneTwister(3), max_steps=100)
     n_steps = 0
-    for (s, sp, r, a) in simulate(sim, mdp, policy)
+    for (s, sp, r, a, ai) in simulate(sim, mdp, policy)
         @test isa(s, state_type(mdp))
         @test isa(sp, state_type(mdp))
         @test isa(r, Float64)
         @test isa(a, action_type(mdp))
+        @test isa(ai, Void)
         n_steps += 1
     end
     @test n_steps <= 100
@@ -53,9 +54,10 @@ let
     pomdp = BabyPOMDP()
     policy = RandomPolicy(pomdp)
 
-    for (s, a, o, r) in stepthrough(pomdp, policy, "s,a,o,r", max_steps=10)
+    for (s, a, o, r, i) in stepthrough(pomdp, policy, "s,a,o,r,i", max_steps=10)
         println("in state $s")
         println("took action $o")
         println("received observation $o and reward $r")
+        @assert i == nothing
     end
 end

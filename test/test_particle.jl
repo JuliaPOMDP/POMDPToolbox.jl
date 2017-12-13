@@ -11,6 +11,7 @@ s = false
 n = 10000 # num particles
 bu = SIRParticleUpdater(pomdp, n)
 
+srand(2)
 b = initialize_belief(bu, initial_state_distribution(pomdp))
 
 a = 0

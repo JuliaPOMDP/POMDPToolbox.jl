@@ -67,11 +67,13 @@ let
     # iterators
     rsum = 0.0
     len = 0
-    for (s, a, r, sp) in eachstep(hv, (:s,:a,:r,:sp))
+    for (s, a, r, sp, i, ai) in eachstep(hv, (:s,:a,:r,:sp,:i,:ai))
         @test isa(s, state_type(problem))
         @test isa(a, action_type(problem))
         @test isa(r, Float64)
         @test isa(sp, state_type(problem))
+        @test isa(i, Void)
+        @test isa(ai, Void)
         rsum += r
         len += 1
     end
@@ -83,8 +85,6 @@ let
     tuples = collect(eachstep(hv, "(r, sp, s, a)"))
     @test sum(first(t) for t in tuples) == undiscounted_reward(hv)
     tuples = collect(eachstep(hv, "r,sp,s,a"))
-    @test sum(first(t) for t in tuples) == undiscounted_reward(hv)
-    tuples = collect(eachstep(hv, "rspsa"))
     @test sum(first(t) for t in tuples) == undiscounted_reward(hv)
 
     @test collect(eachstep(hv, "r")) == reward_hist(hv)

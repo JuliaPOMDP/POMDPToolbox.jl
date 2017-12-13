@@ -54,6 +54,13 @@ Provides a sparse categorical distribution `SparseCat`. This distribution simply
 Function for iterating through pairs of values and their probabilities in a distribution.
 
 ### Model
+#### [`info.jl`](src/model/info.jl)
+Contains a small interface for outputting extra information (usually a `Dict` or `nothing`) from simulations.
+- `sp, o, r, info = generate_sori(pomdp, s, a, rng)` and `sp, r, info = generate_sri(mdp, s, a, rng)` can be implemented to output info from the model when it simulates a step.
+- `a, ainfo = action_info(policy, x)` can be implemented to output info from the policy when it chooses an action.
+- `policy, sinfo = solve_info(solver, problem)` can be implemented to output info from the solver when it solves a POMDP or MDP.
+The action info and transition info can be accessed by simulating with `HistoryRecorder` and using `eachstep(hist, "i,ai")` or with `stepthrough(..., "i,ai")`.
+
 #### [`generative_belief_mdp.jl`](src/model/generative_belief_mdp.jl)
 Transforms a pomdp (and a belief updater) into a belief-space MDP.
 #### [`initial.jl`](src/model/initial.jl)
@@ -150,13 +157,16 @@ for (s, a, r, sp) in eachstep(h, "(s, a, r, sp)")
 end
 ```
 
-The iterator specification string may or may-not include commas and parentheses the possible valid elements in a step tuple are
+The possible valid elements in the iteration specification are
 - `s` - the initial state in a step
 - `b` - the initial belief in the step (for POMDPs only)
 - `a` - the action taken in the step
 - `r` - the reward received for the step
 - `sp` - the final state at the end of the step (s')
 - `o` - the observation received during the step (note that this is usually based on `sp` instead of `s`)
+- `bp` - the belief after being updated based on `o` (for POMDPs only)
+- `i` - info from the state transition (from `generate_sri` for MDPs or `generate_sori` for POMDPs)
+- `ai` - info from the policy decision (from `action_info`)
 
 Examples:
 ```julia
