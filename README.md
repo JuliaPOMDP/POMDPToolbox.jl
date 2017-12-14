@@ -59,7 +59,7 @@ Transforms a pomdp (and a belief updater) into a belief-space MDP.
 #### [`initial.jl`](src/model/initial.jl)
 A uniform distribution for discrete problems.
 #### [`ordered_spaces.jl`](src/model/ordered_spaces.jl)
-Functions that return vectors of all the items in a space correctly ordered. For example `ordered_actions(mdp)` will return a vector `v`, containing all of the actions in `actions(mdp)` in the order such that  `action_index(v[i]) == i`.
+Contains 3 functions, `ordered_states`, `ordered_actions`, and `ordered_observations` that return vectors of all the items in a space correctly ordered according to the respective index function. For example `ordered_actions(mdp)` will return a vector `v`, containing all of the actions in `actions(mdp)` in the order such that  `action_index(mdp, v[i]) == i`.
 
 ### Policies
 #### [`function.jl`](src/policies/function.jl)
