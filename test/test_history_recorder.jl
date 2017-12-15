@@ -22,6 +22,9 @@ let
     @test length(action_hist(r2)) == steps
     @test length(observation_hist(r2)) == steps
     @test length(belief_hist(r2)) == steps+1
+    @test length(info_hist(r2)) == steps
+    @test length(ainfo_hist(r2)) == steps
+    @test length(uinfo_hist(r2)) == steps
 
     @test isnull(exception(r1))
     @test isnull(exception(r2))
@@ -37,6 +40,10 @@ let
 
     for tuple in r1
         length(tuple) == 6
+    end
+
+    for ui in eachstep(r2, "ui")
+        @test ui == nothing
     end
 
     problem = GridWorld()

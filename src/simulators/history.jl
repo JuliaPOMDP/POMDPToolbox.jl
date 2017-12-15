@@ -45,6 +45,7 @@ struct POMDPHistory{S,A,O,B} <: AbstractPOMDPHistory{S,A,O,B}
     reward_hist::Vector{Float64}
     info_hist::Vector{Any}
     ainfo_hist::Vector{Any}
+    uinfo_hist::Vector{Any}
 
     discount::Float64
 
@@ -63,6 +64,7 @@ belief_hist(h::SimHistory) = h.belief_hist
 reward_hist(h::SimHistory) = h.reward_hist
 info_hist(h::SimHistory) = h.info_hist
 ainfo_hist(h::SimHistory) = h.ainfo_hist
+uinfo_hist(h::SimHistory) = h.uinfo_hist
 
 exception(h::SimHistory) = h.exception
 Base.backtrace(h::SimHistory) = h.backtrace
@@ -133,6 +135,7 @@ belief_hist(h::SubHistory) = belief_hist(h.parent)[h.inds]
 reward_hist(h::SubHistory) = reward_hist(h.parent)[h.inds]
 info_hist(h::SubHistory) = info_hist(h.parent)[h.inds]
 ainfo_hist(h::SubHistory) = ainfo_hist(h.parent)[h.inds]
+uinfo_hist(h::SubHistory) = uinfo_hist(h.parent)[h.inds]
 
 step_tuple(h::SubHistory, i::Int) = step_tuple(h.parent, h.inds[i])
 
@@ -149,7 +152,7 @@ end
 # Note this particular function is not type-stable
 function HistoryIterator(history::SimHistory, spec::String)
     # XXX should throw warnings for unrecognized specification characters
-    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|ai|s|a|r|b|o|i)", spec)]
+    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|ai|ui|s|a|r|b|o|i)", spec)]
     if length(syms) == 1
         return HistoryIterator{typeof(history), first(syms)}(history)
     else
@@ -188,6 +191,7 @@ The possible valid elements in the iteration specification are
 - `bp` - the belief after being updated based on `o` (for POMDPs only)
 - `i` - info from the state transition (from `generate_sri` for MDPs or `generate_sori` for POMDPs)
 - `ai` - info from the policy decision (from `action_info`)
+- `ui` - info from the belief update (from `update_info`)
 """
 eachstep(hist::SimHistory, spec) = HistoryIterator(hist, spec)
 
@@ -213,6 +217,8 @@ function sym_to_call(sym::Symbol)
         return :(info_hist(it.history)[i])
     elseif sym == :ai
         return :(ainfo_hist(it.history)[i])
+    elseif sym == :ui
+        return :(uinfo_hist(it.history)[i])
     end
 end
 

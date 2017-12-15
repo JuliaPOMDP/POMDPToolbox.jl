@@ -167,6 +167,7 @@ The possible valid elements in the iteration specification are
 - `bp` - the belief after being updated based on `o` (for POMDPs only)
 - `i` - info from the state transition (from `generate_sri` for MDPs or `generate_sori` for POMDPs)
 - `ai` - info from the policy decision (from `action_info`)
+- `ui` - info from the belief update (from `update_info`)
 
 Examples:
 ```julia

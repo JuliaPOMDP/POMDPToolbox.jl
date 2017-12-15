@@ -20,4 +20,11 @@ let
     solver = RandomSolver(rng=rng)
     policy, sinfo = solve_info(solver, pomdp)
     @test isa(sinfo, Void)
+
+    up = updater(policy)
+    d = initial_state_distribution(pomdp)
+    b = initialize_belief(up, d)
+    a = action(policy, b)
+    sp, o = generate_so(pomdp, rand(rng, d), a, rng)
+    @inferred update_info(up, b, a, o)
 end

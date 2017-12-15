@@ -104,6 +104,7 @@ function simulate{S,A,O}(sim::HistoryRecorder,
     rh = sizehint!(Vector{Float64}(0), sizehint)
     ih = sizehint!(Vector{Any}(0), sizehint)
     aih = sizehint!(Vector{Any}(0), sizehint)
+    uih = sizehint!(Vector{Any}(0), sizehint)
     exception = Nullable{Exception}()
     backtrace = Nullable{Any}()
 
@@ -124,7 +125,7 @@ function simulate{S,A,O}(sim::HistoryRecorder,
         while !isterminal(pomdp, sh[step]) && step <= max_steps
             a, ai = action_info(policy, bh[step])
             push!(ah, a)
-            push!(ih, ai)
+            push!(aih, ai)
 
             sp, o, r, i = generate_sori(pomdp, sh[step], ah[step], sim.rng)
 
@@ -133,7 +134,9 @@ function simulate{S,A,O}(sim::HistoryRecorder,
             push!(rh, r)
             push!(ih, i)
 
-            push!(bh, update(bu, bh[step], ah[step], oh[step]))
+            bp, ui = update_info(bu, bh[step], ah[step], oh[step])
+            push!(bh, bp)
+            push!(uih, ui)
 
             step += 1
 
@@ -154,7 +157,7 @@ function simulate{S,A,O}(sim::HistoryRecorder,
         finish!(prog)
     end
 
-    return POMDPHistory(sh, ah, oh, bh, rh, ih, aih, discount(pomdp), exception, backtrace)
+    return POMDPHistory(sh, ah, oh, bh, rh, ih, aih, uih, discount(pomdp), exception, backtrace)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, mdp::MDP, policy::Policy) begin
