@@ -57,7 +57,7 @@ let
     pomdp = BabyPOMDP()
     policy = RandomPolicy(pomdp)
 
-    for (s, a, o, r, i) in stepthrough(pomdp, policy, "s,a,o,r", max_steps=10)
+    for (s, a, o, r) in stepthrough(pomdp, policy, "s,a,o,r", max_steps=10)
         println("in state $s")
         println("took action $o")
         println("received observation $o and reward $r")
