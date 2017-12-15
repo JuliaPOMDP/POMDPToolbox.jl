@@ -28,14 +28,17 @@ let
     mdp = BabyPOMDP()
     policy = FeedWhenCrying()
     up = PrimedPreviousObservationUpdater(true)
-    sim = StepSimulator("s,sp,r,a,b", rng=MersenneTwister(3), max_steps=100)
+    sim = StepSimulator("s,sp,r,a,b,ui,i,ai", rng=MersenneTwister(3), max_steps=100)
     n_steps = 0
-    for (s, sp, r, a, b) in simulate(sim, mdp, policy, up)
+    for (s, sp, r, a, b, ui, i, ai) in simulate(sim, mdp, policy, up)
         @test isa(s, state_type(mdp))
         @test isa(sp, state_type(mdp))
         @test isa(r, Float64)
         @test isa(a, action_type(mdp))
         @test isa(b, Bool)
+        @test ui == nothing
+        @test ai == nothing
+        @test ui == nothing
         n_steps += 1
     end
     @test n_steps == 100
@@ -54,10 +57,9 @@ let
     pomdp = BabyPOMDP()
     policy = RandomPolicy(pomdp)
 
-    for (s, a, o, r, i) in stepthrough(pomdp, policy, "s,a,o,r,i", max_steps=10)
+    for (s, a, o, r, i) in stepthrough(pomdp, policy, "s,a,o,r", max_steps=10)
         println("in state $s")
         println("took action $o")
         println("received observation $o and reward $r")
-        @assert i == nothing
     end
 end
