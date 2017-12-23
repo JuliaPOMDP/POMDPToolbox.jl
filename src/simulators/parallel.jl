@@ -80,7 +80,7 @@ POMDPs.simulate(s::MDPSim) = simulate(s.simulator, s.mdp, s.policy, s.initial_st
 default_process(s::Sim, r::Float64) = :reward=>r
 default_process(s::Sim, hist::SimHistory) = default_process(s, discounted_reward(hist))
 
-run_parallel(queue::AbstractVector) = run_parallel(default_process, queue)
+run_parallel(queue::AbstractVector; kwargs...) = run_parallel(default_process, queue; kwargs...)
 
 """
     run_parallel(queue::Vector{Sim})
@@ -108,7 +108,8 @@ end
 will return a dataframe with with the number of steps and the reward in it.
 """
 function run_parallel(process::Function, queue::AbstractVector;
-                      progress=Progress(length(queue), desc="Simulating..."))
+                      progress=Progress(length(queue), desc="Simulating..."),
+                      proc_warn=true)
 
     #=
     frame_lines = pmap(progress, queue) do sim
@@ -117,11 +118,20 @@ function run_parallel(process::Function, queue::AbstractVector;
     end
     =#
 
-    # based on the simple implementation of pmap here: https://docs.julialang.org/en/latest/manual/parallel-computing
     np = nprocs()
+    if np == 1 && proc_warn
+        warn("""
+             run_parallel(...) was started with only 1 process, so simulations will be run in serial. 
+
+             To supress this warning, use run_parallel(..., proc_warn=false).
+
+             To use multiple processes, use addprocs() or the -p option (e.g. julia -p 4).
+             """)
+    end
     n = length(queue)
     i = 1
     prog = 0
+    # based on the simple implementation of pmap here: https://docs.julialang.org/en/latest/manual/parallel-computing
     frame_lines = Vector{Any}(n)
     nextidx() = (idx=i; i+=1; idx)
     prog_lock = ReentrantLock()
