@@ -56,6 +56,23 @@ Function for iterating through pairs of values and their probabilities in a dist
 ### Model
 #### [`generative_belief_mdp.jl`](src/model/generative_belief_mdp.jl)
 Transforms a pomdp (and a belief updater) into a belief-space MDP.
+
+Example (note that the states of the belief MDP are beliefs):
+```julia
+using POMDPModels
+using POMDPToolbox
+
+pomdp = BabyPOMDP()
+updater = BabyBeliefUpdater(pomdp)
+
+belief_mdp = GenerativeBeliefMDP(pomdp, updater)
+@show state_type(belief_mdp) # POMDPModels.BoolDistribution
+
+for (a, r, sp) in stepthrough(belief_mdp, RandomPolicy(belief_mdp), "a,r,sp", max_steps=10)
+    @show a, r, sp
+end
+```
+
 #### [`initial.jl`](src/model/initial.jl)
 A uniform distribution for discrete problems.
 #### [`ordered_spaces.jl`](src/model/ordered_spaces.jl)
