@@ -13,11 +13,11 @@ function DiscreteBelief(pomdp)
 
     b = ones(ns) / ns
 
-    return DiscreteBelief(pomdp, os, b)
+    return DiscreteBelief(pomdp, state_list, b)
 end
 
 
-pdf(b::DiscreteBelief, s) = b.b[state_index(pomdp, s)]
+pdf(b::DiscreteBelief, s) = b.b[state_index(b.pomdp, s)]
 
 function rand(rng::AbstractRNG, b::DiscreteBelief)
     i = sample(rng, Weights(b.b))
@@ -93,7 +93,7 @@ function update(bu::DiscreteUpdater, b::DiscreteBelief, a, o)
         end
 
         bp[spi] = po * b_sum
-        bp_sum += bp[i]
+        bp_sum += bp[spi]
     end
 
     if bp_sum == 0.0
