@@ -64,8 +64,9 @@ function initialize_belief(bu::DiscreteUpdater, dist::Any, belief::DiscreteBelie
     belief = fill!(belief, 0.0)
     for s in iterator(dist)
         sidx = state_index(bu.pomdp, s)
-        beleif[sid] = pdf(dist, s)
+        belief.b[sidx] = pdf(dist, s)
     end
+    return belief
 end
 
 function update(bu::DiscreteUpdater, b::DiscreteBelief, a, o)
