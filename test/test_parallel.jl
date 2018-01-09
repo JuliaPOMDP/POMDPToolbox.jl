@@ -24,7 +24,7 @@ let
 
     @show data = run_parallel(q)
     @test data[1, :reward] == data[2, :reward]
-    @test var(data[:reward]) == 0.0
+    @test var(data[:reward][1:2]) == 0.0
     rmprocs(procs)
 
     mdp = GridWorld()
