@@ -215,11 +215,12 @@ function _push_line!(d::Dict{Symbol, AbstractVector}, line)
         len = length(first(values(d)))
     end
     for (key, val) in line
+        T = typeof(val)
         if !haskey(d, key)
-            d[key] = Array{Any}(len)
+            d[key] = fill!(Array{Union{T,Missing}}(len), missing)
         end
         data = d[key]
-        if !(typeof(val) <: eltype(data))
+        if !isa(val,eltype(data))
             d[key] = convert(Array{Any,1}, data)
         end
         push!(d[key], val)
