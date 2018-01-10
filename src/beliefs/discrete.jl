@@ -7,13 +7,18 @@ struct DiscreteBelief{P<:POMDP, S}
     state_list::Vector{S}       # vector of ordered states
     b::Vector{Float64}
 end
-function DiscreteBelief(pomdp)
+function DiscreteBelief(pomdp, b::Vector{Float64})
+    return DiscreteBelief(pomdp, ordered_states(pomdp), b)
+end
+
+
+"""
+Returns a DiscreteBelief with equal probability for each state.
+"""
+function uniform_belief(pomdp)
     state_list = ordered_states(pomdp)
-    ns = n_states(pomdp)
-
-    b = ones(ns) / ns
-
-    return DiscreteBelief(pomdp, state_list, b)
+    ns = length(state_list)
+    return DiscreteBelief(pomdp, state_list, ones(ns) / ns)
 end
 
 
