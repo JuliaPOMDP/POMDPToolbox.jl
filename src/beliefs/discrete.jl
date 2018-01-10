@@ -29,7 +29,6 @@ function Base.fill!(b::DiscreteBelief, x::Float64)
     return b
 end
 
-# should the belief just store the length so we don't have to count?
 Base.length(b::DiscreteBelief) = length(b.b)
 
 # I think this is a disaster and should be removed, but SARSOP.jl uses it
@@ -57,11 +56,12 @@ mutable struct DiscreteUpdater{P<:POMDP} <: Updater
     pomdp::P
 end
 
-# Will this cause excessive calls to DiscreteBelief ?
-create_belief(bu::DiscreteUpdater) = DiscreteBelief(bu.pomdp)
 
-function initialize_belief(bu::DiscreteUpdater, dist::Any, belief::DiscreteBelief=create_belief(bu))
-    belief = fill!(belief, 0.0)
+function initialize_belief(bu::DiscreteUpdater, dist::Any)
+    state_list = ordered_states(bu.pomdp)
+    ns = length(state_list)
+    b = ones(ns) / ns
+    belief = DiscreteBelief(bu.pomdp, state_list, b)
     for s in iterator(dist)
         sidx = state_index(bu.pomdp, s)
         belief.b[sidx] = pdf(dist, s)
