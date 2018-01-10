@@ -98,7 +98,15 @@ function update(bu::DiscreteUpdater, b::DiscreteBelief, a, o)
     end
 
     if bp_sum == 0.0
-        error("INVALID BELIEF UPDATE")
+        error("""
+              Failed discrete belief update: new probabilities sum to zero.
+
+              b = $b
+              a = $a
+              o = $o
+
+              Failed discrete belief update: new probabilities sum to zero.
+             """)
     else
         for i = 1:length(bp); bp[i] /= bp_sum; end
     end
