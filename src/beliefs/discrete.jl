@@ -37,38 +37,16 @@ end
 Base.length(b::DiscreteBelief) = length(b.b)
 
 # equality only depends on belief values
-# does not check that POMDP is the same;
-#  if you are comparing beliefs from different POMDPs you are beyond help
 ==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.b == b2.b
 
 # like equality, hashing only depends on vector
 Base.hash(b::DiscreteBelief) = hash(b.b)
-
-# I think this is a disaster and should be removed, but SARSOP.jl uses it
-# 
-# alphas are |A|x|S| (LD: it looks like |S|x|A|)
-# computes dot product of alpha vectors and belief
-# util is array with utility of each alpha vecotr for belief b
-function product(alphas::Matrix{Float64}, b::DiscreteBelief)
-    @assert size(alphas, 1) == length(b) "Alpha and belief sizes not equal"
-    n = size(alphas, 2) 
-    util = zeros(n)
-    for i = 1:n
-        s = 0.0
-        for j = 1:length(b)
-            s += alphas[j,i]*b[j]
-        end
-        util[i] = s
-    end
-    return util
-end
 
 
 
 mutable struct DiscreteUpdater{P<:POMDP} <: Updater
     pomdp::P
 end
-
 
 function initialize_belief(bu::DiscreteUpdater, dist::Any)
     state_list = ordered_states(bu.pomdp)
