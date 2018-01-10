@@ -2,7 +2,7 @@
 
 # needs pomdp for state_index in pdf(b, s)
 # needs list of ordered_states for rand(b)
-mutable struct DiscreteBelief{P<:POMDP, S}
+struct DiscreteBelief{P<:POMDP, S}
     pomdp::P
     state_list::Vector{S}       # vector of ordered states
     b::Vector{Float64}
