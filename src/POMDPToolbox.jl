@@ -39,6 +39,7 @@ include("beliefs/void.jl")
 export 
     DiscreteBelief,
     DiscreteUpdater,
+    uniform_belief,
     product
 include("beliefs/discrete.jl")
 
