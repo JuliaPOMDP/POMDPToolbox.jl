@@ -41,6 +41,9 @@ Base.length(b::DiscreteBelief) = length(b.b)
 #  if you are comparing beliefs from different POMDPs you are beyond help
 ==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.b == b2.b
 
+# like equality, hashing only depends on vector
+Base.hash(b::DiscreteBelief) = hash(b.b)
+
 # I think this is a disaster and should be removed, but SARSOP.jl uses it
 # 
 # alphas are |A|x|S| (LD: it looks like |S|x|A|)
