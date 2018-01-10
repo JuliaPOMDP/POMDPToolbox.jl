@@ -36,6 +36,11 @@ end
 
 Base.length(b::DiscreteBelief) = length(b.b)
 
+# equality only depends on belief values
+# does not check that POMDP is the same;
+#  if you are comparing beliefs from different POMDPs you are beyond help
+==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.b == b2.b
+
 # I think this is a disaster and should be removed, but SARSOP.jl uses it
 # 
 # alphas are |A|x|S| (LD: it looks like |S|x|A|)
