@@ -132,3 +132,24 @@ end
     Core.println("WARNING: create_belief(up::DiscreteUpdater) is deprecated. Use uniform_belief(up) instead.")
     return :(uniform_belief(bu))
 end
+
+# alphas are |A|x|S|
+# computes dot product of alpha vectors and belief
+# util is array with utility of each alpha vecotr for belief b
+@generated function product(alphas::Matrix{Float64}, b::DiscreteBelief)
+    Core.println("WARNING: product(alphas, b::DiscreteBelief) is deprecated.")
+    quote
+        @assert size(alphas, 1) == length(b) "Alpha and belief sizes not equal"
+        n = size(alphas, 2) 
+        util = zeros(n)
+        for i = 1:n
+            s = 0.0
+            for j = 1:length(b)
+                s += alphas[j,i]*b.b[j]
+            end
+            util[i] = s
+        end
+        return util
+    end
+end
+
