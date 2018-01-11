@@ -3,8 +3,6 @@ using POMDPToolbox
 using POMDPModels
 using Base.Test
 
-include("build.jl")
-
 include("test_random_solver.jl")
 include("test_rollout.jl")
 include("test_history_recorder.jl")

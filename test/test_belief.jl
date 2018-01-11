@@ -2,7 +2,7 @@ using POMDPToolbox
 using POMDPModels
 using Base.Test
 
-using FIB
+# using FIB
 
 pomdp = BabyPOMDP()
 
@@ -61,8 +61,8 @@ b4p = update(up, b4, false, true)
 
 # testing that it works in a solve/simulation loop
 # I'm not sure I need this test (could eliminate FIB dependency if not)
-r = test_solver(FIBSolver(), pomdp, max_steps=100)
-@test isapprox(r, -20.414855)
+# r = test_solver(FIBSolver(), pomdp, max_steps=100)
+# @test isapprox(r, -20.414855)
 
 # Some more tests with tiger problem (old tests, but still work)
 pomdp = TigerPOMDP()
