@@ -10,7 +10,7 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount, isterminal
 import POMDPs: generate_sr, initial_state
-import Base: rand, rand!, mean
+import Base: rand, rand!, mean, ==
 
 using ProgressMeter
 using StatsBase
@@ -39,6 +39,7 @@ include("beliefs/void.jl")
 export 
     DiscreteBelief,
     DiscreteUpdater,
+    uniform_belief,
     product
 include("beliefs/discrete.jl")
 

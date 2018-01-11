@@ -1,133 +1,155 @@
-# Maintained by Max Egorov and Zach Sunberg
+# Goals: minimize calls to ordered_states (allocates memory)
+
+# needs pomdp for state_index in pdf(b, s)
+# needs list of ordered_states for rand(b)
 
 """
-A weight vector to be used as a belief or state distribution.
+    DiscreteBelief
 
-sum(b)=1 is not enforced at all times, but during the update it is normalized to sum to one.
+A belief specified by a probability vector.
 
-pdf(b, i) calculates the sum every time it is called. To access the weight directly (for example if you are sure that the sum is 1), use weight(b, i). 
+Normalization of `b` is NOT enforced at all times, but the `DiscreteBeleif(pomdp, b)` constructor will warn, and `update(...)` always returns a belief with normalized `b`.
 """
-mutable struct DiscreteBelief
+struct DiscreteBelief{P<:POMDP, S}
+    pomdp::P
+    state_list::Vector{S}       # vector of ordered states
     b::Vector{Float64}
 end
 
-# Constructor with uniform belief
-DiscreteBelief(n::Int64) = DiscreteBelief(zeros(n) + 1.0/n)
+function DiscreteBelief(pomdp, b::Vector{Float64}; check::Bool=true)
+    if check
+        if !isapprox(sum(b), 1.0, atol=0.001)
+            warn("""
+                 b in DiscreteBelief(pomdp, b) does not sum to 1.
 
-mutable struct DiscreteUpdater{P<:POMDP} <: Updater
-    pomdp::P
+                 To suppress this warning use `DiscreteBelief(pomdp, b, check=false)`
+                 """)
+        end
+        if !all(0.0 <= p <= 1.0 for p in b)
+            warn("""
+                 b in DiscreteBelief(pomdp, b) contains entries outside [0,1].
+
+                 To suppress this warning use `DiscreteBelief(pomdp, b, check=false)`
+                 """)
+        end
+    end
+    return DiscreteBelief(pomdp, ordered_states(pomdp), b)
 end
 
-vec(b::DiscreteBelief) = b.b
 
-Base.length(b::DiscreteBelief) = length(b.b)
-index(b::DiscreteBelief, i::Int64) = i
-weight(b::DiscreteBelief, i::Int64) = b.b[i]
-iterator(b::DiscreteBelief) = filter(i->b[i]>0.0, 1:length(b))
-rand(rng::AbstractRNG, b::DiscreteBelief) = sample(rng, Weights(b.b)) # This will return an integer - seems like it should actually return an object of the state type of the problem
-pdf(b::DiscreteBelief, s::Int) = b.b[s]/sum(b.b) # only works when the state type is integer
+"""
+Return a DiscreteBelief with equal probability for each state.
+"""
+function uniform_belief(pomdp)
+    state_list = ordered_states(pomdp)
+    ns = length(state_list)
+    return DiscreteBelief(pomdp, state_list, ones(ns) / ns)
+end
+
+pdf(b::DiscreteBelief, s) = b.b[state_index(b.pomdp, s)]
+
+function rand(rng::AbstractRNG, b::DiscreteBelief)
+    i = sample(rng, Weights(b.b))
+    return b.state_list[i]
+end
 
 function Base.fill!(b::DiscreteBelief, x::Float64)
     fill!(b.b, x)
     return b
 end
 
-function Base.fill!(b::DiscreteBelief, idxs::Vector{Int64}, vals::Vector{Float64})
-    fill!(b.b, 0.0)
-    for i = 1:length(idxs)
-        index = idxs[i]
-        index > 0 ? (b[index] = vals[i]) : nothing 
-    end
-    b
+Base.length(b::DiscreteBelief) = length(b.b)
+
+==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.state_list == b2.state_list && b1.b == b2.b
+Base.hash(b::DiscreteBelief, h::UInt) = hash(b.b, hash(b.state_list, h))
+
+mutable struct DiscreteUpdater{P<:POMDP} <: Updater
+    pomdp::P
 end
 
-function Base.setindex!(b::DiscreteBelief, x::Float64, i::Int64) 
-    b.b[i] = x
-    b
-end
+uniform_belief(up::DiscreteUpdater) = uniform_belief(up.pomdp)
 
-Base.getindex(b::DiscreteBelief, i::Int64) = b.b[i]
-
-function Base.copy!(b1::DiscreteBelief, b2::DiscreteBelief)
-    copy!(b1.b, b2.b)
-    return b1
-end
-
-Base.sum(b::DiscreteBelief) = sum(b.b)
-
-create_belief(bu::DiscreteUpdater) = DiscreteBelief(n_states(bu.pomdp))
-
-function initialize_belief(bu::DiscreteUpdater, dist::Any, belief::DiscreteBelief = create_belief(bu))
-    belief = fill!(belief, 0.0)
+function initialize_belief(bu::DiscreteUpdater, dist::Any)
+    state_list = ordered_states(bu.pomdp)
+    ns = length(state_list)
+    b = zeros(ns)
+    belief = DiscreteBelief(bu.pomdp, state_list, b)
     for s in iterator(dist)
-        sidx = state_index(bu.pomdp, s) 
-        belief[sidx] = pdf(dist, s)  
+        sidx = state_index(bu.pomdp, s)
+        belief.b[sidx] = pdf(dist, s)
     end
     return belief
 end
 
+function update(bu::DiscreteUpdater, b::DiscreteBelief, a, o)
+    pomdp = b.pomdp
+    state_space = b.state_list
+    bp = zeros(length(state_space))
 
-# Updates the belief given the current action and observation
-function update{A,O}(bu::DiscreteUpdater, bold::DiscreteBelief, a::A, o::O)
-    bnew = create_belief(bu)
-    pomdp = bu.pomdp
-    # initialize spaces
-    pomdp_states = ordered_states(pomdp)
-    # ensure belief state sizes match 
-    @assert length(bold) == length(bnew)
-    # initialize belief 
-    fill!(bnew, 0.0)
-    # iterate through each state in belief vector
-    for (i, sp) in enumerate(pomdp_states)
-        # get the distributions
+    bp_sum = 0.0   # to normalize the distribution
+
+    for (spi, sp) in enumerate(state_space)
+
+        # po = O(a, sp, o)
         od = observation(pomdp, a, sp)
-        # get prob of observation o from current distribution
-        probo = pdf(od, o)
-        # if observation prob is 0.0, then skip rest of update b/c bnew[i] is zero
-        if probo == 0.0
+        po = pdf(od, o)
+
+        if po == 0.0
             continue
         end
-        b_sum = 0.0 # belief for state sp
-        for (j, s) in enumerate(pomdp_states)
+
+        b_sum = 0.0
+        for (si, s) in enumerate(state_space)
             td = transition(pomdp, s, a)
             pp = pdf(td, sp)
-            b_sum += pp * bold[j]
+            b_sum += pp * b.b[si]
         end
-        bnew[i] = probo * b_sum
+
+        bp[spi] = po * b_sum
+        bp_sum += bp[spi]
     end
-    norm = sum(bnew)
-    # if norm is zero, the update was invalid - reset to uniform
-    if norm == 0.0
-        println("Invalid update for: ", bold, " ", a, " ", o)
-        u = 1.0/length(bnew)
-        fill!(bnew, u)
+
+    if bp_sum == 0.0
+        error("""
+              Failed discrete belief update: new probabilities sum to zero.
+
+              b = $b
+              a = $a
+              o = $o
+
+              Failed discrete belief update: new probabilities sum to zero.
+              """)
     else
-        for i = 1:length(bnew); bnew[i] /= norm; end
+        for i = 1:length(bp); bp[i] /= bp_sum; end
     end
-    bnew
+
+    return DiscreteBelief(pomdp, b.state_list, bp)
 end
 
+
+# DEPRECATED
+@generated function create_belief(bu::DiscreteUpdater)
+    Core.println("WARNING: create_belief(up::DiscreteUpdater) is deprecated. Use uniform_belief(up) instead.")
+    return :(uniform_belief(bu))
+end
 
 # alphas are |A|x|S|
 # computes dot product of alpha vectors and belief
 # util is array with utility of each alpha vecotr for belief b
-function product(alphas::Matrix{Float64}, b::DiscreteBelief)
-    @assert size(alphas, 1) == length(b) "Alpha and belief sizes not equal"
-    n = size(alphas, 2) 
-    util = zeros(n)
-    for i = 1:n
-        s = 0.0
-        for j = 1:length(b)
-            s += alphas[j,i]*b[j]
+@generated function product(alphas::Matrix{Float64}, b::DiscreteBelief)
+    Core.println("WARNING: product(alphas, b::DiscreteBelief) is deprecated.")
+    quote
+        @assert size(alphas, 1) == length(b) "Alpha and belief sizes not equal"
+        n = size(alphas, 2) 
+        util = zeros(n)
+        for i = 1:n
+            s = 0.0
+            for j = 1:length(b)
+                s += alphas[j,i]*b.b[j]
+            end
+            util[i] = s
         end
-        util[i] = s
+        return util
     end
-    return util
 end
 
-# function Base.convert(t::Type{DiscreteBelief}, b::Any)
-#     db = DiscreteBelief(zeros(length(b))) # b must support length
-#     for s in iterator(b)
-#         db[index(b,s)] = pdf(b, s)
-#     end
-# end
