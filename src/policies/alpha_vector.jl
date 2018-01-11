@@ -12,6 +12,7 @@ end
 function AlphaVectorPolicy(pomdp::POMDP, alphas)
     AlphaVectorPolicy(pomdp, alphas, ordered_actions(pomdp))
 end
+# assumes alphas is |S| x |A|
 function AlphaVectorPolicy(p::POMDP, alphas::Matrix{Float64}, action_map)
     # turn alphas into vector of vectors
     num_actions = size(alphas, 2)
@@ -50,4 +51,9 @@ function action(p::AlphaVectorPolicy, b::DiscreteBelief)
         end
     end
     return p.action_map[best_idx]
+end
+
+function Base.push!(p::AlphaVectorPolicy, alpha::Vector{Float64}, a)
+    push!(p.alphas, alpha)
+    push!(p.action_map, a)
 end
