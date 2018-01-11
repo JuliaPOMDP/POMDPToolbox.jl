@@ -2,25 +2,49 @@
 
 # needs pomdp for state_index in pdf(b, s)
 # needs list of ordered_states for rand(b)
+
+"""
+    DiscreteBelief
+
+A belief specified by a probability vector.
+
+Normalization of `b` is NOT enforced at all times, but the `DiscreteBeleif(pomdp, b)` constructor will warn, and `update(...)` always returns a belief with normalized `b`.
+"""
 struct DiscreteBelief{P<:POMDP, S}
     pomdp::P
     state_list::Vector{S}       # vector of ordered states
     b::Vector{Float64}
 end
-function DiscreteBelief(pomdp, b::Vector{Float64})
+
+function DiscreteBelief(pomdp, b::Vector{Float64}; check::Bool=true)
+    if check
+        if !isapprox(sum(b), 1.0, atol=0.001)
+            warn("""
+                 b in DiscreteBelief(pomdp, b) does not sum to 1.
+
+                 To suppress this warning use `DiscreteBelief(pomdp, b, check=false)`
+                 """)
+        end
+        if !all(0.0 <= p <= 1.0 for p in b)
+            warn("""
+                 b in DiscreteBelief(pomdp, b) contains entries outside [0,1].
+
+                 To suppress this warning use `DiscreteBelief(pomdp, b, check=false)`
+                 """)
+        end
+    end
     return DiscreteBelief(pomdp, ordered_states(pomdp), b)
 end
 
 
 """
-Returns a DiscreteBelief with equal probability for each state.
+Return a DiscreteBelief with equal probability for each state.
 """
 function uniform_belief(pomdp)
     state_list = ordered_states(pomdp)
     ns = length(state_list)
     return DiscreteBelief(pomdp, state_list, ones(ns) / ns)
 end
-
 
 pdf(b::DiscreteBelief, s) = b.b[state_index(b.pomdp, s)]
 
@@ -36,22 +60,19 @@ end
 
 Base.length(b::DiscreteBelief) = length(b.b)
 
-# equality only depends on belief values
-==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.b == b2.b
-
-# like equality, hashing only depends on vector
-Base.hash(b::DiscreteBelief) = hash(b.b)
-
-
+==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.state_list == b2.state_list && b1.b == b2.b
+Base.hash(b::DiscreteBelief, h::UInt) = hash(b.b, hash(b.state_list, h))
 
 mutable struct DiscreteUpdater{P<:POMDP} <: Updater
     pomdp::P
 end
 
+uniform_belief(up::DiscreteUpdater) = uniform_belief(up.pomdp)
+
 function initialize_belief(bu::DiscreteUpdater, dist::Any)
     state_list = ordered_states(bu.pomdp)
     ns = length(state_list)
-    b = ones(ns) / ns
+    b = zeros(ns)
     belief = DiscreteBelief(bu.pomdp, state_list, b)
     for s in iterator(dist)
         sidx = state_index(bu.pomdp, s)
@@ -97,10 +118,17 @@ function update(bu::DiscreteUpdater, b::DiscreteBelief, a, o)
               o = $o
 
               Failed discrete belief update: new probabilities sum to zero.
-             """)
+              """)
     else
         for i = 1:length(bp); bp[i] /= bp_sum; end
     end
 
     return DiscreteBelief(pomdp, b.state_list, bp)
+end
+
+
+# DEPRECATED
+@generated function create_belief(bu::DiscreteUpdater)
+    Core.println("WARNING: create_belief(up::DiscreteUpdater) is deprecated. Use uniform_belief(up) instead.")
+    return :(uniform_belief(bu))
 end

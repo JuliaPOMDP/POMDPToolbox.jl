@@ -11,6 +11,15 @@ b0 = DiscreteBelief(pomdp, [0.5,0.5])
 @test pdf(b0,true) == 0.5
 @test pdf(b0,false) == 0.5
 
+println("There should be a warning below:")
+DiscreteBelief(pomdp, [0.6, 0.5])
+println("There should be a warning below:")
+DiscreteBelief(pomdp, [-0.1, 1.1])
+
+println("There should NOT be a warning below:")
+DiscreteBelief(pomdp, [-0.1, 1.1], check=false)
+
+
 # testing uniform belief
 b1 = uniform_belief(pomdp)
 @test pdf(b1,true) == 0.5
@@ -18,13 +27,16 @@ b1 = uniform_belief(pomdp)
 
 # testing equality (== function)
 b2 = uniform_belief(pomdp)
+b3 = DiscreteBelief(pomdp, [0.0,1.0])
 @test b2 == b1
 @test b2 == b0
+@test b2 != b3
 
 # testing hashing
-@test hash(b0) == hash(b0.b)    # hashing only depends on belief
-@test hash(b0) == hash(b1)      # same beliefs should hash equally
+@test hash(b0) == hash(b0)
+@test hash(b0) == hash(b1)
 @test hash(b1) == hash(b2)
+@test hash(b2) != hash(b3)
 
 # testing updater initialization
 up = DiscreteUpdater(pomdp)
