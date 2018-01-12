@@ -7,7 +7,7 @@ using POMDPs
 
 import POMDPs: Updater, update, initialize_belief, pdf, mode, updater
 import POMDPs: Simulator, simulate
-import POMDPs: action, solve
+import POMDPs: action, value, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount, isterminal
 import POMDPs: generate_sr, initial_state
 import Base: rand, rand!, mean, ==
@@ -61,6 +61,10 @@ include("beliefs/particle.jl")
 include("convenience/implementations.jl")
 
 # policies
+export
+    AlphaVectorPolicy
+include("policies/alpha_vector.jl")
+
 export
     VectorPolicy,
     VectorSolver,

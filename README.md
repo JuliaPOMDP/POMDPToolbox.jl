@@ -86,6 +86,8 @@ A uniform distribution for discrete problems.
 Contains 3 functions, `ordered_states`, `ordered_actions`, and `ordered_observations` that return vectors of all the items in a space correctly ordered according to the respective index function. For example `ordered_actions(mdp)` will return a vector `v`, containing all of the actions in `actions(mdp)` in the order such that  `action_index(mdp, v[i]) == i`.
 
 ### Policies
+#### [`alpha_vector.jl`](src/policies/alpha_vector.jl)
+Represents a policy with a set of alpha vectors. Can be constructed with `AlphaVectorPolicy(pomdp, alphas, action_map)`, where `alphas` is either a vector of vectors or an |S| x |A| matrix. The `action_map` argument is a vector of actions with length equal to the number of alpha vectors. If this argument is not provided, `ordered_actions` is used to generate a default action map.
 #### [`function.jl`](src/policies/function.jl)
 Turns a function into a `Policy` object, i.e. when `action` is called on `FunctionPolicy(s->1)`, it will always return `1` as the action.
 #### [`random.jl`](src/policies/random.jl)
