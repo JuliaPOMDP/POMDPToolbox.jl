@@ -30,13 +30,7 @@ updater(p::AlphaVectorPolicy) = DiscreteUpdater(p.pomdp)
 
 value(p::AlphaVectorPolicy, b::DiscreteBelief) = value(p, b.b)
 function value(p::AlphaVectorPolicy, b::Vector{Float64})
-    num_vectors = length(p.alphas)
-    max_value = -Inf
-    for i = 1:num_vectors
-        temp_value = dot(b, p.alphas[i])
-        temp_value > max_value && (max_value = temp_value)
-    end
-    return max_value
+    maximum(dot(b,a) for a in p.alphas)
 end
 
 function action(p::AlphaVectorPolicy, b::DiscreteBelief)
