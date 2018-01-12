@@ -18,10 +18,12 @@ struct MDPHistory{S,A} <: AbstractMDPHistory{S,A}
     state_hist::Vector{S}
     action_hist::Vector{A}
     reward_hist::Vector{Float64}
+    info_hist::Vector{Any}
+    ainfo_hist::Vector{Any}
 
     discount::Float64
 
-    # if capture_exception is true and there is an exception, it will be stored here
+    # if an exception is captured, it will be stored here
     exception::Nullable{Exception}
     backtrace::Nullable{Any}
 end
@@ -41,10 +43,13 @@ struct POMDPHistory{S,A,O,B} <: AbstractPOMDPHistory{S,A,O,B}
     observation_hist::Vector{O}
     belief_hist::Vector{B}
     reward_hist::Vector{Float64}
+    info_hist::Vector{Any}
+    ainfo_hist::Vector{Any}
+    uinfo_hist::Vector{Any}
 
     discount::Float64
 
-    # if capture_exception is true and there is an exception, it will be stored here
+    # if an exception is captured, it will be stored here
     exception::Nullable{Exception}
     backtrace::Nullable{Any}
 end
@@ -57,6 +62,9 @@ action_hist(h::SimHistory) = h.action_hist
 observation_hist(h::SimHistory) = h.observation_hist
 belief_hist(h::SimHistory) = h.belief_hist
 reward_hist(h::SimHistory) = h.reward_hist
+info_hist(h::SimHistory) = h.info_hist
+ainfo_hist(h::SimHistory) = h.ainfo_hist
+uinfo_hist(h::SimHistory) = h.uinfo_hist
 
 exception(h::SimHistory) = h.exception
 Base.backtrace(h::SimHistory) = h.backtrace
@@ -125,6 +133,9 @@ action_hist(h::SubHistory) = action_hist(h.parent)[h.inds]
 observation_hist(h::SubHistory) = observation_hist(h.parent)[h.inds]
 belief_hist(h::SubHistory) = belief_hist(h.parent)[h.inds]
 reward_hist(h::SubHistory) = reward_hist(h.parent)[h.inds]
+info_hist(h::SubHistory) = info_hist(h.parent)[h.inds]
+ainfo_hist(h::SubHistory) = ainfo_hist(h.parent)[h.inds]
+uinfo_hist(h::SubHistory) = uinfo_hist(h.parent)[h.inds]
 
 step_tuple(h::SubHistory, i::Int) = step_tuple(h.parent, h.inds[i])
 
@@ -141,7 +152,7 @@ end
 # Note this particular function is not type-stable
 function HistoryIterator(history::SimHistory, spec::String)
     # XXX should throw warnings for unrecognized specification characters
-    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|s|a|r|b|o)", spec)]
+    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|ai|ui|s|a|r|b|o|i)", spec)]
     if length(syms) == 1
         return HistoryIterator{typeof(history), first(syms)}(history)
     else
@@ -155,7 +166,35 @@ function HistoryIterator(history::SimHistory, spec::Tuple)
 end
 HistoryIterator(h::SimHistory, spec::Symbol) = HistoryIterator{typeof(h), spec}(h)
 
+"""
+    for t in eachstep(hist, [spec])
+        ...
+    end
+
+Iterate through the steps in `SimHistory` `hist`. `spec` is a tuple of symbols or string that controls what is returned for each step.
+
+For example,
+```julia
+for (s, a, r, sp) in eachstep(h, "(s, a, r, sp)")    
+    println("reward \$r received when state \$sp was reached after action \$a was taken in state \$s")
+end
+```
+returns the start state, action, reward and destination state for each step of the simulation.
+
+The possible valid elements in the iteration specification are
+- `s` - the initial state in a step
+- `b` - the initial belief in the step (for POMDPs only)
+- `a` - the action taken in the step
+- `r` - the reward received for the step
+- `sp` - the final state at the end of the step (s')
+- `o` - the observation received during the step (note that this is usually based on `sp` instead of `s`)
+- `bp` - the belief after being updated based on `o` (for POMDPs only)
+- `i` - info from the state transition (from `generate_sri` for MDPs or `generate_sori` for POMDPs)
+- `ai` - info from the policy decision (from `action_info`)
+- `ui` - info from the belief update (from `update_info`)
+"""
 eachstep(hist::SimHistory, spec) = HistoryIterator(hist, spec)
+
 eachstep(mh::AbstractMDPHistory) = eachstep(mh, (:s, :a, :r, :sp))
 eachstep(mh::AbstractPOMDPHistory) = eachstep(mh, (:a, :o))
 
@@ -174,6 +213,12 @@ function sym_to_call(sym::Symbol)
         return :(observation_hist(it.history)[i])
     elseif sym == :bp
         return :(belief_hist(it.history)[i+1])
+    elseif sym == :i
+        return :(info_hist(it.history)[i])
+    elseif sym == :ai
+        return :(ainfo_hist(it.history)[i])
+    elseif sym == :ui
+        return :(uinfo_hist(it.history)[i])
     end
 end
 

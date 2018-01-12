@@ -105,6 +105,9 @@ export
     observation_hist,
     belief_hist,
     reward_hist,
+    info_hist,
+    ainfo_hist,
+    uinfo_hist,
     exception,
     backtrace,
     undiscounted_reward,
@@ -131,6 +134,14 @@ export
 include("simulators/parallel.jl")
 
 # model tools
+export
+    generate_sri,
+    generate_sori,
+    action_info,
+    solve_info,
+    update_info
+include("model/info.jl")
+
 export uniform_state_distribution
 include("model/initial.jl")
 

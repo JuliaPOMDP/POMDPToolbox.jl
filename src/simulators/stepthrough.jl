@@ -44,9 +44,9 @@ Base.done{S}(it::MDPSimIterator, is::Tuple{Int, S}) = isterminal(it.mdp, is[2]) 
 Base.start(it::MDPSimIterator) = (1, it.init_state)
 function Base.next{S}(it::MDPSimIterator, is::Tuple{Int, S})
     s = is[2]
-    a = action(it.policy, s)
-    sp, r = generate_sr(it.mdp, s, a, it.rng)
-    return (out_tuple(it, (s, a, r, sp)), (is[1]+1, sp))
+    a, ai = action_info(it.policy, s)
+    sp, r, i = generate_sri(it.mdp, s, a, it.rng)
+    return (out_tuple(it, (s, a, r, sp, i, ai)), (is[1]+1, sp))
 end
 
 struct POMDPSimIterator{SPEC, M<:POMDP, P<:Policy, U<:Updater, RNG<:AbstractRNG, B, S}
@@ -79,14 +79,14 @@ Base.start(it::POMDPSimIterator) = (1, it.init_state, it.init_belief)
 function Base.next{S,B}(it::POMDPSimIterator, is::Tuple{Int, S, B})
     s = is[2]
     b = is[3]
-    a = action(it.policy, b)
-    sp, o, r = generate_sor(it.pomdp, s, a, it.rng)
-    bp = update(it.updater, b, a, o)
-    return (out_tuple(it, (s, a, r, sp, b, o, bp)), (is[1]+1, sp, bp))
+    a, ai = action_info(it.policy, b)
+    sp, o, r, i = generate_sori(it.pomdp, s, a, it.rng)
+    bp, ui = update_info(it.updater, b, a, o)
+    return (out_tuple(it, (s, a, r, sp, i, ai, b, o, bp, ui)), (is[1]+1, sp, bp))
 end
 
-# all is (s, a, r, sp) for mdps, (s, a, r, sp, b, o, bp) for POMDPs
-sym_to_ind = Dict(sym=>i for (i, sym) in enumerate([:s,:a,:r,:sp,:b,:o,:bp]))
+# all is (s, a, r, sp, i, ai) for mdps, (s, a, r, sp, i, ai, b, o, bp) for POMDPs
+sym_to_ind = Dict(sym=>i for (i, sym) in enumerate([:s,:a,:r,:sp,:i,:ai,:b,:o,:bp,:ui]))
 
 @generated function out_tuple(it::Union{MDPSimIterator, POMDPSimIterator}, all::Tuple)
     spec = it.parameters[1]     
@@ -107,8 +107,8 @@ sym_to_ind = Dict(sym=>i for (i, sym) in enumerate([:s,:a,:r,:sp,:b,:o,:bp]))
     end
 end
 
-convert_spec(spec, T::Type{POMDP}) = convert_spec(spec, Set(tuple(:sp, :bp, :s, :a, :r, :b, :o)))
-convert_spec(spec, T::Type{MDP}) = convert_spec(spec, Set(tuple(:sp, :s, :a, :r)))
+convert_spec(spec, T::Type{POMDP}) = convert_spec(spec, Set(tuple(:sp, :bp, :s, :a, :r, :b, :o, :i, :ai, :ui)))
+convert_spec(spec, T::Type{MDP}) = convert_spec(spec, Set(tuple(:sp, :s, :a, :r, :i, :ai)))
 
 function convert_spec(spec, recognized::Set{Symbol})
     conv = convert_spec(spec)
@@ -121,9 +121,9 @@ function convert_spec(spec, recognized::Set{Symbol})
 end
 
 function convert_spec(spec::String)
-    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|s|a|r|b|o)", spec)]
+    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|ai|ui|s|a|r|b|o|i)", spec)]
     if length(syms) == 0
-        error("$spec does not contain any valid symbols for step iterator output. Valid symbols are sp, bp, s, a, r, b, o")
+        error("$spec does not contain any valid symbols for step iterator output. Valid symbols are sp, bp, ai, ui, s, a, r, b, o, i")
     end
     if length(syms) == 1
         return Symbol(first(syms))
@@ -199,4 +199,3 @@ function stepthrough(pomdp::POMDP, policy::Policy, args...; kwargs...)
     sim = StepSimulator(spec; kwargs...)
     return simulate(sim, pomdp, policy, args[1:end-spec_included]...)
 end
-
