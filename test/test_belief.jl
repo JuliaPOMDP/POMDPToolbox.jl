@@ -19,11 +19,13 @@ DiscreteBelief(pomdp, [-0.1, 1.1])
 println("There should NOT be a warning below:")
 DiscreteBelief(pomdp, [-0.1, 1.1], check=false)
 
-
 # testing uniform belief
 b1 = uniform_belief(pomdp)
 @test pdf(b1,true) == 0.5
 @test pdf(b1,false) == 0.5
+
+# testing iterator
+@test iterator(b1) == ordered_states(pomdp)
 
 # testing equality (== function)
 b2 = uniform_belief(pomdp)

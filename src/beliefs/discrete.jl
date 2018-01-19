@@ -60,7 +60,10 @@ end
 
 Base.length(b::DiscreteBelief) = length(b.b)
 
+iterator(b::DiscreteBelief) = b.state_list
+
 ==(b1::DiscreteBelief, b2::DiscreteBelief) = b1.state_list == b2.state_list && b1.b == b2.b
+
 Base.hash(b::DiscreteBelief, h::UInt) = hash(b.b, hash(b.state_list, h))
 
 mutable struct DiscreteUpdater{P<:POMDP} <: Updater
