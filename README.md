@@ -53,6 +53,9 @@ Provides a sparse categorical distribution `SparseCat`. This distribution simply
 #### [`weighted_iteration.jl`](src/distributions/weighted_iteration.jl)
 Function for iterating through pairs of values and their probabilities in a distribution.
 
+#### [`bool.jl`](src/distributions/bool.jl)
+Distribution over an outcome being true. Create with `BoolDistribution(p_true)`. Obviously, the probability of false is simply `1 - p_true`.
+
 ### Model
 #### [`info.jl`](src/model/info.jl)
 Contains a small interface for outputting extra information (usually a `Dict` or `nothing`) from simulations.

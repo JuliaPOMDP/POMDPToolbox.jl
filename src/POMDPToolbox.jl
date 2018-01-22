@@ -43,6 +43,7 @@ export
     product
 include("beliefs/discrete.jl")
 
+
 export
     PreviousObservationUpdater,
     FastPreviousObservationUpdater,
@@ -168,6 +169,10 @@ include("distributions/weighted_iteration.jl")
 export
     SparseCat
 include("distributions/sparse_cat.jl")
+
+export
+    BoolDistribution
+include("distributions/bool.jl")
 
 # testing
 export test_solver
