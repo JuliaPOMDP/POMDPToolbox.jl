@@ -1,6 +1,10 @@
 using POMDPToolbox
 using Base.Test
 
+# Hack to get this to build with POMDPModels
+# this can be removed once BoolDistribution is removed from POMDPModels
+BoolDistribution = POMDPToolbox.BoolDistribution
+
 # testing constructor and pdf
 d = BoolDistribution(0.3)
 @test pdf(d, true) == 0.3
