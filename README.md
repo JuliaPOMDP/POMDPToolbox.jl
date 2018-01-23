@@ -50,6 +50,8 @@ Provides some compatibility with [Distributions.jl](https://github.com/JuliaStat
 #### [`sparse_cat.jl`](src/distributions/sparse_cat.jl)
 Provides a sparse categorical distribution `SparseCat`. This distribution simply stores a vector of objects and a vector of their associated probabilities. It is optimized for value iteration with a fast implementation of `weighted_iterator`. Both `pdf` and `rand` are order n.
 
+Example: `SparseCat([1,2,3], [0.1,0.2,0.7])` is a categorical distribution that assignes probability 0.1 to `1`, 0.2 to `2`, 0.7 to `3`, and 0 to all other values.
+
 #### [`weighted_iteration.jl`](src/distributions/weighted_iteration.jl)
 Function for iterating through pairs of values and their probabilities in a distribution.
 
