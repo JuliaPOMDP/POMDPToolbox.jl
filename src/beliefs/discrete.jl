@@ -129,6 +129,8 @@ function update(bu::DiscreteUpdater, b::DiscreteBelief, a, o)
     return DiscreteBelief(pomdp, b.state_list, bp)
 end
 
+update(bu::DiscreteUpdater, b::Any, a, o) = update(bu, initialize_belief(bu, b), a, o)
+
 
 # DEPRECATED
 @generated function create_belief(bu::DiscreteUpdater)
