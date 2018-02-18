@@ -32,6 +32,8 @@ actions(bmdp::GenerativeBeliefMDP) = actions(bmdp.pomdp)
 
 isterminal(bmdp::GenerativeBeliefMDP, b) = all(isterminal(bmdp.pomdp, s) for s in iterator(b))
 
+discount(bmdp::GenerativeBeliefMDP) = discount(bmdp.pomdp)
+
 const warned_about_gbmdp_terminal=false
 
 # override this if you want to handle it in a special way
