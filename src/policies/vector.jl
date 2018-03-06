@@ -45,4 +45,3 @@ function ValuePolicy(mdp::Union{MDP,POMDP})
 end
 
 action(p::ValuePolicy, s) = p.act[indmax(p.value_table[state_index(p.mdp, s),:])]
-action(p::ValuePolicy, s, a) = action(p, s)

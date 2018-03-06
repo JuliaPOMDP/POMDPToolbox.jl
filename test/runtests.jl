@@ -4,6 +4,7 @@ using POMDPModels
 using Base.Test
 
 include("test_random_solver.jl")
+include("test_stochastic_policy.jl")
 include("test_rollout.jl")
 include("test_history_recorder.jl")
 include("test_sim.jl")
