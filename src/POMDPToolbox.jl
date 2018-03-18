@@ -95,7 +95,8 @@ export
 include("policies/function.jl")
 
 export
-    PolicyWrapper
+    PolicyWrapper,
+    payload
 include("policies/utility_wrapper.jl")
 
 # simulators

@@ -159,9 +159,11 @@ function run_parallel(process::Function, queue::AbstractVector;
             end
         end
     end
-    lock(prog_lock)
-    finish!(progress)
-    unlock(prog_lock)
+    if progress isa Progress
+        lock(prog_lock)
+        finish!(progress)
+        unlock(prog_lock)
+    end
 
     return create_dataframe(frame_lines)
 end

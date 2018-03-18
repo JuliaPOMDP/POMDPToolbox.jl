@@ -1,3 +1,5 @@
+let
+
 using POMDPToolbox
 using POMDPModels
 
@@ -15,3 +17,4 @@ policy = EpsGreedyPolicy(problem, 0.5)
 sim = RolloutSimulator(max_steps=10)
 simulate(sim, problem, policy)
 
+end

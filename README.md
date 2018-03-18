@@ -50,6 +50,8 @@ Provides some compatibility with [Distributions.jl](https://github.com/JuliaStat
 #### [`sparse_cat.jl`](src/distributions/sparse_cat.jl)
 Provides a sparse categorical distribution `SparseCat`. This distribution simply stores a vector of objects and a vector of their associated probabilities. It is optimized for value iteration with a fast implementation of `weighted_iterator`. Both `pdf` and `rand` are order n.
 
+Example: `SparseCat([1,2,3], [0.1,0.2,0.7])` is a categorical distribution that assignes probability 0.1 to `1`, 0.2 to `2`, 0.7 to `3`, and 0 to all other values.
+
 #### [`weighted_iteration.jl`](src/distributions/weighted_iteration.jl)
 Function for iterating through pairs of values and their probabilities in a distribution.
 
@@ -110,34 +112,49 @@ Tabular policies including the following:
 #### [`utility_wrapper.jl`](src/policies/utility_wrapper.jl)
 A wrapper for policies to collect statistics and handle errors.
 
-    `PolicyWrapper`
-    
+        PolicyWrapper
+
     Flexible utility wrapper for a policy designed for collecting statistics about planning.
-    
-    Carries a function, a policy, and a payload (that can be any type).
-    
-    The function should typically be defined with the do syntax, each time action is called on the wrapper, this function will be called with three arguments: the policy, the payload, and the current state or belief. The function should return an appropriate action. The idea is that, in this function, `action(policy, s)` should be called, statistics from the policy/planner should be collected and saved in the payload, exceptions can be handled, and the action should be returned.
-    
-    Example:
-    
+
+    Carries a function, a policy, and optionally a payload (that can be any type).
+
+    The function should typically be defined with the do syntax. Each time `action` is called on the wrapper, this function will be called.
+
+    If there is no payload, it will be called with two argments: the policy and the state/belief. If there is a payload, it will be called with three arguments: the policy, the payload, and the current state or belief. The function should return an appropriate action. The idea is that, in this function, `action(policy, s)` should be called, statistics from the policy/planner should be collected and saved in the payload, exceptions can be handled, and the action should be returned.
+
+    # Example
+
         using POMDPModels
         using POMDPToolbox
-    
+
         mdp = GridWorld()
         policy = RandomPolicy(mdp)
         counts = Dict(a=>0 for a in iterator(actions(mdp)))
-    
-        wrapper = PolicyWrapper(policy, payload=counts) do policy, counts, s
+
+        # with a payload
+        statswrapper = PolicyWrapper(policy, payload=counts) do policy, counts, s
             a = action(policy, s)
             counts[a] += 1
             return a
         end
-    
-        h = simulate(HistoryRecorder(max_steps=100), mdp, wrapper)
-        for (a, count) in wrapper.payload
+
+        h = simulate(HistoryRecorder(max_steps=100), mdp, statswrapper)
+        for (a, count) in payload(statswrapper)
             println("policy chose action \$a \$count of \$(n_steps(h)) times.")
         end
 
+        # without a payload
+        errwrapper = PolicyWrapper(policy) do policy, s
+            try
+                a = action(policy, s)
+            catch ex
+                warn("Caught error in policy; using default")
+                a = :left
+            end
+            return a
+        end
+
+        h = simulate(HistoryRecorder(max_steps=100), mdp, errwrapper)
 
 ### Simulators
 #### [`rollout.jl`](src/simulators/rollout.jl)

@@ -5,14 +5,28 @@ let
     policy = RandomPolicy(mdp)
     counts = Dict(a=>0 for a in iterator(actions(mdp)))
 
-    wrapper = PolicyWrapper(policy, payload=counts) do policy, counts, s
+    # with a payload
+    statswrapper = PolicyWrapper(policy, payload=counts) do policy, counts, s
         a = action(policy, s)
         counts[a] += 1
         return a
     end
 
-    h = simulate(HistoryRecorder(max_steps=100), mdp, wrapper)
-    for (a, count) in wrapper.payload
-        println("policy chose action $a $count of $(n_steps(h)) times.")
+    h = simulate(HistoryRecorder(max_steps=100), mdp, statswrapper)
+    for (a, count) in payload(statswrapper)
+        println("policy chose action \$a \$count of \$(n_steps(h)) times.")
     end
+
+    # without a payload
+    errwrapper = PolicyWrapper(policy) do policy, s
+        try
+            a = action(policy, s)
+        catch ex
+            warn("Caught error in policy; using default")
+            a = :left
+        end
+        return a
+    end
+
+    h = simulate(HistoryRecorder(max_steps=100), mdp, errwrapper)
 end
