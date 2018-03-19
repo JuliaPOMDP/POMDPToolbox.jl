@@ -11,10 +11,12 @@ import POMDPs: action, value, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount, isterminal
 import POMDPs: generate_sr, initial_state
 import Base: rand, rand!, mean, ==
+import DataStructures: CircularBuffer, isfull, capacity, push!, append!
 
 using ProgressMeter
 using StatsBase
 using DataFrames
+
 
 # export commons
 export

@@ -1,21 +1,24 @@
-
+"""
+Updater that stores the k most recent observations as the belief.
+"""
 struct KMarkovUpdater <: Updater
-    k::Int64
+    k::Int
 end
 
-function initialize_belief{O}(bu::KMarkovUpdater, obs::O, b=nothing)
-    obs_stacked = Vector{O}(bu.k)
+function initialize_belief{O}(bu::KMarkovUpdater, obs::O)
+    b0 = CircularBuffer{O}(bu.k)
     for i=1:bu.k
-        obs_stacked[i] = obs
+        push!(b0, obs)
     end
-    return obs_stacked
+    @assert isfull(b0)
+    return b0
 end
 
-function update{O}(bu::KMarkovUpdater, old_b::Vector{O}, action, obs::O, b=nothing)
-    obs_stacked = Vector{O}(bu.k)
-    for i=1:bu.k-1
-        obs_stacked[i] = old_b[i+1]
-    end
-    obs_stacked[bu.k] = obs
-    return obs_stacked
+function update{O}(bu::KMarkovUpdater, old_b::CircularBuffer{O}, action, obs::O)
+    new_b = CircularBuffer{O}(bu.k)
+    append!(new_b, old_b)
+    push!(new_b, obs)
+    @assert isfull(new_b)
+    @assert capacity(new_b) == bu.k
+    return new_b
 end
