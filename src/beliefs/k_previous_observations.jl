@@ -5,20 +5,19 @@ struct KMarkovUpdater <: Updater
     k::Int
 end
 
-function initialize_belief{O}(bu::KMarkovUpdater, obs::O)
-    b0 = CircularBuffer{O}(bu.k)
+function initialize_belief{O}(bu::KMarkovUpdater, obs::O, b=nothing)
+    obs_stacked = Vector{O}(bu.k)
     for i=1:bu.k
-        push!(b0, obs)
+        obs_stacked[i] = obs
     end
-    @assert isfull(b0)
-    return b0
+    return obs_stacked
 end
 
-function update{O}(bu::KMarkovUpdater, old_b::CircularBuffer{O}, action, obs::O)
-    new_b = CircularBuffer{O}(bu.k)
-    append!(new_b, old_b)
-    push!(new_b, obs)
-    @assert isfull(new_b)
-    @assert capacity(new_b) == bu.k
-    return new_b
+function update{O}(bu::KMarkovUpdater, old_b::Vector{O}, action, obs::O, b=nothing)
+    obs_stacked = Vector{O}(bu.k)
+    for i=1:bu.k-1
+        obs_stacked[i] = old_b[i+1]
+    end
+    obs_stacked[bu.k] = obs
+    return obs_stacked
 end
