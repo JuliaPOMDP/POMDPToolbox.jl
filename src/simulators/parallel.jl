@@ -10,6 +10,8 @@ struct POMDPSim <: Sim
     metadata::Dict{Symbol}
 end
 
+problem(sim::POMDPSim) = sim.pomdp
+
 struct MDPSim <: Sim
     simulator::Simulator
     mdp::MDP
@@ -18,6 +20,8 @@ struct MDPSim <: Sim
     metadata::Dict{Symbol}
 end
 
+problem(sim::MDPSim) = sim.mdp
+
 """
     Sim(p::POMDP, policy::Policy, metadata=Dict(:note=>"a note"))
     Sim(p::POMDP, policy::Policy[, updater[, initial_belief[, initial_state]]]; kwargs...)
@@ -25,15 +29,15 @@ end
 Create a `Sim` object that represents a POMDP simulation.
 """
 function Sim(pomdp::POMDP,
-                    policy::Policy,
-                    up=updater(policy),
-                    initial_belief=initial_state_distribution(pomdp),
-                    initial_state=nothing;
-                    rng::AbstractRNG=Base.GLOBAL_RNG,
-                    max_steps::Int=typemax(Int),
-                    simulator::Simulator=HistoryRecorder(rng=rng, max_steps=max_steps),
-                    metadata::Dict{Symbol}=Dict{Symbol, Any}()
-                   )
+             policy::Policy,
+             up=updater(policy),
+             initial_belief=initial_state_distribution(pomdp),
+             initial_state=nothing;
+             rng::AbstractRNG=Base.GLOBAL_RNG,
+             max_steps::Int=typemax(Int),
+             simulator::Simulator=HistoryRecorder(rng=rng, max_steps=max_steps),
+             metadata::Dict{Symbol}=Dict{Symbol, Any}()
+            )
 
     if initial_state == nothing && state_type(pomdp) != Void
         is = rand(rng, initial_belief)
@@ -147,7 +151,7 @@ function run_parallel(process::Function, queue::AbstractVector;
                         frame_lines[idx] = remotecall_fetch(p, queue[idx]) do sim
                             result = simulate(sim)
                             output = process(sim, result)
-                            append_metadata(output, sim.metadata)
+                            return append_metadata(output, sim.metadata)
                         end
                         if progress isa Progress
                             lock(prog_lock)
@@ -183,7 +187,9 @@ function Base.run(process::Function, queue::AbstractVector; show_progress=true)
     if show_progress
         @showprogress for sim in queue
             result = simulate(sim)
-            push!(lines, process(sim, result))
+            output = process(sim, result)
+            line = append_metadata(output, sim.metadata)
+            push!(lines, line)
         end
     else
         for sim in queue
@@ -196,7 +202,7 @@ function Base.run(process::Function, queue::AbstractVector; show_progress=true)
     return create_dataframe(lines)
 end
 
-append_metadata(single::Pair, metadata::Dict) = vcat(Any[single], collect(metadata))
+append_metadata(single::Pair, metadata::Dict) = append!(Any[single], collect(metadata))
 append_metadata(pairvec::AbstractVector, metadata::Dict) = vcat(pairvec, collect(metadata))
 append_metadata(d::Dict, metadata::Dict) = merge!(d, metadata)
 

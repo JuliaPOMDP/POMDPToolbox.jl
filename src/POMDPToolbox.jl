@@ -143,7 +143,8 @@ include("simulators/stepthrough.jl")
 export
     Sim,
     run,
-    run_parallel
+    run_parallel,
+    problem
 include("simulators/parallel.jl")
 
 # model tools
