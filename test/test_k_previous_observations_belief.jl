@@ -1,5 +1,6 @@
 using POMDPToolbox
 using POMDPModels
+using POMDPs
 using Base.Test
 
 
@@ -11,6 +12,16 @@ function test_initial_belief(b0, o0)
     end
     return true
 end
+
+function test_hist(belief_hist)
+    for i=1:length(belief_hist)-1
+        if hist.belief_hist[i][2:end] != hist.belief_hist[i+1][1:end-1]
+            return false
+        end
+    end
+    return true
+end
+
 
 rng = MersenneTwister(0)
 pomdp = RandomPOMDP()
@@ -43,3 +54,17 @@ bp = update(up, bp, rand(rng, actions(pomdp)), op)
 @test bp[end-1] == o
 @test length(bp) == up.k == 5
 @test bp[1:end-2] == fill(o0, length(bp)-2)
+
+# test with history recorder
+pomdp = BabyPOMDP()
+solver = RandomSolver(rng=rng)
+policy = solve(solver, pomdp)
+
+s0 = initial_state(pomdp, rng)
+hr = HistoryRecorder(rng=rng, initial_state = s0, max_steps=100)
+o0 = generate_o(pomdp, s0, rng)
+
+hist = simulate(hr, pomdp, policy, up, o0)
+
+@test hist.belief_hist[1] == fill(o0, up.k)
+@test test_hist(hist.belief_hist)
