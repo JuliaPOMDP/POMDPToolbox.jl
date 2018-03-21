@@ -5,7 +5,7 @@ struct KMarkovUpdater <: Updater
     k::Int
 end
 
-function initialize_belief{O}(bu::KMarkovUpdater, obs::O, b=nothing)
+function initialize_belief{O}(bu::KMarkovUpdater, obs::O)
     obs_stacked = Vector{O}(bu.k)
     for i=1:bu.k
         obs_stacked[i] = obs
@@ -13,7 +13,11 @@ function initialize_belief{O}(bu::KMarkovUpdater, obs::O, b=nothing)
     return obs_stacked
 end
 
-function update{O}(bu::KMarkovUpdater, old_b::Vector{O}, action, obs::O, b=nothing)
+function initialize_belief{O}(bu::KMarkovUpdater, obs_vec::Vector{O})
+    return obs_vec
+end
+
+function update{O}(bu::KMarkovUpdater, old_b::Vector{O}, action, obs::O)
     obs_stacked = Vector{O}(bu.k)
     for i=1:bu.k-1
         obs_stacked[i] = old_b[i+1]
