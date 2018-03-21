@@ -30,7 +30,7 @@ pomdp = RandomPOMDP()
 up = KMarkovUpdater(5)
 
 o0 = rand(rng, observations(pomdp))
-b0 = initialize_belief(up, o0)
+b0 = initialize_belief(up, fill(o0, up.k))
 
 @test typeof(b0[1]) == typeof(o0)
 @test length(b0) == up.k == 5
@@ -45,7 +45,7 @@ bp = update(up, b, rand(rng, actions(pomdp)), o)
 @test bp[1:end-1] == fill(o0, length(bp)-1)
 
 # check that b is unchanged
-@test b == initialize_belief(up, o0)
+@test b == initialize_belief(up, fill(o0, up.k))
 
 b = bp
 op = rand(rng, observations(pomdp))
@@ -64,7 +64,11 @@ s0 = initial_state(pomdp, rng)
 hr = HistoryRecorder(rng=rng, initial_state = s0, max_steps=100)
 o0 = generate_o(pomdp, s0, rng)
 
-hist = simulate(hr, pomdp, policy, up, o0)
+hist = simulate(hr, pomdp, policy, up, fill(o0, up.k))
 
 @test hist.belief_hist[1] == fill(o0, up.k)
 @test test_hist(hist.belief_hist)
+
+@test_throws ErrorException simulate(hr, pomdp, policy, up)
+@test_throws ErrorException initialize_belief(up, o0)
+@test_throws ErrorException initialize_belief(up, fill(o0, up.k-1))
