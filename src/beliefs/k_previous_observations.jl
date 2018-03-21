@@ -14,6 +14,7 @@ function initialize_belief{O}(bu::KMarkovUpdater, obs::O)
 end
 
 function initialize_belief{O}(bu::KMarkovUpdater, obs_vec::Vector{O})
+    @assert length(obs_vec) == bu.k
     return obs_vec
 end
 
