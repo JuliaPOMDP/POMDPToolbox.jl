@@ -37,7 +37,7 @@ Beliefs (and updaters) that only deal with the most recent observation
 - `PrimedPreviousObservationUpdater` also returns the previous observation, but if an observation is not available, it returns a default.
 
 #### [`k_previous_observation.jl`](src/beliefs/k_previous_observation.jl)
-- `KMarkovUpdater` maintains a "belief" that is a `Vector{O}` where `O` is the observation type. It consists of the last k observations where k is an integer to pass to the constructor of `KMarkovUpdater`. The last observation is at the end of the vector and the oldest one is at the beginning.
+`KMarkovUpdater` maintains a "belief" that is a `Vector{O}` where `O` is the observation type. It consists of the last k observations where k is an integer to pass to the constructor of `KMarkovUpdater`. The last observation is at the end of the vector and the oldest one is at the beginning.
 
 #### [`void.jl`](src/beliefs/void.jl)
 An updater useful for when a belief is not necessary (i.e. for a random policy). `update` always returns `nothing`.
