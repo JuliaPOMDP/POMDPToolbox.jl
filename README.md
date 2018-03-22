@@ -38,6 +38,15 @@ Beliefs (and updaters) that only deal with the most recent observation
 
 #### [`k_previous_observation.jl`](src/beliefs/k_previous_observation.jl)
 `KMarkovUpdater` maintains a "belief" that is a `Vector{O}` where `O` is the observation type. It consists of the last k observations where k is an integer to pass to the constructor of `KMarkovUpdater`. The last observation is at the end of the vector and the oldest one is at the beginning.
+Example:
+```julia
+up = KMarkovUpdater(5)
+s0 = initial_state(pomdp, rng)
+initial_observation = generate_o(pomdp, s0, rng)
+initial_obs_vec = fill(initial_observation, 5)
+hr = HistoryRecorder(rng=rng, max_steps=100)
+hist = simulate(hr, pomdp, policy, up, initial_obs_vec, s0)
+```
 
 #### [`void.jl`](src/beliefs/void.jl)
 An updater useful for when a belief is not necessary (i.e. for a random policy). `update` always returns `nothing`.
