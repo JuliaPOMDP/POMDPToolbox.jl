@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/JuliaPOMDP/POMDPToolbox.jl/badge.svg?)](https://coveralls.io/github/JuliaPOMDP/POMDPToolbox.jl?)
 
 Support tools for POMDPs.jl. This is a supported [JuliaPOMDP](https://github.com/JuliaPOMDP) package that provides tools
-for belief updating, problem modeling, and running simulations. 
+for belief updating, problem modeling, and running simulations.
 
 The most important tools in this package are the [simulators](#simulators). They can be used to easily run simulations of POMDP problems and policies.
 
@@ -35,6 +35,9 @@ Beliefs (and updaters) that only deal with the most recent observation
 - `PreviousObservationUpdater` maintains a "belief" that is a `Nullable{O}` where `O` is the observation type. The "belief" is null if there is no observation available, and contains the previous observation if there is one.
 - `FastPreviousObservationUpdater` just returns the previous observation when `update` is called. There is no mechanism for representing the case when an observation is not available.
 - `PrimedPreviousObservationUpdater` also returns the previous observation, but if an observation is not available, it returns a default.
+
+#### [`k_previous_observation.jl`](src/beliefs/k_previous_observation.jl)
+- `KMarkovUpdater` maintains a "belief" that is a `Vector{O}` where `O` is the observation type. It consists of the last k observations where k is an integer to pass to the constructor of `KMarkovUpdater`. The last observation is at the end of the vector and the oldest one is at the beginning.
 
 #### [`void.jl`](src/beliefs/void.jl)
 An updater useful for when a belief is not necessary (i.e. for a random policy). `update` always returns `nothing`.
