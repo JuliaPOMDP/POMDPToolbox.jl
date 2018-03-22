@@ -11,10 +11,12 @@ import POMDPs: action, value, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount, isterminal
 import POMDPs: generate_sr, initial_state
 import Base: rand, rand!, mean, ==
+import DataStructures: CircularBuffer, isfull, capacity, push!, append!
 
 using ProgressMeter
 using StatsBase
 using DataFrames
+
 
 # export commons
 export
@@ -33,10 +35,10 @@ export
 
 # beliefs
 export
-    VoidUpdater   
+    VoidUpdater
 include("beliefs/void.jl")
 
-export 
+export
     DiscreteBelief,
     DiscreteUpdater,
     uniform_belief,
@@ -49,6 +51,11 @@ export
     FastPreviousObservationUpdater,
     PrimedPreviousObservationUpdater
 include("beliefs/previous_observation.jl")
+
+export
+    KMarkovUpdater
+
+include("beliefs/k_previous_observations.jl")
 
 export
     Particle,
@@ -92,7 +99,7 @@ include("policies/function.jl")
 export
     PolicyWrapper,
     payload
-include("policies/utility_wrapper.jl")    
+include("policies/utility_wrapper.jl")
 
 # simulators
 export RolloutSimulator
@@ -180,7 +187,7 @@ include("distributions/bool.jl")
 export test_solver
 include("testing/solver.jl")
 
-export 
+export
     probability_check,
     obs_prob_consistency_check,
     trans_prob_consistency_check
