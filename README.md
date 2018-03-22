@@ -26,7 +26,12 @@ Within each class directory, each file contains one tool. Each file should clear
 
 ### Beliefs
 #### [`discrete.jl`](src/beliefs/discrete.jl)
-Dense discrete probability distribution and updater. Create an updater with `DiscreteUpdater(pomdp)`. Create a belief with `DiscreteBelief(pomdp, b)`, where `b` is a vector of probabilities. Create a uniform belief with `uniform_belief(pomdp)`.
+Dense discrete probability distribution and updater. Create an updater with `DiscreteUpdater(pomdp)`.
+
+Create a belief with `DiscreteBelief(pomdp, b)`, where `b` is a vector of probabilities. Create a uniform belief with `uniform_belief(pomdp)`.
+
+States sampled from a `DiscreteBelief` will be actual states (of type `state_type(pomdp)`) instead of integer indices as in previous versions, and actual states instead of indices should be used in `pdf(b::DiscreteBelief, s)`. `DiscreteBelief` uses `state_index(pomdp, s)` to keep track of the states internally.
+
 #### [`particle.jl`](src/beliefs/particle.jl)
 Basic particle filter (deprecated; use [ParticleFilters.jl](https://github.com/JuliaPOMDP/ParticleFilters.jl))
 #### [`previous_observation.jl`](src/beliefs/previous_observation.jl)
