@@ -51,7 +51,7 @@ function sim(polfunc::Function, mdp::MDP,
     end
     delete!(kwargd, :initial_state)
     if simulator==nothing
-        simulator = HistoryRecorder(;kwargd...) # kwargd does not contain :initial_state because it was popped
+        simulator = HistoryRecorder(;kwargd...)
     end
     policy = FunctionPolicy(polfunc)
     simulate(simulator, mdp, policy, initial_state)
