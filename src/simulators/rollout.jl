@@ -9,28 +9,33 @@ The simulation will be terminated when either
 2) the discount factor is as small as `eps` or
 3) max_steps have been executed
 
-Keyword arguments are:
+Keyword Arguments:
+    - eps
+    - max_steps
 
-    initial_state
-    
-    eps
-
-    max_steps
+Usage (optional arguments in brackets):
+    ro = RolloutSimulator()
+    history = simulate(ro, pomdp, policy, [updater [, init_belief [, init_state]]])
 """
 struct RolloutSimulator{RNG<:AbstractRNG} <: Simulator
     rng::RNG
 
     # optional: if these are null, they will be ignored
-    initial_state::Nullable{Any}
     eps::Nullable{Float64}
     max_steps::Nullable{Int}
+
+    # DEPRECATED
+    initial_state::Nullable{Any}
 end
-RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, Nullable{Any}(), Nullable{Float64}(), Nullable{Int}())
+RolloutSimulator(rng::AbstractRNG) = RolloutSimulator(rng, Nullable{Float64}(), Nullable{Int}(), Nullable{Any}())
 function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
                            initial_state=Nullable{Any}(),
                            eps=Nullable{Float64}(),
                            max_steps=Nullable{Int}())
-    return RolloutSimulator{typeof(rng)}(rng, initial_state, eps, max_steps)
+    if !isnull(initial_state)
+        warn("The initial_state argument for RolloutSimulator is deprecated. The initial state should be specified as the last argument to simulate(...).")
+    end
+    return RolloutSimulator{typeof(rng)}(rng, eps, max_steps, initial_state)
 end
 
 @POMDP_require simulate(sim::RolloutSimulator, pomdp::POMDP, policy::Policy) begin

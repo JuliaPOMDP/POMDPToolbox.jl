@@ -13,10 +13,13 @@ Keyword Arguments:
     - `rng`: The random number generator for the simulation
     - `capture_exception::Bool`: whether to capture an exception and store it in the history, or let it go uncaught, potentially killing the script
     - `show_progress::Bool`: show a progress bar for the simulation
-    - `initial_state`
     - `eps`
     - `max_steps`
     - `sizehint::Int`: the expected length of the simulation (for preallocation)
+
+Usage (optional arguments in brackets):
+    hr = HistoryRecorder()
+    history = simulate(hr, pomdp, policy, [updater [, init_belief [, init_state]]])
 """
 mutable struct HistoryRecorder <: Simulator
     rng::AbstractRNG
@@ -26,10 +29,12 @@ mutable struct HistoryRecorder <: Simulator
     show_progress::Bool
 
     # optional: if these are null, they will be ignored
-    initial_state::Nullable{Any}
     eps::Nullable{Any}
     max_steps::Nullable{Any}
     sizehint::Nullable{Integer}
+
+    # DEPRECATED
+    initial_state::Nullable{Any}
 end
 
 function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
@@ -39,7 +44,10 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           sizehint=Nullable{Integer}(),
                           capture_exception=false,
                           show_progress=false)
-    return HistoryRecorder(rng, capture_exception, show_progress, initial_state, eps, max_steps, sizehint)
+    if !isnull(initial_state)
+        warn("The initial_state argument for HistoryRecorder is deprecated. The initial state should be specified as the last argument to simulate(...).")
+    end
+    return HistoryRecorder(rng, capture_exception, show_progress, eps, max_steps, sizehint, initial_state)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy) begin

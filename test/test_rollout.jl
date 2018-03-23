@@ -9,8 +9,8 @@ let
     sim = RolloutSimulator(max_steps=10, rng=MersenneTwister(1))
     r1 = @inferred simulate(sim, problem, policy, updater(policy), initial_state_distribution(problem))
 
-    sim = RolloutSimulator(max_steps=10, rng=MersenneTwister(1), initial_state=true)
-    dummy = @inferred simulate(sim, problem, policy, updater(policy), nothing)
+    sim = RolloutSimulator(max_steps=10, rng=MersenneTwister(1))
+    dummy = @inferred simulate(sim, problem, policy, updater(policy), nothing, true)
 
     problem = GridWorld()
     solver = RandomSolver(rng=MersenneTwister(1))
