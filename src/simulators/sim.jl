@@ -40,16 +40,18 @@ function sim(polfunc::Function, mdp::MDP,
              simulator=nothing,
              kwargs...
             )
+
     kwargd = Dict(kwargs)
-    if simulator==nothing
-        simulator = HistoryRecorder(;kwargs...)
-    end
     if initial_state==nothing && state_type(mdp) != Void
         if haskey(kwargd, :initial_state)
-            initial_state = kwargd[:initial_state]
+            initial_state = pop!(kwargd, :initial_state)
         else
             initial_state = default_init_state(mdp)
         end    
+    end
+    delete!(kwargd, :initial_state)
+    if simulator==nothing
+        simulator = HistoryRecorder(;kwargd...) # kwargd does not contain :initial_state because it was popped
     end
     policy = FunctionPolicy(polfunc)
     simulate(simulator, mdp, policy, initial_state)
@@ -62,16 +64,18 @@ function sim(polfunc::Function, pomdp::POMDP,
              updater=nothing,
              kwargs...
             )
+
     kwargd = Dict(kwargs)
-    if simulator==nothing
-        simulator = HistoryRecorder(;initial_state=initial_state, kwargs...)
-    end
     if initial_state==nothing && state_type(pomdp) != Void
         if haskey(kwargd, :initial_state)
-            initial_state = kwargd[:initial_state]
+            initial_state = pop!(kwargd, :initial_state)
         else
             initial_state = default_init_state(pomdp)
         end    
+    end
+    delete!(kwargd, :initial_state)
+    if simulator==nothing
+        simulator = HistoryRecorder(;kwargd...)
     end
     if initial_obs==nothing && obs_type(pomdp) != Void
         initial_obs = default_init_obs(pomdp, initial_state)
@@ -80,7 +84,7 @@ function sim(polfunc::Function, pomdp::POMDP,
         updater = PrimedPreviousObservationUpdater{Any}(initial_obs)
     end
     policy = FunctionPolicy(polfunc)
-    simulate(simulator, pomdp, policy, updater)
+    simulate(simulator, pomdp, policy, updater, initial_obs, initial_state)
 end
 
 function default_init_obs(p::POMDP, s)
