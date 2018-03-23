@@ -29,14 +29,15 @@ mutable struct HistoryRecorder <: Simulator
     show_progress::Bool
 
     # optional: if these are null, they will be ignored
-    eps::Nullable{Any}
     max_steps::Nullable{Any}
+    eps::Nullable{Any}
     sizehint::Nullable{Integer}
 
     # DEPRECATED
     initial_state::Nullable{Any}
 end
 
+# This is the only stable constructor
 function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           initial_state=Nullable{Any}(),
                           eps=Nullable{Any}(),
@@ -47,7 +48,7 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
     if !isnull(initial_state)
         warn("The initial_state argument for HistoryRecorder is deprecated. The initial state should be specified as the last argument to simulate(...).")
     end
-    return HistoryRecorder(rng, capture_exception, show_progress, eps, max_steps, sizehint, initial_state)
+    return HistoryRecorder(rng, capture_exception, show_progress, max_steps, eps, sizehint, initial_state)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, pomdp::POMDP, policy::Policy) begin
