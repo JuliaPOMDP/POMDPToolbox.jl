@@ -94,10 +94,6 @@ function simulate{S,A,O}(sim::HistoryRecorder,
                           )
 
     initial_belief = initialize_belief(bu, initial_state_dist)
-    # use of deepcopy inspired from rollout.jl
-    if initial_belief === initial_state_dist
-        initial_belief = deepcopy(initial_belief)
-    end
     max_steps = get(sim.max_steps, typemax(Int))
     if !isnull(sim.eps)
         max_steps = min(max_steps, ceil(Int,log(get(sim.eps))/log(discount(pomdp))))

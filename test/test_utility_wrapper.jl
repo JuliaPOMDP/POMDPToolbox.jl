@@ -14,7 +14,7 @@ let
 
     h = simulate(HistoryRecorder(max_steps=100), mdp, statswrapper)
     for (a, count) in payload(statswrapper)
-        println("policy chose action \$a \$count of \$(n_steps(h)) times.")
+        println("policy chose action $a $count of $(n_steps(h)) times.")
     end
 
     # without a payload
