@@ -37,11 +37,7 @@ mutable struct ValuePolicy{A} <: Policy
     act::Vector{A}
 end
 function ValuePolicy(mdp::Union{MDP,POMDP})
-    acts = Any[]
-    for a in iterator(actions(mdp))
-        push!(acts, a)
-    end
-    return ValuePolicy(mdp, zeros(n_states(mdp), n_actions(mdp)), acts)
+    return ValuePolicy(mdp, zeros(n_states(mdp), n_actions(mdp)), ordered_actions(mdp))
 end
 
 action(p::ValuePolicy, s) = p.act[indmax(p.value_table[state_index(p.mdp, s),:])]
