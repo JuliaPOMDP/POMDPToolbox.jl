@@ -29,7 +29,7 @@ struct RolloutSimulator{RNG<:AbstractRNG} <: Simulator
 end
 
 # These are the only safe constructors to use
-RolloutSimulator(rng::AbstractRNG, d::Int=typemax(Int)) = RolloutSimulator(rng, Nullable{Float64}(), Nullable{Int}(d), Nullable{Any}())
+RolloutSimulator(rng::AbstractRNG, d::Int=typemax(Int)) = RolloutSimulator(rng, Nullable{Int}(d), Nullable{Float64}(), Nullable{Any}())
 function RolloutSimulator(;rng=MersenneTwister(rand(UInt32)),
                            initial_state=Nullable{Any}(),
                            eps=Nullable{Float64}(),
