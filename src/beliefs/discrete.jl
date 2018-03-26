@@ -48,7 +48,7 @@ end
 
 pdf(b::DiscreteBelief, s) = b.b[state_index(b.pomdp, s)]
 
-function rand(rng::AbstractRNG, b::DiscreteBelief)
+function Base.rand(rng::AbstractRNG, b::DiscreteBelief)
     i = sample(rng, Weights(b.b))
     return b.state_list[i]
 end

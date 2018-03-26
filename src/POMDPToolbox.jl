@@ -33,24 +33,56 @@ export
 # only include the things that are working
 # export things immediately above the file they are contained in
 
+# model tools
+export
+    generate_sri,
+    generate_sori,
+    action_info,
+    solve_info,
+    update_info
+include("model/info.jl")
+
+export uniform_state_distribution
+include("model/initial.jl")
+
+export
+    ordered_states,
+    ordered_actions,
+    ordered_observations
+include("model/ordered_spaces.jl")
+
+export GenerativeBeliefMDP
+include("model/generative_belief_mdp.jl")
+
+
 # beliefs
+include("beliefs/BeliefUpdaters.jl")
+import .BeliefUpdaters
+
 export
     VoidUpdater
-include("beliefs/void.jl")
+
+@deprecate VoidUpdater BeliefUpdaters.VoidUpdater
 
 export
     DiscreteBelief,
     DiscreteUpdater,
     uniform_belief,
     product
-include("beliefs/discrete.jl")
 
+@deprecate DiscreteBelief BeliefUpdaters.DiscreteBelief
+@deprecate DiscreteBelief(pomdp, b; check=true) BeliefUpdaters.DiscreteBelief(pomdp, b; check=check)
+@deprecate DiscreteUpdater BeliefUpdaters.DiscreteUpdater
+@deprecate uniform_belief BeliefUpdaters.uniform_belief
+@deprecate product BeliefUpdaters.product
 
 export
     PreviousObservationUpdater,
     FastPreviousObservationUpdater,
     PrimedPreviousObservationUpdater
-include("beliefs/previous_observation.jl")
+@deprecate PreviousObservationUpdater BeliefUpdaters.PreviousObservationUpdater
+@deprecate FastPreviousObservationUpdater BeliefUpdaters.FastPreviousObservationUpdater
+@deprecate PrimedPreviousObservationUpdater BeliefUpdaters.PrimedPreviousObservationUpdater
 
 export
     KMarkovUpdater
@@ -147,26 +179,6 @@ export
     problem
 include("simulators/parallel.jl")
 
-# model tools
-export
-    generate_sri,
-    generate_sori,
-    action_info,
-    solve_info,
-    update_info
-include("model/info.jl")
-
-export uniform_state_distribution
-include("model/initial.jl")
-
-export
-    ordered_states,
-    ordered_actions,
-    ordered_observations
-include("model/ordered_spaces.jl")
-
-export GenerativeBeliefMDP
-include("model/generative_belief_mdp.jl")
 
 # tools for distributions
 include("distributions/distributions_jl.jl")
