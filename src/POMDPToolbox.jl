@@ -101,37 +101,57 @@ include("beliefs/particle.jl")
 include("convenience/implementations.jl")
 
 # policies
+include("policies/Policies.jl")
+import .Policies
+
 export
     AlphaVectorPolicy
-include("policies/alpha_vector.jl")
+
+@deprecate AlphaVectorPolicy Policies.AlphaVectorPolicy
 
 export
     VectorPolicy,
     VectorSolver,
     ValuePolicy
-include("policies/vector.jl")
+
+@deprecate VectorPolicy Policies.VectorPolicy
+@deprecate VectorSolver Policies.VectorSolver
+@deprecate ValuePolicy Policies.ValuePolicy
 
 export
     RandomPolicy,
     RandomSolver
-include("policies/random.jl")
+
+@deprecate RandomPolicy Policies.RandomPolicy
+@deprecate RandomPolicy(problem; rng=Base.GLOBAL_RNG, updater=VoidUpdater()) Policies.RandomPolicy(problem; rng=rng, updater=updater)
+@deprecate RandomSolver Policies.RandomSolver
+@deprecate RandomSolver(;rng=Base.GLOBAL_RNG) Policies.RandomSolver(;rng=rng)
 
 export
     StochasticPolicy,
     UniformRandomPolicy,
     CategoricalTabularPolicy,
     EpsGreedyPolicy
-include("policies/stochastic.jl")
+
+@deprecate StochasticPolicy Policies.StochasticPolicy
+@deprecate UniformRandomPolicy Policies.UniformRandomPolicy
+@deprecate CategoricalTabularPoliocy Policies.CategoricalTabularPolicy
+@deprecate EpsGreedyPolicy Policies.EpsGreedyPolicy
 
 export
     FunctionPolicy,
     FunctionSolver
-include("policies/function.jl")
+
+@deprecate FunctionPolicy Policies.FunctionPolicy
+@deprecate FunctionSolver Policies.FunctionSolver
 
 export
     PolicyWrapper,
     payload
-include("policies/utility_wrapper.jl")
+
+@deprecate PolicyWrapper Policies.PolicyWrapper
+@deprecate PolicyWrapper(f, p; payload=Nullable()) Policies.PolicyWrapper(f, p; payload=payload)
+@deprecate payload Policies.payload
 
 # simulators
 export RolloutSimulator
