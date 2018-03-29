@@ -41,3 +41,14 @@ function ValuePolicy(mdp::Union{MDP,POMDP})
 end
 
 action(p::ValuePolicy, s) = p.act[indmax(p.value_table[state_index(p.mdp, s),:])]
+
+@POMDP_require ValuePolicy(mdp::Union{MDP, POMDP}) begin
+    M = typeof(mdp)
+    @req n_states(::M)
+    @req n_actions(::M)
+    @subreq ordered_actions(mdp)
+end
+
+@POMDP_require action(p::ValuePolicy, s) begin
+    @req state_index(::typeof(p.mdp), ::typeof(s))
+end
