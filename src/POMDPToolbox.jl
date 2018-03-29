@@ -135,7 +135,7 @@ export
 
 @deprecate StochasticPolicy Policies.StochasticPolicy
 @deprecate UniformRandomPolicy Policies.UniformRandomPolicy
-@deprecate CategoricalTabularPoliocy Policies.CategoricalTabularPolicy
+@deprecate CategoricalTabularPolicy Policies.CategoricalTabularPolicy
 @deprecate EpsGreedyPolicy Policies.EpsGreedyPolicy
 
 export
