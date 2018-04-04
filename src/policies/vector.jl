@@ -31,13 +31,14 @@ end
 """
 A generic MDP policy that consists of a value table. The entry at `state_index(mdp, s)` is the action that will be taken in state `s`.
 """
-mutable struct ValuePolicy{A} <: Policy
-    mdp::Union{MDP,POMDP}
+mutable struct ValuePolicy{A, P <: Union{MDP, POMDP}} <: Policy
+    mdp::P
     value_table::Matrix{Float64}
     act::Vector{A}
 end
-function ValuePolicy(mdp::Union{MDP,POMDP})
-    return ValuePolicy(mdp, zeros(n_states(mdp), n_actions(mdp)), ordered_actions(mdp))
+function ValuePolicy{P <: Union{MDP, POMDP}}(mdp::P)
+    A = action_type(mdp)
+    return ValuePolicy{A, P}(mdp, zeros(n_states(mdp), n_actions(mdp)), ordered_actions(mdp))
 end
 
 action(p::ValuePolicy, s) = p.act[indmax(p.value_table[state_index(p.mdp, s),:])]
