@@ -19,9 +19,9 @@ mutable struct VectorSolver{A}
     act::Vector{A}
 end
 
-create_policy{S,A}(s::VectorSolver{A}, mdp::MDP{S,A}) = VectorPolicy(mdp, Array{A}(0))
+create_policy(s::VectorSolver{A}, mdp::MDP{S,A}) where {S,A} = VectorPolicy(mdp, Array{A}(0))
 
-function solve{S,A}(s::VectorSolver{A}, mdp::MDP{S,A}, p::VectorPolicy=create_policy(s,mdp))
+function solve(s::VectorSolver, mdp::MDP, p::VectorPolicy=create_policy(s,mdp))
     p.mdp = mdp
     p.act = s.act
     return p
@@ -36,7 +36,7 @@ mutable struct ValuePolicy{A, P <: Union{MDP, POMDP}} <: Policy
     value_table::Matrix{Float64}
     act::Vector{A}
 end
-function ValuePolicy{P <: Union{MDP, POMDP}}(mdp::P)
+function ValuePolicy(mdp::P) where {P <: Union{MDP, POMDP}}
     A = action_type(mdp)
     return ValuePolicy{A, P}(mdp, zeros(n_states(mdp), n_actions(mdp)), ordered_actions(mdp))
 end
