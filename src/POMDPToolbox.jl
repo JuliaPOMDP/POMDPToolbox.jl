@@ -83,7 +83,6 @@ export
 @deprecate PreviousObservationUpdater BeliefUpdaters.PreviousObservationUpdater
 @deprecate FastPreviousObservationUpdater BeliefUpdaters.FastPreviousObservationUpdater
 
-# @deprecate PrimedPreviousObservationUpdater BeliefUpdaters.PrimedPreviousObservationUpdater
 struct PrimedPreviousObservationUpdater{O} <: Updater
     default::O
 
@@ -92,6 +91,7 @@ struct PrimedPreviousObservationUpdater{O} <: Updater
         return new(o)
     end
 end
+PrimedPreviousObservationUpdater(o::O) where O = PrimedPreviousObservationUpdater{O}(o)
 initialize_belief(u::PrimedPreviousObservationUpdater, b) = u.default
 update{O}(u::PrimedPreviousObservationUpdater{O}, old_b, action, obs::O) = obs
 
