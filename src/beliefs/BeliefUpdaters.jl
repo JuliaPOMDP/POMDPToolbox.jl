@@ -3,14 +3,15 @@ module BeliefUpdaters
 using POMDPs
 import POMDPs: Updater, update, initialize_belief, pdf, mode, updater, iterator
 import Base: rand, rand!, mean, ==
-    
+
 using POMDPToolbox.ordered_states
+using StatsBase
 
 export
     VoidUpdater
 include("void.jl")
 
-export 
+export
     DiscreteBelief,
     DiscreteUpdater,
     uniform_belief,
