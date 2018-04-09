@@ -82,7 +82,18 @@ export
     PrimedPreviousObservationUpdater
 @deprecate PreviousObservationUpdater BeliefUpdaters.PreviousObservationUpdater
 @deprecate FastPreviousObservationUpdater BeliefUpdaters.FastPreviousObservationUpdater
-@deprecate PrimedPreviousObservationUpdater BeliefUpdaters.PrimedPreviousObservationUpdater
+
+# @deprecate PrimedPreviousObservationUpdater BeliefUpdaters.PrimedPreviousObservationUpdater
+struct PrimedPreviousObservationUpdater{O} <: Updater
+    default::O
+
+    function PrimedPreviousObservationUpdater{O}(o) where O
+        warn("PrimedPreviousObservationUpdater{T}(o) is deprecated. Please use BeliefUpdaters.PrimedPreviousObservationUpdater{T}(o) instead.")
+        return new(o)
+    end
+end
+initialize_belief(u::PrimedPreviousObservationUpdater, b) = u.default
+update{O}(u::PrimedPreviousObservationUpdater{O}, old_b, action, obs::O) = obs
 
 export
     KMarkovUpdater
