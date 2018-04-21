@@ -13,6 +13,7 @@ Keyword Arguments:
     - `rng`: The random number generator for the simulation
     - `capture_exception::Bool`: whether to capture an exception and store it in the history, or let it go uncaught, potentially killing the script
     - `show_progress::Bool`: show a progress bar for the simulation
+    - `skip_rng::Bool`: skip saving the rng (this might be important for performance since it makes a copy)
     - `eps`
     - `max_steps`
     - `sizehint::Int`: the expected length of the simulation (for preallocation)
@@ -27,6 +28,7 @@ mutable struct HistoryRecorder <: Simulator
     # options
     capture_exception::Bool
     show_progress::Bool
+    skip_rng::Bool
 
     # optional: if these are null, they will be ignored
     max_steps::Nullable{Any}
@@ -44,7 +46,9 @@ function HistoryRecorder(;rng=MersenneTwister(rand(UInt32)),
                           max_steps=Nullable{Any}(),
                           sizehint=Nullable{Integer}(),
                           capture_exception=false,
-                          show_progress=false)
+                          show_progress=false,
+                          skip_rng::Bool=false
+                         )
     if !isnull(initial_state)
         warn("The initial_state argument for HistoryRecorder is deprecated. The initial state should be specified as the last argument to simulate(...).")
     end
@@ -110,6 +114,7 @@ function simulate{S,A,O}(sim::HistoryRecorder,
     ih = sizehint!(Vector{Any}(0), sizehint)
     aih = sizehint!(Vector{Any}(0), sizehint)
     uih = sizehint!(Vector{Any}(0), sizehint)
+    rngh = sizehint!(Vector{Any}(0), sizehint)
     exception = Nullable{Exception}()
     backtrace = Nullable{Any}()
 
@@ -131,6 +136,8 @@ function simulate{S,A,O}(sim::HistoryRecorder,
             a, ai = action_info(policy, bh[step])
             push!(ah, a)
             push!(aih, ai)
+
+            push!(rngh, copy(sim.rng))
 
             sp, o, r, i = generate_sori(pomdp, sh[step], ah[step], sim.rng)
 
@@ -162,7 +169,7 @@ function simulate{S,A,O}(sim::HistoryRecorder,
         finish!(prog)
     end
 
-    return POMDPHistory(sh, ah, oh, bh, rh, ih, aih, uih, discount(pomdp), exception, backtrace)
+    return POMDPHistory(sh, ah, oh, bh, rh, ih, aih, uih, rngh, discount(pomdp), exception, backtrace)
 end
 
 @POMDP_require simulate(sim::HistoryRecorder, mdp::MDP, policy::Policy) begin
@@ -199,6 +206,7 @@ function simulate{S,A}(sim::HistoryRecorder,
     rh = sizehint!(Vector{Float64}(0), sizehint)
     ih = sizehint!(Vector{Any}(0), sizehint)
     aih = sizehint!(Vector{Any}(0), sizehint)
+    rngh = sizehint!(Vector{Any}(0), sizehint)
     exception = Nullable{Exception}()
     backtrace = Nullable{Any}()
 
@@ -216,6 +224,8 @@ function simulate{S,A}(sim::HistoryRecorder,
             a, ai = action_info(policy, sh[step])
             push!(ah, a)
             push!(aih, ai)
+
+            push!(rngh, copy(sim.rng))
 
             sp, r, i = generate_sri(mdp, sh[step], ah[step], sim.rng)
 

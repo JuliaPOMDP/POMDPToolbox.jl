@@ -20,6 +20,7 @@ struct MDPHistory{S,A} <: AbstractMDPHistory{S,A}
     reward_hist::Vector{Float64}
     info_hist::Vector{Any}
     ainfo_hist::Vector{Any}
+    rng_hist::Vector{Any}
 
     discount::Float64
 
@@ -46,6 +47,7 @@ struct POMDPHistory{S,A,O,B} <: AbstractPOMDPHistory{S,A,O,B}
     info_hist::Vector{Any}
     ainfo_hist::Vector{Any}
     uinfo_hist::Vector{Any}
+    rng_hist::Vector{Any}
 
     discount::Float64
 
@@ -65,6 +67,7 @@ reward_hist(h::SimHistory) = h.reward_hist
 info_hist(h::SimHistory) = h.info_hist
 ainfo_hist(h::SimHistory) = h.ainfo_hist
 uinfo_hist(h::SimHistory) = h.uinfo_hist
+rng_hist(h::SimHistory) = h.rng_hist
 
 exception(h::SimHistory) = h.exception
 Base.backtrace(h::SimHistory) = h.backtrace
@@ -136,6 +139,7 @@ reward_hist(h::SubHistory) = reward_hist(h.parent)[h.inds]
 info_hist(h::SubHistory) = info_hist(h.parent)[h.inds]
 ainfo_hist(h::SubHistory) = ainfo_hist(h.parent)[h.inds]
 uinfo_hist(h::SubHistory) = uinfo_hist(h.parent)[h.inds]
+rng_hist(h::SubHistory) = rng_hist(h.parent)[h.inds]
 
 step_tuple(h::SubHistory, i::Int) = step_tuple(h.parent, h.inds[i])
 
@@ -152,7 +156,7 @@ end
 # Note this particular function is not type-stable
 function HistoryIterator(history::SimHistory, spec::String)
     # XXX should throw warnings for unrecognized specification characters
-    syms = [Symbol(m.match) for m in eachmatch(r"(sp|bp|ai|ui|s|a|r|b|o|i)", spec)]
+    syms = [Symbol(m.match) for m in eachmatch(r"(rng|sp|bp|ai|ui|s|a|r|b|o|i)", spec)]
     if length(syms) == 1
         return HistoryIterator{typeof(history), first(syms)}(history)
     else
@@ -192,6 +196,7 @@ The possible valid elements in the iteration specification are
 - `i` - info from the state transition (from `generate_sri` for MDPs or `generate_sori` for POMDPs)
 - `ai` - info from the policy decision (from `action_info`)
 - `ui` - info from the belief update (from `update_info`)
+- `rng` - random number generator for the transition
 """
 eachstep(hist::SimHistory, spec) = HistoryIterator(hist, spec)
 
@@ -219,6 +224,8 @@ function sym_to_call(sym::Symbol)
         return :(ainfo_hist(it.history)[i])
     elseif sym == :ui
         return :(uinfo_hist(it.history)[i])
+    elseif sym == :rng
+        return :(rng_hist(it.history)[i])
     end
 end
 
