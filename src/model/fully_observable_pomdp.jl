@@ -19,11 +19,11 @@ function POMDPs.generate_o(pomdp::FullyObservablePOMDP, s, a, rng::AbstractRNG)
 end
 
 function POMDPs.observation(pomdp::FullyObservablePOMDP, s, a)
-    return SparseCat([s], [1.])
+    return SparseCat((s,), (1.,))
 end
 
 function POMDPs.observation(pomdp::FullyObservablePOMDP, s, a, sp)
-    return SparseCat([sp], [1.])
+    return SparseCat((sp,), (1.,))
 end
 
 POMDPs.isterminal_obs{S,A}(problem::FullyObservablePOMDP{S,A}, o::S) = isterminal(pomdp.mdp, o)
@@ -35,6 +35,7 @@ POMDPs.actions(pomdp::FullyObservablePOMDP) = actions(pomdp.mdp)
 POMDPs.transition{S,A}(pomdp::FullyObservablePOMDP{S,A}, s::S, a::A) = transition(pomdp.mdp, s, a)
 POMDPs.initial_state_distribution(pomdp::FullyObservablePOMDP) = initial_state_distribution(pomdp.mdp)
 POMDPs.initial_state(pomdp::FullyObservablePOMDP, rng::AbstractRNG) = initial_state(pomdp.mdp, rng)
+POMDPs.generate_s{S, A}(pomdp::FullyObservablePOMDP{S, A}, s::S, a::A, rng::AbstractRNG) = generate_s(pomdp.mdp, s, a, rng)
 POMDPs.generate_sr(pomdp::FullyObservablePOMDP, s, a, rng::AbstractRNG) = generate_sr(pomdp.mdp, s, a, rng)
 POMDPs.reward{S,A}(pomdp::FullyObservablePOMDP{S, A}, s::S, a::A) = reward(pomdp.mdp, s, a)
 POMDPs.isterminal(pomdp::FullyObservablePOMDP, s) = isterminal(pomdp.mdp, s)
