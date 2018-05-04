@@ -1,5 +1,3 @@
-using POMDPs
-POMDPs.add("DiscreteValueIteration")
 using DiscreteValueIteration
 
 pomdp = TigerPOMDP()
