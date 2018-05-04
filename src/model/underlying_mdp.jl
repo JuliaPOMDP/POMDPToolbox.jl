@@ -1,6 +1,6 @@
 # provide a structure to extract the underlying MDP of a POMDP
 
-struct UnderlyingMDP{P, S, A} <: MDP{S, A} where P <: POMDP{S, A, Any}
+struct UnderlyingMDP{P <: POMDP, S, A} <: MDP{S, A}
     pomdp::P
 end
 
