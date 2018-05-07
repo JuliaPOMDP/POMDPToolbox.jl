@@ -12,7 +12,7 @@ end
 POMDPs.transition{P, S, A}(mdp::UnderlyingMDP{P, S, A}, s::S, a::A) = transition(mdp.pomdp, s, a)
 POMDPs.initial_state_distribution(mdp::UnderlyingMDP) = initial_state_distribution(mdp.pomdp)
 POMDPs.generate_s(mdp::UnderlyingMDP, s, a, rng::AbstractRNG) = generate_s(mdp.pomdp, s, a, rng)
-POMDPs.generate_sr(mdp::UnderlyingMDP, s::S, a::A, rng::AbstractRNG) = generate_sr(mdp.pomdp, s, a, rng)
+POMDPs.generate_sr(mdp::UnderlyingMDP, s, a, rng::AbstractRNG) = generate_sr(mdp.pomdp, s, a, rng)
 POMDPs.initial_state(mdp::UnderlyingMDP, rng::AbstractRNG) = initial_state(mdp.pomdp, rng)
 POMDPs.states(mdp::UnderlyingMDP) = states(mdp.pomdp)
 POMDPs.actions(mdp::UnderlyingMDP) = actions(mdp.pomdp)
