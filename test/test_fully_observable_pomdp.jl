@@ -1,3 +1,5 @@
+# following tests require DiscreteValueIteration
+POMDPs.add("DiscreteValueIteration")
 using DiscreteValueIteration
 
 mdp = GridWorld()
