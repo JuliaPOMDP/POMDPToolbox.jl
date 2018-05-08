@@ -168,6 +168,12 @@ include("model/ordered_spaces.jl")
 export GenerativeBeliefMDP
 include("model/generative_belief_mdp.jl")
 
+export FullyObservablePOMDP
+include("model/fully_observable_pomdp.jl")
+
+export UnderlyingMDP
+include("model/underlying_mdp.jl")
+
 # tools for distributions
 include("distributions/distributions_jl.jl")
 
