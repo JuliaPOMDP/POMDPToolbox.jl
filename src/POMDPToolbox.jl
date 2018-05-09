@@ -33,24 +33,67 @@ export
 # only include the things that are working
 # export things immediately above the file they are contained in
 
+# model tools
+export
+    generate_sri,
+    generate_sori,
+    action_info,
+    solve_info,
+    update_info
+include("model/info.jl")
+
+export uniform_state_distribution
+include("model/initial.jl")
+
+export
+    ordered_states,
+    ordered_actions,
+    ordered_observations
+include("model/ordered_spaces.jl")
+
+export GenerativeBeliefMDP
+include("model/generative_belief_mdp.jl")
+
+
 # beliefs
+include("beliefs/BeliefUpdaters.jl")
+import .BeliefUpdaters
+
 export
     VoidUpdater
-include("beliefs/void.jl")
+
+@deprecate VoidUpdater BeliefUpdaters.VoidUpdater
 
 export
     DiscreteBelief,
     DiscreteUpdater,
     uniform_belief,
     product
-include("beliefs/discrete.jl")
 
+@deprecate DiscreteBelief BeliefUpdaters.DiscreteBelief
+@deprecate DiscreteBelief(pomdp, b; check=true) BeliefUpdaters.DiscreteBelief(pomdp, b; check=check)
+@deprecate DiscreteUpdater BeliefUpdaters.DiscreteUpdater
+@deprecate uniform_belief BeliefUpdaters.uniform_belief
+@deprecate product BeliefUpdaters.product
 
 export
     PreviousObservationUpdater,
     FastPreviousObservationUpdater,
     PrimedPreviousObservationUpdater
-include("beliefs/previous_observation.jl")
+@deprecate PreviousObservationUpdater BeliefUpdaters.PreviousObservationUpdater
+@deprecate FastPreviousObservationUpdater BeliefUpdaters.FastPreviousObservationUpdater
+
+struct PrimedPreviousObservationUpdater{O} <: Updater
+    default::O
+
+    function PrimedPreviousObservationUpdater{O}(o) where O
+        warn("PrimedPreviousObservationUpdater{T}(o) is deprecated. Please use BeliefUpdaters.PrimedPreviousObservationUpdater{T}(o) instead.")
+        return new(o)
+    end
+end
+PrimedPreviousObservationUpdater(o::O) where O = PrimedPreviousObservationUpdater{O}(o)
+initialize_belief(u::PrimedPreviousObservationUpdater, b) = u.default
+update{O}(u::PrimedPreviousObservationUpdater{O}, old_b, action, obs::O) = obs
 
 export
     KMarkovUpdater
@@ -69,37 +112,57 @@ include("beliefs/particle.jl")
 include("convenience/implementations.jl")
 
 # policies
+include("policies/Policies.jl")
+import .Policies
+
 export
     AlphaVectorPolicy
-include("policies/alpha_vector.jl")
+
+@deprecate AlphaVectorPolicy Policies.AlphaVectorPolicy
 
 export
     VectorPolicy,
     VectorSolver,
     ValuePolicy
-include("policies/vector.jl")
+
+@deprecate VectorPolicy Policies.VectorPolicy
+@deprecate VectorSolver Policies.VectorSolver
+@deprecate ValuePolicy Policies.ValuePolicy
 
 export
     RandomPolicy,
     RandomSolver
-include("policies/random.jl")
+
+@deprecate RandomPolicy Policies.RandomPolicy
+@deprecate RandomPolicy(problem; rng=Base.GLOBAL_RNG, updater=VoidUpdater()) Policies.RandomPolicy(problem; rng=rng, updater=updater)
+@deprecate RandomSolver Policies.RandomSolver
+@deprecate RandomSolver(;rng=Base.GLOBAL_RNG) Policies.RandomSolver(;rng=rng)
 
 export
     StochasticPolicy,
     UniformRandomPolicy,
     CategoricalTabularPolicy,
     EpsGreedyPolicy
-include("policies/stochastic.jl")
+
+@deprecate StochasticPolicy Policies.StochasticPolicy
+@deprecate UniformRandomPolicy Policies.UniformRandomPolicy
+@deprecate CategoricalTabularPolicy Policies.CategoricalTabularPolicy
+@deprecate EpsGreedyPolicy Policies.EpsGreedyPolicy
 
 export
     FunctionPolicy,
     FunctionSolver
-include("policies/function.jl")
+
+@deprecate FunctionPolicy Policies.FunctionPolicy
+@deprecate FunctionSolver Policies.FunctionSolver
 
 export
     PolicyWrapper,
     payload
-include("policies/utility_wrapper.jl")
+
+@deprecate PolicyWrapper Policies.PolicyWrapper
+@deprecate PolicyWrapper(f, p; payload=Nullable()) Policies.PolicyWrapper(f, p; payload=payload)
+@deprecate payload Policies.payload
 
 # simulators
 export RolloutSimulator
@@ -147,26 +210,6 @@ export
     problem
 include("simulators/parallel.jl")
 
-# model tools
-export
-    generate_sri,
-    generate_sori,
-    action_info,
-    solve_info,
-    update_info
-include("model/info.jl")
-
-export uniform_state_distribution
-include("model/initial.jl")
-
-export
-    ordered_states,
-    ordered_actions,
-    ordered_observations
-include("model/ordered_spaces.jl")
-
-export GenerativeBeliefMDP
-include("model/generative_belief_mdp.jl")
 
 export FullyObservablePOMDP
 include("model/fully_observable_pomdp.jl")
