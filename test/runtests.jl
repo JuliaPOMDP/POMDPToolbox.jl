@@ -1,6 +1,7 @@
 using POMDPs
 using POMDPToolbox
 using POMDPModels
+using ParticleFilters
 using Base.Test
 
 include("test_random_solver.jl")

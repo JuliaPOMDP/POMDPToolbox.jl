@@ -51,3 +51,43 @@ function Base.push!(p::AlphaVectorPolicy, alpha::Vector{Float64}, a)
     push!(p.alphas, alpha)
     push!(p.action_map, a)
 end
+
+function action(p::AlphaVectorPolicy, b)
+    return action(p, DiscreteBelief(p.pomdp, belief_vector(p, b)))
+end
+
+
+"""
+Given a belief, return a vector representation bv where bv[i] is the probability
+of being in the i-th state 
+    belief_vector(p::AlphaVectorPolicy, b)
+"""
+function belief_vector(p::AlphaVectorPolicy, b)
+    bv = Vector{Float64}(n_states(p.pomdp))
+    for (i, s) in enumerate(ordered_states(p.pomdp))
+        bv[i] = pdf(b, s)
+    end
+    return bv
+end
+
+"""
+Given a particle belief, return the unnormalized utility function that weights each state value by the weight of 
+the corresponding particle 
+    unnormalized_util(p::AlphaVectorPolicy, b::AbstractParticleBelief)
+"""
+function unnormalized_util(p::AlphaVectorPolicy, b::AbstractParticleBelief)
+    util = zeros(n_actions(p.pomdp))
+    for (i, s) in enumerate(particles(b))
+        j = state_index(p.pomdp, s)
+        util += weight(b, i)*getindex.(p.alphas, (j,))
+    end
+    return util
+end
+
+function action(p::AlphaVectorPolicy, b::AbstractParticleBelief)
+    util = unnormalized_util(p, b)
+    ihi = indmax(util)
+    return p.action_map[ihi]
+end
+
+value(p::AlphaVectorPolicy, b::AbstractParticleBelief) = maximum(unnormalized_util(p, b))/weight_sum(b)

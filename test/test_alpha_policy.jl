@@ -14,8 +14,14 @@ policy = AlphaVectorPolicy(pomdp, alphas)
 # because baby isn't hungry, policy should not feed (return false)
 @test action(policy, b0) == false
 
+# try other belief type 
+b = ParticleCollection([true for i=1:100])
+@test action(policy, b) == true
+@test isapprox(value(policy, b), -29.4557)
+
 # try pushing new vector
 push!(policy, [0.0,0.0], true)
 
 @test value(policy, b0) == 0.0
 @test action(policy, b0) == true
+

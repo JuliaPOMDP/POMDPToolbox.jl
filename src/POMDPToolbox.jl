@@ -16,6 +16,7 @@ import DataStructures: CircularBuffer, isfull, capacity, push!, append!
 using ProgressMeter
 using StatsBase
 using DataFrames
+using ParticleFilters
 
 
 # export commons
@@ -70,7 +71,9 @@ include("convenience/implementations.jl")
 
 # policies
 export
-    AlphaVectorPolicy
+    AlphaVectorPolicy,
+    belief_vector,
+    unnormalized_util
 include("policies/alpha_vector.jl")
 
 export
