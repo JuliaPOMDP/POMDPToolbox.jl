@@ -53,21 +53,11 @@ function Base.push!(p::AlphaVectorPolicy, alpha::Vector{Float64}, a)
 end
 
 function action(p::AlphaVectorPolicy, b)
-    return action(p, DiscreteBelief(p.pomdp, belief_vector(p, b)))
+    return action(p, DiscreteBelief(p.pomdp, b))
 end
 
-
-"""
-Given a belief, return a vector representation bv where bv[i] is the probability
-of being in the i-th state 
-    belief_vector(p::AlphaVectorPolicy, b)
-"""
-function belief_vector(p::AlphaVectorPolicy, b)
-    bv = Vector{Float64}(n_states(p.pomdp))
-    for (i, s) in enumerate(ordered_states(p.pomdp))
-        bv[i] = pdf(b, s)
-    end
-    return bv
+function value(p::AlphaVectorPolicy, b)
+    return value(p, DiscreteBelief(p.pomdp, b))
 end
 
 """

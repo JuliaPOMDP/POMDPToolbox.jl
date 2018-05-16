@@ -18,7 +18,6 @@ using StatsBase
 using DataFrames
 using ParticleFilters
 
-
 # export commons
 export
     update,

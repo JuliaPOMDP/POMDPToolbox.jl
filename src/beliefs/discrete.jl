@@ -36,6 +36,15 @@ function DiscreteBelief(pomdp, b::Vector{Float64}; check::Bool=true)
     return DiscreteBelief(pomdp, ordered_states(pomdp), b)
 end
 
+function DiscreteBelief(pomdp, b; check::Bool=true)
+    # convert b to a vector representation 
+    bv = Vector{Float64}(n_states(pomdp))
+    for (i, s) in enumerate(ordered_states(pomdp))
+        bv[i] = pdf(b, s)
+    end
+    return DiscreteBelief(pomdp, bv, check=check)
+end
+
 
 """
 Return a DiscreteBelief with equal probability for each state.
