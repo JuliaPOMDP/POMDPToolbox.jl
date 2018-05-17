@@ -16,7 +16,6 @@ import DataStructures: CircularBuffer, isfull, capacity, push!, append!
 using ProgressMeter
 using StatsBase
 using DataFrames
-using ParticleFilters
 
 # export commons
 export
