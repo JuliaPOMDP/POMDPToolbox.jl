@@ -44,7 +44,7 @@ function DiscreteBelief(pomdp::POMDP, b; check::Bool=true)
     # convert b to a vector representation 
     state_list = ordered_states(pomdp)
     bv = Vector{Float64}(n_states(pomdp))
-    for (i, s) in enumerate(states)
+    for (i, s) in enumerate(state_list)
         bv[i] = pdf(b, s)
     end
     return DiscreteBelief(pomdp, state_list, bv, check)
