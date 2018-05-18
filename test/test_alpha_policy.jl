@@ -19,3 +19,4 @@ push!(policy, [0.0,0.0], true)
 
 @test value(policy, b0) == 0.0
 @test action(policy, b0) == true
+

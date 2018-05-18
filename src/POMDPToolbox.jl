@@ -17,7 +17,6 @@ using ProgressMeter
 using StatsBase
 using DataFrames
 
-
 # export commons
 export
     update,
@@ -70,7 +69,9 @@ include("convenience/implementations.jl")
 
 # policies
 export
-    AlphaVectorPolicy
+    AlphaVectorPolicy,
+    belief_vector,
+    unnormalized_util
 include("policies/alpha_vector.jl")
 
 export

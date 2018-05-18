@@ -51,3 +51,11 @@ function Base.push!(p::AlphaVectorPolicy, alpha::Vector{Float64}, a)
     push!(p.alphas, alpha)
     push!(p.action_map, a)
 end
+
+function action(p::AlphaVectorPolicy, b)
+    return action(p, DiscreteBelief(p.pomdp, b))
+end
+
+function value(p::AlphaVectorPolicy, b)
+    return value(p, DiscreteBelief(p.pomdp, b))
+end
