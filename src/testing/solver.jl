@@ -33,8 +33,32 @@ function simulate(sim::TestSimulator, pomdp::POMDP, policy::Policy, updater::Upd
     return r_total
 end
 
+function simulate(sim::TestSimulator, mdp::MDP, policy::Policy, s)
+
+    disc = 1.0
+    r_total = 0.0
+
+    step = 1
+
+    while !isterminal(mdp, s) && step <= sim.max_steps # TODO also check for terminal observation
+        a = action(policy, s)
+
+        (sp, r) = generate_sr(mdp, s, a, sim.rng)
+
+        r_total += disc*r
+
+        disc *= discount(mdp)
+        s = sp
+        step += 1
+    end
+
+    return r_total
+end
+
+
 """
     test_solver(solver::Solver, problem::POMDP)
+    test_solver(solver::Solver, problem::MDP)
 
 Use the solver to solve the specified problem, then run a simulation.
 
@@ -60,4 +84,13 @@ function test_solver(solver::Solver, problem::POMDP; max_steps=10, updater=nothi
     sim = TestSimulator(MersenneTwister(1), max_steps)
 
     simulate(sim, problem, policy, updater, initial_state_distribution(problem))
+end
+
+function test_solver(solver::Solver, problem::MDP; max_steps=10)
+    
+    policy = solve(solver, problem)
+
+    sim = TestSimulator(MersenneTwister(1), max_steps)
+
+    simulate(sim, problem, policy, initial_state(problem, MersenneTwister(0)))
 end
