@@ -10,8 +10,8 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, value, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount, isterminal
 import POMDPs: generate_sr, initial_state
+import POMDPs: implemented
 import Base: rand, rand!, mean, ==
-import DataStructures: CircularBuffer, isfull, capacity, push!, append!
 
 using ProgressMeter
 using StatsBase
@@ -177,6 +177,9 @@ include("model/underlying_mdp.jl")
 
 # tools for distributions
 include("distributions/distributions_jl.jl")
+
+export obs_weight
+include("model/obs_weight.jl")
 
 export
     weighted_iterator

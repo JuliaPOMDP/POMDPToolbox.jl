@@ -127,7 +127,7 @@ function run_parallel(process::Function, queue::AbstractVector;
         warn("""
              run_parallel(...) was started with only 1 process, so simulations will be run in serial. 
 
-             To supress this warning, use run_parallel(..., proc_warn=false).
+             To suppress this warning, use run_parallel(..., proc_warn=false).
 
              To use multiple processes, use addprocs() or the -p option (e.g. julia -p 4).
              """)
