@@ -1,5 +1,5 @@
 using POMDPToolbox
-using Base.Test
+using Test
 
 # Hack to get this to build with POMDPModels
 # this can be removed once BoolDistribution is removed from POMDPModels

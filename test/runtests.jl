@@ -1,7 +1,8 @@
 using POMDPs
 using POMDPToolbox
 using POMDPModels
-using Base.Test
+using Test
+
 
 include("test_random_solver.jl")
 include("test_stochastic_policy.jl")

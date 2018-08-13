@@ -1,7 +1,7 @@
 using POMDPToolbox
 using POMDPs
 using POMDPModels
-using Base.Test
+using Test
 
 let
     problem = BabyPOMDP()
