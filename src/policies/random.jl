@@ -10,7 +10,7 @@ mutable struct RandomPolicy{RNG<:AbstractRNG, P<:Union{POMDP,MDP}, U<:Updater} <
 end
 # The constructor below should be used to create the policy so that the action space is initialized correctly
 RandomPolicy(problem::Union{POMDP,MDP};
-             rng=Base.GLOBAL_RNG,
+             rng=Random.GLOBAL_RNG,
              updater=VoidUpdater()) = RandomPolicy(rng, problem, updater)
 
 ## policy execution ##
@@ -18,7 +18,7 @@ function action(policy::RandomPolicy, s)
     return rand(policy.rng, actions(policy.problem, s))
 end
 
-function action(policy::RandomPolicy, b::Void)
+function action(policy::RandomPolicy, b::Nothing)
     return rand(policy.rng, actions(policy.problem))
 end
 

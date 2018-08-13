@@ -5,8 +5,9 @@ import POMDPs: action, value, solve, updater
 
 using POMDPToolbox.BeliefUpdaters
 using POMDPToolbox: ordered_actions
-
+using Random
 using StatsBase # for Weights
+using Nullables
 
 export
     AlphaVectorPolicy

@@ -79,7 +79,7 @@ Base.length(d::SparseCat) = min(length(d.vals), length(d.probs))
 Base.eltype(D::Type{SparseCat{V,P}}) where {V, P} = Pair{eltype(V), eltype(P)}
 sampletype(D::Type{SparseCat{V,P}}) where {V, P} = eltype(V)
 
-function Base.mean(d::SparseCat)
+function Statistics.mean(d::SparseCat)
     vsum = zero(eltype(d.vals))
     for (v, p) in d
         vsum += v*p

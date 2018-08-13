@@ -2,10 +2,12 @@ module BeliefUpdaters
 
 using POMDPs
 import POMDPs: Updater, update, initialize_belief, pdf, mode, updater, iterator
-import Base: rand, rand!, mean, ==
-
-using POMDPToolbox.ordered_states
+import Base: ==
+import Random: rand, rand!
+import Statistics: mean
+using POMDPToolbox: ordered_states
 using StatsBase
+using Random
 
 export
     VoidUpdater

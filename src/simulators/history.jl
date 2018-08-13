@@ -107,7 +107,7 @@ end
 
 
 
-const Inds = Union{Range,Colon,Real}
+const Inds = Union{AbstractRange,Colon,Real}
 
 Base.view(h::AbstractMDPHistory, inds::Inds) = SubMDPHistory(h, inds)
 Base.view(h::AbstractPOMDPHistory, inds::Inds) = SubPOMDPHistory(h, inds)
@@ -116,13 +116,13 @@ struct SubMDPHistory{S,A,H<:AbstractMDPHistory,I<:Inds} <: AbstractMDPHistory{S,
     parent::H
     inds::I
 end
-SubMDPHistory{S,A,I<:Inds}(h::AbstractMDPHistory{S,A}, inds::I) = SubMDPHistory{S,A,typeof(h),I}(h, inds)
+SubMDPHistory(h::AbstractMDPHistory{S,A}, inds::I) where {S,A,I<:Inds} = SubMDPHistory{S,A,typeof(h),I}(h, inds)
 
 struct SubPOMDPHistory{S,A,O,B,H<:AbstractPOMDPHistory,I<:Inds} <: AbstractPOMDPHistory{S,A,O,B}
     parent::H
     inds::I
 end
-SubPOMDPHistory{S,A,O,B,I<:Inds}(h::AbstractPOMDPHistory{S,A,O,B}, inds::I) = SubPOMDPHistory{S,A,O,B,typeof(h),I}(h, inds)
+SubPOMDPHistory(h::AbstractPOMDPHistory{S,A,O,B}, inds::I) where {S,A,O,B,I<:Inds} = SubPOMDPHistory{S,A,O,B,typeof(h),I}(h, inds)
 
 const SubHistory = Union{SubMDPHistory, SubPOMDPHistory}
 

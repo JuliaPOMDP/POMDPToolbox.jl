@@ -86,13 +86,13 @@ end
     @req update(::typeof(bu), ::B, ::A, ::O)
 end
 
-function simulate{S,A,O}(sim::HistoryRecorder,
+function simulate(sim::HistoryRecorder,
                            pomdp::POMDP{S,A,O}, 
                            policy::Policy,
                            bu::Updater,
                            initial_state_dist::Any,
                            initial_state::Any=get_initial_state(sim, initial_state_dist)
-                          )
+                  ) where {S,A,O}
 
     initial_belief = initialize_belief(bu, initial_state_dist)
     max_steps = get(sim.max_steps, typemax(Int))
@@ -183,9 +183,9 @@ end
     @req discount(::P)
 end
 
-function simulate{S,A}(sim::HistoryRecorder,
-                       mdp::MDP{S,A}, policy::Policy,
-                       init_state::S=get_initial_state(sim, mdp))
+function simulate(sim::HistoryRecorder,
+                  mdp::MDP{S,A}, policy::Policy,
+                  init_state::S=get_initial_state(sim, mdp)) where {S,A}
 
     max_steps = get(sim.max_steps, typemax(Int))
     if !isnull(sim.eps)

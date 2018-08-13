@@ -11,7 +11,7 @@ function StepSimulator(spec; rng=Base.GLOBAL_RNG, initial_state=nothing, max_ste
     return StepSimulator(rng, initial_state, max_steps, spec)
 end
 
-function simulate{S}(sim::StepSimulator, mdp::MDP{S}, policy::Policy, init_state::S=get_initial_state(sim, mdp))
+function simulate(sim::StepSimulator, mdp::MDP{S}, policy::Policy, init_state::S=get_initial_state(sim, mdp)) where {S}
     symtuple = convert_spec(sim.spec, MDP)
     return MDPSimIterator(symtuple, mdp, policy, sim.rng, init_state, get(sim.max_steps, typemax(Int64)))
 end
@@ -40,9 +40,9 @@ function MDPSimIterator(spec::Union{Tuple, Symbol}, mdp::MDP, policy::Policy, rn
     return MDPSimIterator{spec, typeof(mdp), typeof(policy), typeof(rng), typeof(init_state)}(mdp, policy, rng, init_state, max_steps)
 end
 
-Base.done{S}(it::MDPSimIterator, is::Tuple{Int, S}) = isterminal(it.mdp, is[2]) || is[1] > it.max_steps
+Base.done(it::MDPSimIterator, is::Tuple{Int, S}) where {S} = isterminal(it.mdp, is[2]) || is[1] > it.max_steps
 Base.start(it::MDPSimIterator) = (1, it.init_state)
-function Base.next{S}(it::MDPSimIterator, is::Tuple{Int, S})
+function Base.next(it::MDPSimIterator, is::Tuple{Int, S}) where {S}
     s = is[2]
     a, ai = action_info(it.policy, s)
     sp, r, i = generate_sri(it.mdp, s, a, it.rng)
@@ -74,9 +74,9 @@ function POMDPSimIterator(spec::Union{Tuple,Symbol}, pomdp::POMDP, policy::Polic
                                                 max_steps)
 end
 
-Base.done{S,B}(it::POMDPSimIterator, is::Tuple{Int, S, B}) = isterminal(it.pomdp, is[2]) || is[1] > it.max_steps
+Base.done(it::POMDPSimIterator, is::Tuple{Int, S, B}) where {S, B} = isterminal(it.pomdp, is[2]) || is[1] > it.max_steps
 Base.start(it::POMDPSimIterator) = (1, it.init_state, it.init_belief)
-function Base.next{S,B}(it::POMDPSimIterator, is::Tuple{Int, S, B})
+function Base.next(it::POMDPSimIterator, is::Tuple{Int, S, B}) where {S, B}
     s = is[2]
     b = is[3]
     a, ai = action_info(it.policy, b)
@@ -174,11 +174,11 @@ end
 
 Step through an mdp simulation. The initial state is optional. If no spec is given, (s, a, r, sp) is used.
 """
-function stepthrough{S}(mdp::MDP{S},
-                        policy::Policy,
-                        init_state::S,
-                        spec::Union{String, Tuple, Symbol}=(:s,:a,:r,:sp);
-                        kwargs...)
+function stepthrough(mdp::MDP{S},
+                     policy::Policy,
+                     init_state::S,
+                     spec::Union{String, Tuple, Symbol}=(:s,:a,:r,:sp);
+                     kwargs...) where {S}
     sim = StepSimulator(spec; kwargs...)
     return simulate(sim, mdp, policy, init_state)
 end

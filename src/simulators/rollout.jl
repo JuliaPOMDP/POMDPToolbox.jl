@@ -69,7 +69,7 @@ end
     @subreq simulate(sim, pomdp, policy, updater, initial_belief, s)
 end
 
-function simulate{S}(sim::RolloutSimulator, pomdp::POMDP{S}, policy::Policy, updater::Updater, initial_belief)
+function simulate(sim::RolloutSimulator, pomdp::POMDP{S}, policy::Policy, updater::Updater, initial_belief) where {S}
 
     if !isnull(sim.initial_state)
         s = convert(S, get(sim.initial_state))::S
@@ -148,7 +148,7 @@ function simulate(sim::RolloutSimulator, mdp::MDP, policy::Policy)
     simulate(sim, mdp, policy, istate)
 end
 
-function simulate{S}(sim::RolloutSimulator, mdp::Union{MDP{S}, POMDP{S}}, policy::Policy, initial_state::S)
+function simulate(sim::RolloutSimulator, mdp::Union{MDP{S}, POMDP{S}}, policy::Policy, initial_state::S) where {S}
 
     eps = get(sim.eps, 0.0)
     max_steps = get(sim.max_steps, typemax(Int))
