@@ -1,0 +1,8 @@
+name = "POMDPToolbox"
+uuid = "0729bffe-8e6b-52fa-a3fa-893719b744f4"
+repo = "https://github.com/JuliaPOMDP/POMDPToolbox.jl.git"
+
+[deps]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+Nullables = "4d1e1d77-625e-5b40-9113-a560ec7a8ecd"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
