@@ -1,7 +1,7 @@
 using POMDPToolbox
 using POMDPModels
 using POMDPs
-using Base.Test
+using Test
 
 
 function test_initial_belief(b0, o0)

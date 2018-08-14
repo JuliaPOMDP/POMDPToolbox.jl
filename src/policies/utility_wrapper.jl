@@ -69,4 +69,4 @@ updater(p::PolicyWrapper) = updater(p.policy)
 
 payload(p::PolicyWrapper) = get(p.payload, nothing)
 
-Base.srand(p::PolicyWrapper, seed) = srand(p.policy, seed)
+Random.seed!(p::PolicyWrapper, seed) = seed!(p.policy, seed)

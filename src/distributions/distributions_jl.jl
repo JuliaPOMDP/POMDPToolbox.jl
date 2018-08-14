@@ -4,6 +4,7 @@
 import Distributions
 import Distributions: Distribution, UnivariateDistribution, MultivariateDistribution, Matrixvariate
 import Distributions: Categorical, MvNormal
+using Statistics
 
 @generated function rand(rng::AbstractRNG, d::Distribution)
     Core.println("""

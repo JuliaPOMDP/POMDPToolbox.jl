@@ -13,7 +13,7 @@ function initialize_belief(bu::KMarkovUpdater, obs_vec::AbstractVector)
     return obs_vec
 end
 
-function update{O}(bu::KMarkovUpdater, old_b::AbstractVector{O}, action, obs)
+function update(bu::KMarkovUpdater, old_b::AbstractVector{O}, action, obs) where {O}
     obs_stacked = Vector{O}(bu.k)
     if !isa(obs, O)
         error("KMarkovUpdater: Observation did not match previous observation type.\n"*throw_example(bu))

@@ -28,14 +28,14 @@ mutable struct ParticleBelief{T}
     probs_arr::Vector{Float64} # particle weights
     keep_dict::Bool # for more efficient pdf
 end
-function ParticleBelief{S}(particles::Vector{Particle{S}})
+function ParticleBelief(particles::Vector{Particle{S}}) where {S}
     warn("POMDPToolbox.ParticleBelief is deprecated, please use the beliefs from https://github.com/JuliaPOMDP/ParticleFilters.jl instead.")
     return ParticleBelief(particles, Dict{S,Float64}(), Float64[p.weight for p in particles], false)
 end
 const ParticleDistribution{T} = ParticleBelief{T}
 
 
-function pdf{S}(b::ParticleBelief{S}, s::S)
+function pdf(b::ParticleBelief{S}, s::S) where {S}
     if !b.keep_dict
         # search through the particle array (very slow)
         w = 0.0
@@ -52,17 +52,17 @@ function pdf{S}(b::ParticleBelief{S}, s::S)
     return 0.0
 end
 
-function rand{S}(rng::AbstractRNG, b::ParticleBelief{S})
+function rand(rng::AbstractRNG, b::ParticleBelief{S}) where {S}
     cat = Weights(b.probs_arr)
     k = sample(rng, cat)
     s = b.particles[k].state
     return s
 end
-rand{S}(rng::AbstractRNG, b::ParticleBelief{S}, s::S) = rand(rng, b)
+rand(rng::AbstractRNG, b::ParticleBelief{S}, s::S) where {S} = rand(rng, b)
 
 mean(b::ParticleBelief) = sum(p.weight*p.state for p in b.particles)/sum(p.weight for p in b.particles)
 
-function mode{T}(b::ParticleBelief{T}) # don't know if this is efficient
+function mode(b::ParticleBelief{T}) where {T} # don't know if this is efficient
     d = Dict{T, Float64}()
     best_weight = first(b.particles).weight
     most_likely = first(b.particles).state
@@ -132,7 +132,7 @@ function initialize_belief(up::SIRParticleUpdater, d::Any, b::ParticleBelief = c
     return b
 end
 
-function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, bnew::ParticleBelief=create_belief(bu))
+function update(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, bnew::ParticleBelief=create_belief(bu)) where {A,O}
     
     rng = bu.rng
     particles = bold.particles
@@ -168,7 +168,7 @@ function update{A,O}(bu::SIRParticleUpdater, bold::ParticleBelief, a::A, o::O, b
     return bnew
 end
 
-function normalize!{s}(particles::Vector{Particle{s}}) 
+function normalize!(particles::Vector{Particle{s}}) where {s}
     prob_sum = 0.0
     for p in particles
         prob_sum += p.weight

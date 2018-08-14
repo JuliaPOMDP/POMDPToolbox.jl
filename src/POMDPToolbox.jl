@@ -10,13 +10,16 @@ import POMDPs: Simulator, simulate
 import POMDPs: action, value, solve
 import POMDPs: actions, action_index, state_index, obs_index, iterator, sampletype, states, n_actions, n_states, observations, n_observations, discount, isterminal
 import POMDPs: generate_sr, initial_state
-import Base: rand, rand!, mean, ==
+import Base: ==
+import Statistics: mean
+import Random: rand, rand!
 import DataStructures: CircularBuffer, isfull, capacity, push!, append!
 
 using ProgressMeter
 using StatsBase
 using DataFrames
-
+using Random
+using Nullables
 
 # export commons
 export
@@ -93,7 +96,7 @@ struct PrimedPreviousObservationUpdater{O} <: Updater
 end
 PrimedPreviousObservationUpdater(o::O) where O = PrimedPreviousObservationUpdater{O}(o)
 initialize_belief(u::PrimedPreviousObservationUpdater, b) = u.default
-update{O}(u::PrimedPreviousObservationUpdater{O}, old_b, action, obs::O) = obs
+update(u::PrimedPreviousObservationUpdater{O}, old_b, action, obs::O) where {O} = obs
 
 export
     KMarkovUpdater

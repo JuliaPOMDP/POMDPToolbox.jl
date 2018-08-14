@@ -1,6 +1,6 @@
 using POMDPToolbox
 using POMDPModels
-using Base.Test
+using Test
 
 # using FIB
 
